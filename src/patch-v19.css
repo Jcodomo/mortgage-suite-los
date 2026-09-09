@@ -1,0 +1,5 @@
+/* v19 - compact release theme control and freeform-field affordance. */
+html[data-los-release="19"] input[data-v19-freeform]{font-variant-numeric:tabular-nums}
+#themeBtn svg,#suite-root .topbar button[data-v17-theme] svg{display:block;pointer-events:none}
+#themeBtn:hover,#suite-root .topbar button[data-v17-theme]:hover{transform:translateY(-1px);filter:brightness(1.14)}
+#themeBtn:focus-visible,#suite-root .topbar button[data-v17-theme]:focus-visible{outline:2px solid #60a5fa!important;outline-offset:2px}

@@ -1,0 +1,43 @@
+/* =====================================================================
+   v8 — styling
+   ===================================================================== */
+
+/* --- 1. Advanced subtabs match the main tab row ---------------------
+   They were square-bordered boxes with a different font and radius. Same
+   pill shape, weight, letter-spacing and active treatment as the row
+   above them now, so the two read as one control language.            */
+.advbar{
+  display:flex; gap:5px; flex-wrap:wrap; padding:10px 20px 12px;
+  border-bottom:1px solid var(--line);
+}
+.advbar .advtab{
+  background:var(--panel); border:1px solid var(--line); color:var(--muted);
+  padding:7px 14px; border-radius:999px; cursor:pointer;
+  font-weight:700; font-size:11.5px; letter-spacing:.4px; text-transform:uppercase;
+  box-shadow:var(--shadow-sm); transition:all .12s ease;
+}
+.advbar .advtab:hover{ color:var(--ink); border-color:var(--accent); }
+.advbar .advtab.on{
+  background:linear-gradient(135deg,var(--major-1),var(--major-2));
+  border-color:transparent; color:#fff;
+  box-shadow:0 4px 14px rgba(18,38,63,.25);
+}
+[data-theme="dark"] .advbar .advtab.on{ color:#fff; }
+
+/* --- 2. the extra top-level tabs ----------------------------------- */
+#suite-root .tabs .v8-tab{ /* inherits .tab; nothing extra needed */ }
+#suite-root .tabs .v8-docs{
+  margin-left:10px;
+  border-style:dashed;          /* it leaves the suite, so it reads differently */
+}
+#suite-root .tabs .v8-docs:hover{ border-style:solid; }
+
+/* --- 3. property listing link row ---------------------------------- */
+.v8-listing{
+  display:flex; align-items:flex-end; gap:10px; margin-top:12px;
+  padding-top:12px; border-top:1px dotted var(--line-2, #2a3142);
+}
+.v8-listing .field{ margin:0; }
+
+/* --- 4. the tax panel sitting under the aggregate escrow section ---- */
+#v8TaxHost{ margin-top:14px; }

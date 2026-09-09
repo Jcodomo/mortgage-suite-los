@@ -1,0 +1,24 @@
+/* v20 - final publishing, editability and reference-workbook QA. */
+:root{--v20-focus:#2563eb;--v20-danger:#c2413b}
+.v20-invalid{outline:2px solid var(--v20-danger)!important;outline-offset:1px}.v20-validation{color:var(--v20-danger);font-size:11px;font-weight:700;margin-top:4px}
+.v20-setup,.v20-rent,.v20-escrow,.v20-live-warnings,.v20-amort-actions{margin-bottom:12px}
+.v20-grid{display:grid;grid-template-columns:repeat(4,minmax(145px,1fr));gap:10px}.v20-grid .wide{grid-column:span 2}
+.v20-field label{display:block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}.v20-field input,.v20-field select{width:100%}
+.v20-quick{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.v20-kpis{display:grid;grid-template-columns:repeat(4,minmax(135px,1fr));gap:8px;margin-top:10px}.v20-kpis>button,.v20-kpis>div{border:1px solid var(--line);background:var(--calc-bg);border-radius:10px;padding:10px;text-align:left;color:inherit}.v20-kpis span{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:750}.v20-kpis b{display:block;margin-top:3px;font-size:14px;font-variant-numeric:tabular-nums}
+.v20-live-warnings{display:flex;gap:6px;flex-wrap:wrap}.v20-warning{border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn-ink);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:750;cursor:pointer}
+.v20-trace-edit{border-top:1px solid var(--line);padding-top:12px;margin-top:14px}.v20-trace-edit .v20-grid{grid-template-columns:repeat(2,minmax(160px,1fr))}
+.v20-direct-edit{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:12px;margin:0 0 12px}
+.v20-session{display:inline-flex;gap:5px;align-items:center}.v20-session select{max-width:190px}
+.v20-amort-table{max-height:55vh;overflow:auto}.v20-amort-table table{width:100%;border-collapse:collapse}.v20-amort-table th,.v20-amort-table td{padding:6px;border-bottom:1px solid var(--line);text-align:right}.v20-amort-table th:first-child,.v20-amort-table td:first-child{text-align:left}
+.v20-threshold{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.v20-cost-flag{color:var(--warn-ink);background:var(--warn-bg);font-weight:750}
+.v20-ocr-extra{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.v20-uw-compact .lines>div:nth-child(n+15){display:none}.v20-uw-compact .note{margin-top:8px}
+.v20-stable .card,.v20-stable .v13-modal,.v20-stable .modal-bg{animation:none!important}
+/* Printed pay statement: one low-opacity background watermark, no banner. */
+.v13-paystub{position:relative!important;border:1px solid #64748b!important;overflow:hidden}.v13-paystub:before{content:'DRAFT'!important;position:absolute!important;inset:38% auto auto 18%!important;transform:rotate(-24deg)!important;color:rgba(120,20,20,.075)!important;background:transparent!important;border:0!important;font:900 82px/1 Arial,sans-serif!important;letter-spacing:.12em!important;padding:0!important;margin:0!important;z-index:0!important;pointer-events:none!important}.v13-paystub>*{position:relative;z-index:1}.v13-paystub.voucher{border:0!important}.v13-paystub.voucher .rpt-band{background:#dfe6f5!important;border:0!important;border-bottom:2px solid #111!important}.v13-paystub.voucher table{background:repeating-linear-gradient(to bottom,#fff 0,#fff 20px,#e9edf7 21px)!important}.v13-paystub.voucher th{border-bottom:2px solid #111!important}
+#v13DocsCard .note{display:none!important}
+.v17-compare-scroll{max-width:100%;overflow:auto!important}.v17-comparison{min-width:3100px!important}.v17-comparison th{position:sticky;top:0;z-index:2}
+@media(max-width:850px){.v20-grid,.v20-kpis{grid-template-columns:repeat(2,minmax(130px,1fr))}}
+@media(max-width:520px){.v20-grid,.v20-kpis,.v20-threshold{grid-template-columns:1fr}.v20-grid .wide{grid-column:auto}}
+@media print{.v20-live-warnings,.v20-direct-edit,.v20-session{display:none!important}.v13-paystub:before{display:block!important}}

@@ -1,0 +1,47 @@
+/* =====================================================================
+   v11 — import modal layout
+   ---------------------------------------------------------------------
+   The screenshot showed two stacking faults at once:
+
+   a) .rpt-modal is z-index 300 while #shellbar is 400, so the mode-switch
+      bar painted straight over the dimmed overlay AND over the modal's
+      own title row — a bar sitting on top of a modal that is supposed to
+      be covering the page.
+   b) .rpt-modal-bar is sticky with no z-index, so the panel below it
+      (later in the DOM, carrying a shadow) scrolled over the top of it
+      rather than under.
+
+   Both are fixed for the existing report/extract modals and the new one.
+   ===================================================================== */
+.rpt-modal{ z-index:900 !important; }
+.rpt-modal-bar{
+  z-index:2;
+  justify-content:flex-start !important;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+.rpt-modal-bar .ttl{
+  font-weight:800; font-size:13px; color:#e8eefb;
+  margin-right:auto;                 /* title left, buttons right */
+  white-space:nowrap;
+}
+.rpt-picker{ position:relative; z-index:1; }
+
+/* the wider layout the new modal uses — an LE table needs the room */
+.v11-modal .rpt-modal-bar,
+.v11-modal .rpt-picker{ max-width:1040px; }
+.v11-grow{ flex:1; }
+.v11-ta{
+  min-height:220px; width:100%; text-align:left;
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:11px; line-height:1.5; resize:vertical;
+}
+.v11-modal table.tbl td.num, .v11-modal table.tbl th.num{
+  text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+#suite-root .v11-lebtn{ margin-left:6px; }
+
+/* On a narrow window the bar wraps; keep the title on its own line
+   instead of the buttons crushing it to nothing. */
+@media (max-width:820px){
+  .rpt-modal-bar .ttl{ width:100%; margin-bottom:4px; }
+}

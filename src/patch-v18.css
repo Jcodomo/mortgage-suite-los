@@ -1,0 +1,14 @@
+/* v18 - theme presets control both the shell and editable-field tone. */
+html[data-skin="light"]{--v18-field:#dbe3ec;--v18-field-border:#9aabba;--v18-field-text:#101b2a}
+html[data-skin="dark"]{--v18-field:#e4eaf1;--v18-field-border:#91a2b5;--v18-field-text:#111827}
+html[data-skin="navy"]{--v18-field:#174a78;--v18-field-border:#4c86bb;--v18-field-text:#f5faff}
+html[data-skin="oled"]{--v18-field:#121820;--v18-field-border:#3d5269;--v18-field-text:#f3f7fb}
+html[data-skin] #calc-root input:not([type="checkbox"]):not([type="radio"]),html[data-skin] #calc-root select,html[data-skin] #calc-root textarea,
+html[data-skin] #suite-root input:not([type="checkbox"]):not([type="radio"]),html[data-skin] #suite-root select,html[data-skin] #suite-root textarea,
+html[data-skin] .v13-modal input:not([type="checkbox"]):not([type="radio"]),html[data-skin] .v13-modal select,html[data-skin] .v13-modal textarea{background:var(--v18-field)!important;border-color:var(--v18-field-border)!important;color:var(--v18-field-text)!important}
+html[data-skin="navy"] select option,html[data-skin="oled"] select option{background:#102238;color:#f5faff}
+#themeBtn,#suite-root .topbar button[data-v17-theme]{width:36px!important;min-width:36px!important;height:32px!important;padding:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;color:var(--blue)!important}
+html[data-skin="dark"] #themeBtn,html[data-skin="dark"] #suite-root .topbar button[data-v17-theme],html[data-skin="navy"] #themeBtn,html[data-skin="navy"] #suite-root .topbar button[data-v17-theme],html[data-skin="oled"] #themeBtn,html[data-skin="oled"] #suite-root .topbar button[data-v17-theme]{color:#8fc5ff!important}
+#v17FeeSources>a,#v17FeeSources [onclick*="searchClosingFees"],#v17ClosingFeeSource [onclick*="searchClosingFees"]{display:none!important}
+#v18FeeApply,#v18ClosingApply{white-space:nowrap}
+@media(max-width:850px){#themeBtn,#suite-root .topbar button[data-v17-theme]{width:34px!important;min-width:34px!important}}

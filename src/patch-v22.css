@@ -1,0 +1,26 @@
+/* v22 - scenario control center metric cards and publishable release polish. */
+#v20Setup .v20-kpis{gap:10px;margin-top:14px}
+#v20Setup .v20-kpis>button{
+  position:relative;min-height:82px;padding:13px 13px 12px 48px;overflow:hidden;
+  border:1px solid var(--line)!important;border-radius:12px!important;
+  background:linear-gradient(145deg,var(--panel),var(--calc-bg))!important;
+  color:var(--ink)!important;box-shadow:0 5px 15px rgba(8,20,38,.07);
+  cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+#v20Setup .v20-kpis>button:hover{transform:translateY(-1px);border-color:var(--accent)!important;box-shadow:0 8px 20px rgba(8,20,38,.12)}
+#v20Setup .v20-kpis>button:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 30%,transparent);outline-offset:2px}
+#v20Setup .v20-kpis>button:after{content:'›';position:absolute;right:11px;top:10px;color:var(--muted);font-size:18px;line-height:1}
+#v20Setup .v20-kpis span:not(.v22-metric-icon):not(.v22-metric-note){font-size:9px;letter-spacing:.075em;color:var(--muted);line-height:1.3}
+#v20Setup .v20-kpis b{font-size:16px;line-height:1.3;margin-top:5px;color:var(--ink);white-space:nowrap}
+#v20Setup .v22-metric-icon{position:absolute;left:12px;top:14px;width:27px;height:27px;border-radius:8px;display:grid;place-items:center;background:var(--accent);color:#fff;box-shadow:0 4px 10px rgba(20,82,145,.22)}
+#v20Setup .v22-metric-icon svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#v20Setup .v22-metric-note{display:block!important;margin-top:4px!important;font-size:9px!important;line-height:1.25!important;color:var(--muted)!important;text-transform:none!important;letter-spacing:0!important;font-weight:600!important}
+#v20Setup .v22-metric-note:before{content:'Open details'}
+#v20Setup .v20-kpis>button:nth-child(1) .v22-metric-note:before{content:'HUD-92700 value basis'}
+#v20Setup .v20-kpis>button:nth-child(2) .v22-metric-note:before{content:'Before financed mortgage insurance'}
+#v20Setup .v20-kpis>button:nth-child(3) .v22-metric-note:before{content:'Financed balance at closing'}
+#v20Setup .v20-kpis>button:nth-child(4) .v22-metric-note:before{content:'Payment and balance schedule'}
+[data-los-skin="navy"] #v20Setup .v20-kpis>button,[data-los-skin="oled"] #v20Setup .v20-kpis>button,[data-theme="dark"] #v20Setup .v20-kpis>button{box-shadow:0 7px 18px rgba(0,0,0,.24)}
+@media(max-width:850px){#v20Setup .v20-kpis>button{min-height:78px}}
+@media(max-width:520px){#v20Setup .v20-kpis>button{min-height:74px}}
+

@@ -1,0 +1,233 @@
+/* =====================================================================
+   v9 — OLED skin and the suite Documents/OCR panel
+   ===================================================================== */
+
+/* =====================================================================
+   DARK = NEUTRAL BLACK
+   ---------------------------------------------------------------------
+   The engine's dark theme is blue-tinted throughout (--bg:#0b1220,
+   --surface:#131c2e, a whole --navy-* ramp), which put it within a few
+   degrees of hue of the Navy skin — two of the four themes were reading
+   as the same theme at slightly different brightness.
+
+   This neutralises the greys to a charcoal ramp on BOTH shells, so the
+   four skins separate cleanly:
+
+     Light  paper white
+     Dark   neutral charcoal, no hue          <- this block
+     Navy   blue, mid-brightness
+     OLED   true #000, maximum contrast
+
+   Only the structural greys are touched. The amber input fields, the
+   green pass states, the warn reds and the blue accent are hue-carrying
+   by design and are left exactly as they are — desaturating those would
+   cost the colour-coding the sheet relies on.
+   ===================================================================== */
+html[data-skin="dark"]{
+  --bg:#121212;  --surface:#1A1A1A;  --surface-2:#202020;  --surface-3:#262626;
+  --line:#2E2E2E; --line-2:#3A3A3A;
+  --text:#D0D0D0; --text-strong:#F3F3F3; --text-muted:#8F8F8F;
+  --bar-bg:linear-gradient(135deg,#141414,#1E1E1E); --bar-line:#2E2E2E;
+  --bar-tile:rgba(255,255,255,.07);
+  --thead:#1E1E1E; --thead-text:#F0F0F0;
+  --tag-bg:#242424; --tag-text:#C4C4C4;
+  --total-bg:#1F1F1F; --total-text:#DCDCDC; --total-line:#333333;
+  --accent-soft:#232323; --accent-soft-text:#C8C8C8;
+  --calc-bg:#1C1C1C; --calc-line:#303030; --calc-ink:#D6D6D6;
+  --slate-50:#161616; --slate-100:#1C1C1C; --slate-200:#2A2A2A; --slate-300:#3A3A3A;
+  --slate-400:#7E7E7E; --slate-500:#8C8C8C; --slate-600:#9A9A9A;
+  --navy-900:#0C0C0C; --navy-800:#161616; --navy-700:#2A2A2A;
+  --opt-sel-bg:#242424;
+  /* Enterable cells sit ABOVE the panel, not level with it — see the
+     block below for the reasoning and the measured lift. */
+  --input-bg:#3D3722; --input-line:#82733A; --input-ink:#FFF7E0;
+  --input-focus:#E8C25A; --input-focus-bg:#4A4229;
+}
+html[data-skin="dark"] body{
+  background:linear-gradient(180deg,#161616,#121212 320px) no-repeat #121212;
+}
+/* the suite runs on its own token set — same neutralisation */
+html[data-skin="dark"] #suite-root{
+  --bg:#121212; --bg-2:#171717;
+  --panel:#1A1A1A; --panel-2:#202020;
+  --ink:#F3F3F3; --ink-2:#D0D0D0; --muted:#8F8F8F; --line:#2E2E2E; --line-2:#262626;
+  --calc-bg:#1C1C1C; --calc-line:#303030; --calc-ink:#D6D6D6;
+  --off-bg:#1A1A1A; --off-line:#2A2A2A; --off-ink:#7E7E7E;
+  --brand-1:#0C0C0C; --brand-2:#181818;
+  --major-1:#1A1A1A; --major-2:#242424; --major-ink:#F3F3F3; --major-sub:#9A9A9A;
+  --subhead-bg:#1E1E1E; --subhead-line:#2E2E2E; --subhead-ink:#C4C4C4;
+}
+html[data-skin="dark"] #suite-root{
+  background:linear-gradient(180deg,#171717,#121212 320px) no-repeat #121212;
+}
+/* The rest of the suite's 47 tokens. Without these the semantic states
+   fell through to the engine's blue-tinted dark set, so a Dark file
+   showed charcoal chrome around navy-blue pass/warn/input panels. The
+   hues stay — green still means pass, amber still means input — they are
+   just re-based on the charcoal ramp instead of the blue one, and the
+   shadows lose their blue cast. */
+html[data-skin="dark"] #suite-root{
+  --input-bg:#3D3722; --input-line:#82733A; --input-ink:#FFF7E0; --input-focus:#E8C25A;
+  --pass-bg:#0F2417; --pass-line:#1E5334; --pass-ink:#7FE0A4;
+  --final-bg:#12503A; --final-bg-2:#0D3C2B; --final-ink:#EAFFF4; --final-sub:#8DDCB4;
+  --warn-bg:#2C1315; --warn-line:#63262A; --warn-ink:#FFB1B1;
+  --amber-bg:#2A2009; --amber-line:#5C4614; --amber-ink:#F3C877;
+  --accent:#5B8CFF; --accent-2:#82A9FF; --accent-ink:#04122B;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.55);
+  --shadow:0 1px 3px rgba(0,0,0,.6), 0 10px 26px rgba(0,0,0,.45);
+  --shadow-lg:0 16px 48px rgba(0,0,0,.7);
+}
+/* Navy defined 44 of the 47 and inherited three shadows from the
+   engine's dark block. Stated explicitly so no skin depends on
+   inheriting from another skin's palette. */
+html[data-skin="navy"] #suite-root{
+  --shadow-sm:0 1px 2px rgba(3,12,26,.5);
+  --shadow:0 1px 3px rgba(3,12,26,.55), 0 10px 26px rgba(3,12,26,.4);
+  --shadow-lg:0 16px 48px rgba(3,12,26,.65);
+}
+
+/* --- 1. OLED --------------------------------------------------------
+   True #000, not a near-black grey: an OLED panel spends no power on a
+   black pixel, and #0b0b0b throws that away for no visual gain. Text is
+   stepped down from pure white because full-white on true black smears
+   on OLED at small sizes.                                             */
+html[data-skin="oled"]{
+  --bg:#000000;
+  --surface:#0A0A0A;  --surface-2:#101010; --surface-3:#161616;
+  --panel:#0A0A0A;    --panel-2:#131313;
+  --line:#242424;     --line-2:#303030;
+  --text:#C8C8C8;     --text-strong:#F0F0F0; --text-muted:#7C7C7C;
+  --ink:#F0F0F0;      --ink-2:#C8C8C8;      --muted:#7C7C7C;
+  --accent:#5B8CFF;   --accent-soft:rgba(91,140,255,.14);
+  --major-1:#141414;  --major-2:#000000;
+  --final-1:#101010;  --final-2:#000000;
+  --shadow-sm:none;   --shadow-lg:0 10px 30px rgba(0,0,0,.9);
+}
+html[data-skin="oled"] body,
+html[data-skin="oled"] #suite-root{
+  background:#000000 !important;
+  color:var(--text);
+}
+
+/* The Loan Suite runs on its own #suite-root variable set — ~30 tokens
+   the engine defines for light and dark and patch.css redefines for
+   navy. Without this block, OLED gave the suite the engine's dark-grey
+   surfaces under a black page: cards floating in #131c2e on #000, which
+   is neither theme. Every token the navy block covers is covered here,
+   on true black, so the four skins are complete on BOTH shells. */
+html[data-skin="oled"] #suite-root{
+  --bg:#000000; --bg-2:#050505;
+  --panel:#0A0A0A; --panel-2:#111111;
+  --ink:#F0F0F0; --ink-2:#C8C8C8; --muted:#7C7C7C; --line:#242424; --line-2:#1B1B1B;
+  --input-bg:#141204; --input-line:#3E3814; --input-ink:#F6ECD0; --input-focus:#D9B143;
+  --calc-bg:#06121F; --calc-line:#173049; --calc-ink:#A8D1F5;
+  --pass-bg:#03160C; --pass-line:#164A2C; --pass-ink:#7FE0A4;
+  --final-bg:#04331F; --final-bg-2:#022415; --final-ink:#EAFFF4; --final-sub:#8DDCB4;
+  --warn-bg:#1C0507; --warn-line:#571A1D; --warn-ink:#FFB1B1;
+  --amber-bg:#181103; --amber-line:#4E3A0F; --amber-ink:#F3C877;
+  --off-bg:#0C0C0C; --off-line:#1E1E1E; --off-ink:#6E6E6E;
+  --accent:#5B8CFF; --accent-2:#82A9FF; --accent-ink:#020B1E;
+  --brand-1:#000000; --brand-2:#0A0A0A;
+  --major-1:#0A0A0A; --major-2:#141414; --major-ink:#F0F0F0; --major-sub:#8F8F8F;
+  --subhead-bg:#0E0E0E; --subhead-line:#1F1F1F; --subhead-ink:#B9B9B9;
+  --shadow-sm:none;
+  --shadow:0 0 0 1px #1B1B1B;
+  --shadow-lg:0 0 0 1px #242424, 0 18px 50px rgba(0,0,0,.9);
+}
+html[data-skin="oled"] .appbar,
+html[data-skin="oled"] .toolbar,
+html[data-skin="oled"] #shellbar{ background:#000000; }
+html[data-skin="oled"] .card,
+html[data-skin="oled"] #suite-root .card{ box-shadow:none; }
+html[data-skin="oled"] #suite-root .tab.active,
+html[data-skin="oled"] .advbar .advtab.on{
+  background:#1E1E1E; border-color:#3A3A3A; color:#F0F0F0; box-shadow:none;
+}
+
+/* --- 2. documents / OCR panel -------------------------------------- */
+.v9-dz{
+  border:2px dashed var(--line-2, #2a3142);
+  border-radius:14px; background:var(--surface-2, rgba(125,135,165,.05));
+  padding:26px 16px; text-align:center; cursor:pointer;
+  transition:border-color .12s, background .12s;
+}
+.v9-dz:hover, .v9-dz.drag{
+  border-color:var(--accent, #4C56D6);
+  background:var(--accent-soft, rgba(76,86,214,.07));
+}
+.v9-row{ display:flex; gap:9px; flex-wrap:wrap; margin-top:12px; }
+.v9-lbl{
+  display:block; font-size:10px; text-transform:uppercase; letter-spacing:.06em;
+  font-weight:700; color:var(--muted, #8a93a8); margin:12px 0 4px;
+}
+.v9-ta{
+  width:100%; font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:11px; line-height:1.5; resize:vertical; text-align:left;
+}
+#v9DocBody table.tbl td.num, #v9DocBody table.tbl th.num{
+  text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+#v9DocBody table.tbl select.cell-input{ min-width:170px; }
+
+/* the shellbar theme button — matches the toolbar one */
+.v9-shelltheme{
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; padding:0;
+  border-radius:8px; border:1px solid rgba(255,255,255,.16);
+  background:transparent; color:#dbe6f7; cursor:pointer;
+}
+.v9-shelltheme:hover{ background:rgba(255,255,255,.10); }
+
+/* =====================================================================
+   ENTERABLE CELLS READ AS LIGHTER THAN THE SURFACE THEY SIT ON
+   ---------------------------------------------------------------------
+   The whole sheet leans on the spreadsheet convention that a tinted cell
+   is one you type into and a flat one is calculated — the legend at the
+   bottom of the suite says exactly that. That only works if the input
+   tint is visibly lighter than its panel.
+
+   Measured lift (perceptual luminance of the input surface minus the
+   panel it sits on) before this block:
+
+     dark  suite   +4.8    effectively invisible
+     dark  calc   +12.5    faint
+     navy  both   +13.6    faint
+
+   Raised to roughly +28 on all four, which is the point where the field
+   reads as a distinct surface at a glance without glowing.
+
+   Checked rather than eyeballed. Typed text on the new surfaces is
+   11.1:1 (dark) and 9.3:1 (navy) — comfortably AAA. The borders were
+   then raised to clear the 3:1 WCAG floor for non-text boundaries
+   against their panel (dark 2.83 -> 3.70, navy 3.19 -> 3.6), because
+   the fill alone is a low-contrast cue and the border is what carries
+   the field edge on a busy screen.
+
+   Two skins are deliberately left alone:
+
+   - LIGHT. Its input is a warm cream on a white panel — darker than the
+     panel, not lighter. That is correct here: on white there is nowhere
+     lighter to go, so the convention inverts and the tint carries the
+     signal. Lifting it toward white would erase the distinction.
+   - OLED, as asked. Its whole point is minimum emission on black, and a
+     lifted input surface would be the brightest thing on the screen.
+   ===================================================================== */
+html[data-skin="navy"]{
+  --input-bg:#17497A; --input-line:#4A87BC; --input-ink:#FFFFFF;
+  --input-focus:#9BD4FF; --input-focus-bg:#1D5891;
+}
+html[data-skin="navy"] #suite-root{
+  --input-bg:#17497A; --input-line:#4A87BC; --input-ink:#FFFFFF; --input-focus:#9BD4FF;
+}
+
+/* the Loan Suite toolbar's theme button — matches the ghost buttons it
+   sits beside (New / Reset / Save scenario) rather than inventing a
+   third look for the same control */
+#suite-root .v9-suitetheme{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:30px; height:30px; padding:0; margin-left:6px; flex:none;
+  border:1px solid rgba(255,255,255,.28); border-radius:8px;
+  background:transparent; color:#dceaf9; cursor:pointer;
+}
+#suite-root .v9-suitetheme:hover{ background:rgba(255,255,255,.12); }
+#suite-root .v9-suitetheme svg{ width:16px; height:16px; }

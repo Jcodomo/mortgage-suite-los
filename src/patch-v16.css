@@ -1,0 +1,50 @@
+/* v16 - darker editable fields, document-only export, and compact statements. */
+:root{--v16-input:#e2e8f0;--v16-input-border:#a9b7c8}
+html[data-los-skin="dark"],html[data-skin="dark"]{--v16-input:#202b3a;--v16-input-border:#46566d}
+html[data-los-skin="navy"],html[data-skin="navy"]{--v16-input:#17253b;--v16-input-border:#405675}
+html[data-los-skin="oled"],html[data-skin="oled"]{--v16-input:#111827;--v16-input-border:#37455b}
+#calc-root input:not([type="checkbox"]):not([type="radio"]),#calc-root select,#calc-root textarea,
+#suite-root input:not([type="checkbox"]):not([type="radio"]),#suite-root select,#suite-root textarea,
+.v13-modal input:not([type="checkbox"]):not([type="radio"]),.v13-modal select,.v13-modal textarea{
+  background:var(--v16-input)!important;border-color:var(--v16-input-border)!important;
+}
+html[data-los-skin="light"] #calc-root input:not([type="checkbox"]):not([type="radio"]),html[data-skin="light"] #calc-root input:not([type="checkbox"]):not([type="radio"]),
+html[data-los-skin="light"] #calc-root select,html[data-los-skin="light"] #calc-root textarea,
+html[data-los-skin="light"] #suite-root input:not([type="checkbox"]):not([type="radio"]),html[data-skin="light"] #suite-root input:not([type="checkbox"]):not([type="radio"]),
+html[data-los-skin="light"] #suite-root select,html[data-los-skin="light"] #suite-root textarea,
+html[data-los-skin="light"] .v13-modal input:not([type="checkbox"]):not([type="radio"]),
+html[data-los-skin="light"] .v13-modal select,html[data-los-skin="light"] .v13-modal textarea{
+  color:#132238!important;background:#e2e8f0!important;
+}
+html[data-theme="dark"] #calc-root input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] #calc-root select,html[data-theme="dark"] #calc-root textarea,
+html[data-theme="dark"] #suite-root input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] #suite-root select,html[data-theme="dark"] #suite-root textarea,
+html[data-theme="dark"] .v13-modal input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] .v13-modal select,html[data-theme="dark"] .v13-modal textarea{color:#f2f6fb!important}
+
+.v16-head-actions{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
+.v16-loan-docs{margin-bottom:14px}.v16-loan-docs .card-body{padding-top:12px}
+.v16-loan-docs-grid{display:grid;grid-template-columns:repeat(4,minmax(135px,1fr));gap:8px}
+.v16-fee-pull{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;margin:0 0 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.v16-gross-rent{margin:12px 0 7px!important;background:#143c5d!important;color:#fff!important;border-color:#255b87!important}
+#v15Fannie{display:none!important}#v15Fannie.v16-show{display:block!important}
+.v16-nav-warning{cursor:pointer!important;outline:1px solid transparent}.v16-nav-warning:hover{outline-color:#dc2626;transform:translateY(-1px)}
+
+.v16-lease-sheet{font:13px/1.42 Arial,Helvetica,sans-serif!important;color:#111!important;background:#fff!important;padding:38px 44px!important;max-width:8.5in;min-height:10.2in;margin:0 auto}
+.v16-lease-sheet h1{text-align:center;font:800 25px/1.15 Arial,sans-serif!important;letter-spacing:.01em;margin:0 0 30px!important}
+.v16-lease-sheet .lease-section{margin:0 0 17px}.v16-lease-sheet .lease-section p{margin:7px 0!important}
+.v16-lease-sheet .secnum{font-weight:800;margin-right:7px}.v16-lease-sheet .line{display:inline-block;min-width:135px;min-height:18px;padding:0 4px;border-bottom:1px solid #111;vertical-align:bottom}
+.v16-lease-sheet .line.long{min-width:360px}.v16-lease-sheet .line.med{min-width:230px}.v16-lease-sheet .box{display:inline-flex;width:13px;height:13px;border:1.5px solid #111;align-items:center;justify-content:center;margin:0 4px 0 7px;font-size:11px;font-weight:bold;vertical-align:-1px}
+.v16-lease-sheet .sigrow{display:grid;grid-template-columns:155px 1fr 45px 125px;align-items:end;gap:4px;margin:13px 0}.v16-lease-sheet .sigline{height:23px;border-bottom:1px solid #111}
+.v16-lease-sheet .page-foot{display:flex;justify-content:space-between;margin-top:60px;font-size:11px;color:#333}
+.v16-analysis-only{margin-top:14px}
+
+.v13-paystub:before{content:'TRAINING DRAFT - NOT FOR SUBMISSION'!important;font:800 9px/1.1 Arial,sans-serif!important;letter-spacing:.045em!important;padding:4px 7px!important;margin:0 0 6px!important;border-bottom:1px solid #b91c1c!important}
+.v13-paystub.voucher{border:1px solid #4b5563!important;font-family:Arial,sans-serif!important;box-shadow:none!important}
+.v13-paystub.voucher .rpt-band{background:#f1f5f9!important;color:#111!important;border:1px solid #64748b!important}
+.v13-paystub.voucher table{border-collapse:collapse!important}.v13-paystub.voucher th,.v13-paystub.voucher td{border-bottom:1px dotted #94a3b8!important;padding:4px 6px!important}
+
+.v16-pdf-stage{position:fixed;left:-12000px;top:0;width:816px;background:#fff;z-index:999999;pointer-events:none}.v16-pdf-stage .v14-doc,.v16-pdf-stage .v16-lease-sheet{width:816px;max-width:816px;margin:0!important;box-sizing:border-box}
+@media(max-width:900px){.v16-loan-docs-grid{grid-template-columns:repeat(2,minmax(135px,1fr))}.v16-lease-sheet{padding:25px!important}.v16-lease-sheet .line.long{min-width:240px}}
+@media print{.v16-head-actions,.v16-loan-docs,.v16-fee-pull,.v16-analysis-only{display:none!important}.v16-lease-sheet{padding:8mm 11mm!important;min-height:auto!important}.v13-paystub:before{font-size:8px!important;padding:3px!important}}

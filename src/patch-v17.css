@@ -1,0 +1,19 @@
+/* v17 - one theme control, complete comparison canvas, and source-aware fees. */
+#v5ThemeBtn,#v9ShellTheme,#v9SuiteTheme,#v15ThemeMenu{display:none!important}
+#themeBtn,#suite-root .topbar button[data-v17-theme]{width:auto!important;min-width:104px!important;height:32px!important;border-radius:7px!important;padding:0 10px!important;font-size:10px!important;font-weight:800!important;white-space:nowrap!important}
+
+.v17-source-card,.v17-freeform,.v17-escrow-card{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:11px 13px;margin:0 0 12px}
+.v17-source-card,.v17-freeform{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.v17-source-card>div,.v17-freeform>div{flex:1;min-width:260px}.v17-source-card b,.v17-freeform b,.v17-escrow-head b{display:block;font-size:12px}.v17-source-card span,.v17-freeform span,.v17-escrow-head span{display:block;color:var(--text-muted);font-size:10px;margin-top:2px}.v17-source-card a{font-size:10px;font-weight:700;color:var(--blue)}
+#v14FeesBody input[readonly]{opacity:.88;cursor:not-allowed;font-weight:800}
+
+.v17-modal-full .v13-sheet{width:calc(100vw - 22px)!important;max-width:none!important;height:calc(100vh - 22px)!important;max-height:none!important;margin:11px!important;display:flex!important;flex-direction:column!important}
+.v17-modal-full .v13-body{min-height:0!important;max-height:none!important;overflow:hidden!important;display:flex!important;flex:1!important;flex-direction:column!important}
+.v17-modal-full #v14CompareBody{min-height:0;display:flex;flex:1;flex-direction:column}
+.v17-compare-scroll{overflow:auto;min-height:260px;flex:1;border:1px solid var(--line);border-radius:8px;overscroll-behavior:contain}
+.v17-comparison{min-width:3220px;margin:0!important}.v17-comparison th{position:sticky;top:0;z-index:3;background:var(--surface-2)!important;white-space:nowrap}.v17-comparison td{vertical-align:top}.v17-comparison th:first-child,.v17-comparison td:first-child{position:sticky;left:0;z-index:2;background:var(--surface)!important}.v17-comparison th:first-child{z-index:5;background:var(--surface-2)!important}
+.v17-comparison input,.v17-comparison select{min-width:105px!important}.v17-comparison .short{min-width:72px!important;width:72px!important}.v17-comparison .wide{min-width:180px!important}.v17-comparison .address{min-width:250px!important}.v17-comparison .zip{min-width:78px!important;width:78px!important}.v17-comparison .state{min-width:130px!important}.v17-comparison .county{min-width:130px!important}.v17-comparison .occupancy{min-width:145px!important}.v17-comparison .money{min-width:110px!important}.v17-comparison .program{min-width:120px!important}
+
+.v17-escrow-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.v17-escrow-head>div{flex:1;min-width:240px}.v17-mini-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:7px;margin-top:9px}.v17-mini-grid>div{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 9px}.v17-mini-grid span{display:block;color:var(--text-muted);font-size:9px;text-transform:uppercase}.v17-mini-grid b{font-size:11px}
+
+@media(max-width:850px){.v17-mini-grid{grid-template-columns:repeat(2,1fr)}#themeBtn,#suite-root .topbar button[data-v17-theme]{min-width:86px!important;padding:0 7px!important}.v17-modal-full .v13-sheet{width:100vw!important;height:100vh!important;margin:0!important}}
+@media print{.v17-source-card,.v17-freeform,.v17-escrow-card{display:none!important}}

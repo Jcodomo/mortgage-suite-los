@@ -1,0 +1,40 @@
+/* =====================================================================
+   v10 — agency strip and property estimate button
+   ===================================================================== */
+.v10-agstrip{
+  margin:0 0 14px; padding:11px 14px;
+  border:1px solid var(--line-2, #2a3142); border-radius:12px;
+  background:var(--surface-2, rgba(125,135,165,.05));
+}
+.v10-ag-head{
+  font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--muted, #8a93a8); margin-bottom:8px;
+}
+.v10-ag-row{ display:flex; gap:9px; flex-wrap:wrap; }
+.v10-ag{
+  flex:1 1 150px; min-width:140px; padding:8px 10px; border-radius:9px;
+  border:1px solid var(--line-2, #2a3142);
+}
+.v10-ag.best{
+  border-color:var(--emerald, #1f9d55);
+  background:rgba(31,157,85,.07);
+}
+.v10-ag.cur{ outline:2px solid var(--accent, #4C56D6); outline-offset:-1px; }
+.v10-ag .nm{ font-size:11px; font-weight:800; }
+.v10-ag .inc{
+  font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; margin-top:2px;
+}
+.v10-ag .dti{ font-size:10.5px; color:var(--muted, #8a93a8); margin:1px 0 6px; }
+.v10-ag-why{
+  font-size:10.5px; line-height:1.5; color:var(--muted, #8a93a8);
+  margin-top:8px; padding-top:7px; border-top:1px dotted var(--line-2, #2a3142);
+}
+#v10ZipEst{ margin-left:8px; }
+.v10-stip-toggle{ display:inline-flex; gap:0; margin-left:10px; }
+.v10-stip-toggle button{
+  font-size:10px; font-weight:700; padding:3px 9px; cursor:pointer;
+  border:1px solid var(--line-2, #2a3142); background:transparent; color:var(--muted, #8a93a8);
+}
+.v10-stip-toggle button:first-child{ border-radius:6px 0 0 6px; }
+.v10-stip-toggle button:last-child{ border-radius:0 6px 6px 0; border-left:none; }
+.v10-stip-toggle button.on{ background:var(--accent, #4C56D6); border-color:var(--accent, #4C56D6); color:#fff; }
