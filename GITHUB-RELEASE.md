@@ -1,4 +1,4 @@
-# Mortgage Suite LOS v22
+# Mortgage Suite LOS v23
 
 A self-contained mortgage income, renovation, property, qualification, closing-cost, scenario, OCR, and document-workbench application.
 
@@ -17,7 +17,7 @@ npm run build
 
 ## Release verification
 
-- All repository test files pass through `npm test`, including the release 22 income and loan scenario matrix.
+- All repository test files pass through `npm test`, including the release 22 calculation matrix and the release 23 UI/performance checks.
 - GitHub Actions rebuilds the HTML and confirms the release artifact is non-empty.
 - The distributed HTML contains all styles, application code, calculators, and printable templates in one file.
 
