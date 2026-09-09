@@ -8,6 +8,9 @@ const income=fs.readFileSync(path.join(root,'income-calculator.html'),'utf8');
 const checks=[
   ['four scenario metric icons',/var ICONS=\[[\s\S]*?<svg[\s\S]*?<svg[\s\S]*?<svg[\s\S]*?<svg/.test(js)],
   ['stable render protects active fields',/editing\|\|next===last/.test(js)],
+  ['shell controller is exposed for direct links',/window\.SHELL=SHELL/.test(js)],
+  ['direct route selects requested workspace',/target=app==='income'\?'calc':'suite'/.test(js)&&/shell\.go\(target\)/.test(js)],
+  ['direct route is guarded after initial navigation',/if\(V\.routeApplied\)return true/.test(js)&&/V\.routeApplied=true/.test(js)],
   ['release stamp',/losRelease='22'/.test(js)],
   ['metric cards use theme tokens',/var\(--panel\)/.test(css)&&/var\(--calc-bg\)/.test(css)&&/var\(--accent\)/.test(css)],
   ['metric cards remain responsive',/@media\(max-width:520px\)/.test(css)],
@@ -18,4 +21,3 @@ const checks=[
   ['income entry routes to calculator',/app=income/.test(income)]
 ];
 let failed=0;for(const [name,ok] of checks){console.log((ok?'PASS  ':'FAIL  ')+name);if(!ok)failed++;}assert.equal(failed,0);console.log(`\nv22 UI: ${checks.length} passed, 0 failed`);
-
