@@ -1,0 +1,9 @@
+# verification artefacts
+build/shots/
+build/__pycache__/
+*.pyc
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/

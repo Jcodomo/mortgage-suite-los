@@ -1,0 +1,14 @@
+{
+  "name": "mortgage-suite-los",
+  "version": "22.0.0",
+  "private": true,
+  "description": "Self-contained mortgage income and renovation scenario suite",
+  "scripts": {
+    "build": "python3 build/inject.py src/mortgage-suite-allinone.html dist/mortgage-suite-los.html",
+    "test": "node test/run-all.js",
+    "verify": "npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
