@@ -16,8 +16,8 @@ var CALC_GROUPS=[
   {key:'qualification',label:'Qualification',icon:'check',tabs:['dti','aus','summary']},
   {key:'documents',label:'Documents',icon:'file',tabs:['docs']}
 ];
-var THEMES=['light','dark','navy','oled'],THEME_LABEL={light:'Daylight',dark:'Slate night',navy:'Deep navy',oled:'Midnight black'};
-var INPUTS=['cloud','paper','blue','graphite'],INPUT_LABEL={cloud:'Soft cloud fields',paper:'Paper fields',blue:'Blue fields',graphite:'Graphite fields'};
+var THEMES=['ledger','slate','bank','graphite','terminal','federal','clay','violet','evergreen','steel'],THEME_LABEL={ledger:'Navy ledger',slate:'Slate and teal',bank:'Bank paper',graphite:'Graphite mono',terminal:'Midnight terminal',federal:'Federal blue',clay:'Clay and sand',violet:'Violet fintech',evergreen:'Evergreen ledger',steel:'Steel and amber'};
+var INPUTS=['paper','mist','mint','sand','ink'],INPUT_LABEL={paper:'Paper fields',mist:'Mist fields',mint:'Mint fields',sand:'Sand fields',ink:'Ink fields'};
 function norm(s){return String(s||'').trim().replace(/\s+/g,' ').toUpperCase();}
 function safeGet(key,fallback){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
 function safeSet(key,value){try{localStorage.setItem(key,value);}catch(e){}}
@@ -92,14 +92,14 @@ function installCalcActions(){
 }
 function appearanceArt(kind){return kind==='theme'?'<span class="v23-palette-art" aria-hidden="true"><i></i><i></i><i></i></span>':'<span class="v23-input-art" aria-hidden="true"><i></i></span>';}
 function paintAppearance(){
-  var theme=window.LOS&&LOS.skin?LOS.skin():(document.documentElement.dataset.losSkin||'navy');if(THEMES.indexOf(theme)<0)theme='navy';
-  var tone=document.documentElement.dataset.inputTone||safeGet('los.v23.inputTone','blue');if(INPUTS.indexOf(tone)<0)tone='blue';document.documentElement.dataset.inputTone=tone;
+  var theme=document.documentElement.dataset.v24Theme||safeGet('los.v24.theme','terminal');if(THEMES.indexOf(theme)<0)theme='terminal';
+  var tone=document.documentElement.dataset.inputTone||safeGet('los.v24.inputTone','ink');if(INPUTS.indexOf(tone)<0)tone='ink';document.documentElement.dataset.inputTone=tone;
   var tb=$('v23ThemeButton'),ib=$('v23InputButton');
   if(tb){var next=THEMES[(THEMES.indexOf(theme)+1)%THEMES.length];tb.dataset.value=theme;tb.title='Color theme: '+THEME_LABEL[theme]+'. Next: '+THEME_LABEL[next];tb.setAttribute('aria-label',tb.title);}
   if(ib){var nextTone=INPUTS[(INPUTS.indexOf(tone)+1)%INPUTS.length];ib.dataset.value=tone;ib.title='Input color: '+INPUT_LABEL[tone]+'. Next: '+INPUT_LABEL[nextTone];ib.setAttribute('aria-label',ib.title);}
 }
-V.cycleTheme=function(){var cur=window.LOS&&LOS.skin?LOS.skin():'navy',idx=THEMES.indexOf(cur),next=THEMES[(idx<0?0:idx+1)%THEMES.length];if(window.LOS&&LOS.setSkin)LOS.setSkin(next);else document.documentElement.dataset.losSkin=next;if(window.mortgageSuite&&mortgageSuite.store){mortgageSuite.store.snapshot.theme=next;mortgageSuite.store.emit();}paintAppearance();};
-V.cycleInput=function(){var cur=document.documentElement.dataset.inputTone||'blue',idx=INPUTS.indexOf(cur),next=INPUTS[(idx<0?0:idx+1)%INPUTS.length];document.documentElement.dataset.inputTone=next;safeSet('los.v23.inputTone',next);paintAppearance();};
+V.cycleTheme=function(){if(window.V24&&V24.cycleTheme)return V24.cycleTheme();var cur=document.documentElement.dataset.v24Theme||'terminal',idx=THEMES.indexOf(cur),next=THEMES[(idx<0?0:idx+1)%THEMES.length];document.documentElement.dataset.v24Theme=next;safeSet('los.v24.theme',next);paintAppearance();};
+V.cycleInput=function(){if(window.V24&&V24.cycleInput)return V24.cycleInput();var cur=document.documentElement.dataset.inputTone||'ink',idx=INPUTS.indexOf(cur),next=INPUTS[(idx<0?0:idx+1)%INPUTS.length];document.documentElement.dataset.inputTone=next;safeSet('los.v24.inputTone',next);paintAppearance();};
 function installAppearance(){
   var shell=$('shellbar');if(!shell)return false;
   var hand=shell.querySelector('.hand');if(!hand)return false;
