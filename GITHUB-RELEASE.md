@@ -1,10 +1,10 @@
-# Mortgage Suite LOS v23
+# Mortgage Suite LOS v36
 
 A self-contained mortgage income, renovation, property, qualification, closing-cost, scenario, OCR, and document-workbench application.
 
 ## Run
 
-Open `index.html` for the landing page, `loan-suite.html` to start directly in Mortgage Suite Setup, or `income-calculator.html` to start directly in the Income Calculator. No server or installation is required for the application.
+Open `index.html` for the landing page, `loan-suite.html` to start directly in Mortgage Suite Quote, or `income-calculator.html` to start directly in the Income Calculator. No server or installation is required for the application.
 
 ## Develop
 
@@ -17,7 +17,7 @@ npm run build
 
 ## Release verification
 
-- All repository test files pass through `npm test`, including the release 22 calculation matrix and the release 23 UI/performance checks.
+- All 26 repository test files pass through `npm test`, including calculation, freeform date/number, navigation, print, and Release 36 UI checks.
 - GitHub Actions rebuilds the HTML and confirms the release artifact is non-empty.
 - The distributed HTML contains all styles, application code, calculators, and printable templates in one file.
 

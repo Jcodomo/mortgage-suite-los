@@ -1,0 +1,116 @@
+/* =====================================================================
+   v36 — compact, centered working canvas and reviewed asset intake
+   ===================================================================== */
+:root{--v36-measure:1320px}
+
+/* Shared visual rhythm: the Loan Suite now follows the Income Calculator's
+   restrained app-shell language instead of looking like a nested dashboard. */
+#suite-root{font-family:Manrope,Inter,Segoe UI,sans-serif!important;letter-spacing:-.005em}
+#suite-root .cols-main{padding-top:14px!important}
+#suite-root #screen-body{display:grid;gap:12px}
+#suite-root .card{border:1px solid color-mix(in srgb,var(--v24-border,#d4dfeb) 88%,transparent)!important;border-radius:12px!important;background:var(--v24-card,#fff)!important;box-shadow:0 3px 12px rgba(18,45,78,.045)!important;overflow:hidden}
+#suite-root .card>h3{min-height:41px!important;padding:10px 13px!important;border-bottom:1px solid color-mix(in srgb,var(--v24-border,#d4dfeb) 76%,transparent)!important;background:color-mix(in srgb,var(--v24-card,#fff) 94%,var(--v24-page,#eef3f8))!important;font-size:11.5px!important;letter-spacing:.01em!important}
+#suite-root .card>.body{padding:12px 13px!important}
+#suite-root .sec-head{margin:10px 0 5px!important;padding:0!important;border:0!important;color:var(--v24-muted,#67809c)!important;font-size:8.5px!important;font-weight:850!important;letter-spacing:.09em!important;text-transform:uppercase!important}
+#suite-root .row{gap:5px!important}
+#suite-root .row>label,#suite-root .checkrow>label{color:var(--v24-muted,#657b95)!important;font-size:9px!important;font-weight:650!important}
+#suite-root input:not([type="checkbox"]),#suite-root select,#suite-root textarea{border-radius:8px!important;box-shadow:none!important}
+#suite-root input:not([type="checkbox"]):focus,#suite-root select:focus,#suite-root textarea:focus{border-color:var(--v24-accent,#2D7DD2)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--v24-accent,#2D7DD2) 15%,transparent)!important;outline:none!important}
+#suite-root .out{min-height:33px!important;padding:7px 9px!important;border-radius:7px!important}
+#suite-root .out.jump{transition:background-color .14s ease,border-color .14s ease!important}
+#suite-root .out.jump:hover{transform:none!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 8%,var(--v24-card,#fff))!important}
+#suite-root .btn,#suite-root button{font-family:inherit}
+#suite-root .btn.small,#suite-root .inline>.btn{min-height:31px!important;border-radius:8px!important;padding-inline:11px!important;font-size:9px!important;font-weight:750!important}
+
+/* Income and Loan Suite use the same centered body measure. Chrome is
+   full-bleed, like the Income Calculator, while page content stays readable. */
+#calc-root main .wrap,#suite-root .app,#suite-root .cols-main{width:min(100%,var(--v36-measure))!important;max-width:var(--v36-measure)!important;margin-inline:auto!important}
+#suite-root .topbar,#suite-root .v34-bar,#suite-root .chrome,#suite-root .v23-primary-nav,#suite-root .v23-context-tabs,#suite-root .v36-suite-footer{width:100vw!important;max-width:none!important;margin-left:calc(50% - 50vw)!important;margin-right:calc(50% - 50vw)!important}
+#suite-root .topbar{padding-left:max(16px,calc((100vw - var(--v36-measure))/2))!important;padding-right:max(16px,calc((100vw - var(--v36-measure))/2))!important}
+#suite-root .v34-bar,#suite-root .v23-primary-nav,#suite-root .v23-context-tabs{padding-left:max(16px,calc((100vw - var(--v36-measure))/2))!important;padding-right:max(16px,calc((100vw - var(--v36-measure))/2))!important}
+#suite-root .v25-topbar{border-radius:0!important;box-shadow:none!important}
+#suite-root .v25-header-main{min-height:58px!important;padding-block:8px!important}
+#suite-root .v25-brand{gap:9px!important}
+#suite-root .v25-brand h1{font-size:13px!important;letter-spacing:-.02em!important}
+#suite-root .v24-scenario-combo{border-radius:9px!important;background:color-mix(in srgb,var(--v24-page,#07111e) 70%,var(--v24-card,#111d2d))!important;box-shadow:none!important}
+#suite-root .v34-bar{min-height:48px!important;border-bottom-color:color-mix(in srgb,var(--v24-border,#2b405c) 82%,transparent)!important;box-shadow:none!important}
+#suite-root .v23-primary-nav{min-height:54px!important;gap:6px!important;background:color-mix(in srgb,var(--v24-header,#0b1422) 95%,#000)!important}
+#suite-root .v23-primary-nav>button{min-width:92px!important;min-height:39px!important;padding:5px 12px!important;border:1px solid transparent!important;border-radius:9px!important;background:transparent!important;color:var(--v24-muted,#9db2cd)!important;font-size:10px!important;font-weight:750!important;box-shadow:none!important;transition:background-color .14s ease,border-color .14s ease,color .14s ease!important}
+#suite-root .v23-primary-nav>button:hover{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 38%,transparent)!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 7%,transparent)!important;color:var(--v24-text,#eef5ff)!important}
+#suite-root .v23-primary-nav>button.active{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 62%,transparent)!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 16%,transparent)!important;color:var(--v24-accent,#72d8b7)!important}
+#suite-root .v23-context-tabs{min-height:46px!important;gap:5px!important;background:color-mix(in srgb,var(--v24-header,#0b1422) 91%,var(--v24-card,#111d2d))!important}
+#suite-root .v23-context-tabs .tab{min-height:31px!important;padding:0 12px!important;border:1px solid transparent!important;border-radius:8px!important;background:transparent!important;color:var(--v24-muted,#9db2cd)!important;font-size:9px!important;font-weight:800!important;box-shadow:none!important}
+#suite-root .v23-context-tabs .tab.active{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 52%,transparent)!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 13%,transparent)!important;color:var(--v24-accent,#72d8b7)!important}
+
+/* Modern paired actions — Live is primary context, Actions is the menu. */
+#suite-root .v36-live-button,#suite-root .v35-btn{height:34px!important;display:inline-flex!important;align-items:center!important;gap:7px!important;padding:0 13px!important;border-radius:9px!important;font:750 11px/1 inherit!important;letter-spacing:.01em!important;box-shadow:none!important;transform:none!important}
+#suite-root .v36-live-button{border:1px solid color-mix(in srgb,var(--v24-accent,#2D7DD2) 62%,var(--v24-border,#2b405c));background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 15%,var(--v24-card,#111d2d));color:var(--v24-text,#e8f0fa);cursor:pointer}
+#suite-root .v36-live-button:hover{background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 27%,var(--v24-card,#111d2d));border-color:var(--v24-accent,#2D7DD2)}
+.v36-pulse-icon{display:flex;align-items:end;gap:2px;width:13px;height:13px}.v36-pulse-icon i{display:block;width:2px;border-radius:2px;background:var(--v24-accent,#72d8b7)}.v36-pulse-icon i:nth-child(1){height:5px}.v36-pulse-icon i:nth-child(2){height:11px}.v36-pulse-icon i:nth-child(3){height:8px}
+
+/* Old detail groups are removed from the visible Live Summary. */
+#suite-root .rail [data-v36-rail-hidden="1"]{display:none!important}
+#suite-root .rail [data-section="rail"]>.body{display:grid;gap:5px}
+#suite-root .rail .v35-live-details{order:20;margin-top:7px;padding-top:9px}
+#suite-root .rail .v35-live-row,#suite-root .rail .v35-live-warnings button{min-height:32px;padding:6px 8px;border-radius:8px;transform:none!important}
+#suite-root .rail .v35-live-row:hover,#suite-root .rail .v35-live-warnings button:hover{box-shadow:inset 3px 0 0 var(--v24-accent,#2D7DD2),0 4px 12px rgba(0,0,0,.08)}
+#suite-root .cols-main>.rail.v31-rail{padding-left:13px!important;border-left-color:color-mix(in srgb,var(--v24-border,#2b405c) 55%,transparent)!important}
+#suite-root .cols-main>.rail.v31-rail>.card{background:transparent!important;box-shadow:none!important}
+#suite-root .rail .statuspill{border-radius:9px!important}
+
+/* Keep the open Live Summary in the 1320px worksheet grid.  Older drawer
+   rules left right/bottom/width values on the sticky rail, which pushed the
+   summary partly off-screen on wide and ultrawide displays. */
+#suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+#suite-root.v251-full-active .cols-main>.rail.v31-rail,
+#suite-root .cols-main>.rail.v31-rail{
+  right:auto!important;bottom:auto!important;width:auto!important;max-width:none!important;
+  padding:0 0 0 13px!important;border-top:0!important;border-right:0!important;
+  border-bottom:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;transform:none!important
+}
+
+/* Stop the contextual Property button from inheriting pulse animation or
+   geometry transitions from earlier emphasis layers. */
+#suite-root .v36-stable-property{animation:none!important;transition:background-color .14s ease,border-color .14s ease,color .14s ease!important;transform:none!important;contain:layout paint;min-width:86px}
+#suite-root .v36-stable-property::before,#suite-root .v36-stable-property::after{animation:none!important}
+
+/* Full form page index lives immediately under File → Documents. */
+#suite-root .v36-full-nav-host{width:100vw;margin-left:calc(50% - 50vw);padding:7px max(16px,calc((100vw - var(--v36-measure))/2));border-bottom:1px solid var(--v24-border,#2b405c);background:color-mix(in srgb,var(--v24-header,#0b1422) 93%,var(--v24-card,#111d2d));position:sticky;top:var(--v34-chrome,130px);z-index:52}
+#suite-root .v36-full-nav-host .v251-full-index{position:static!important;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px!important;width:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;backdrop-filter:none!important;overflow:visible!important}
+#suite-root .v36-full-nav-host .v251-full-index button{width:100%!important;min-width:0!important;min-height:30px!important;padding:5px 8px!important;overflow:hidden;text-overflow:ellipsis}
+
+/* Footer mirrors the Income Calculator's quiet status treatment. */
+#suite-root .v36-suite-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:24px;padding:13px max(16px,calc((100vw - var(--v36-measure))/2));border-top:1px solid var(--v24-border,#2b405c);background:color-mix(in srgb,var(--v24-header,#0b1422) 95%,#000);color:var(--v24-muted,#94a8c1)}
+.v36-suite-footer>div{display:flex;align-items:center;gap:9px;font-size:10px}.v36-suite-footer b{color:var(--v24-text,#e8f0fa)}.v36-suite-footer button{height:30px;padding:0 11px;border:1px solid var(--v24-border,#2b405c);border-radius:8px;background:transparent;color:var(--v24-text,#e8f0fa);font:750 9px inherit;cursor:pointer}.v36-suite-footer button:hover{border-color:var(--v24-accent,#2D7DD2)}
+
+/* Restore Assets to the compact Qualification subgroup. */
+#calc-root .v36-assets-tab{display:none!important}
+#calc-root.v36-qualification-active .v36-assets-tab{display:inline-flex!important}
+
+/* Asset guideline + OCR workflow. */
+.v36-guideline-button{min-height:34px!important;padding:0 13px!important;border:1px solid color-mix(in srgb,var(--blue,#1685d8) 45%,var(--line,#d5dfeb))!important;border-radius:9px!important;background:color-mix(in srgb,var(--blue,#1685d8) 8%,transparent)!important}
+.v36-asset-use,.v36-asset-ocr{margin-top:14px;padding:15px;border:1px solid var(--line,#d9e2ec);border-radius:14px;background:var(--card,#fff)}
+.v36-agency-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.v36-agency-tabs button{min-height:31px;padding:0 11px;border:1px solid var(--line,#d5dfeb);border-radius:999px;background:var(--field,#f6f9fc);color:var(--text,#173858);font:750 10px inherit;cursor:pointer}.v36-agency-tabs button.active{border-color:var(--blue,#1685d8);background:var(--blue,#1685d8);color:#fff}
+.v36-guide-lead{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:11px 12px;border-radius:10px;background:color-mix(in srgb,var(--blue,#1685d8) 7%,var(--card,#fff));font-size:11px}.v36-guide-lead>b{font-size:13px}.v36-guide-lead>span{color:var(--muted,#64748b)}.v36-guide-lead p{grid-column:1/-1;margin:2px 0;line-height:1.45}
+.v36-account-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.v36-account-summary article{padding:11px;border:1px solid var(--line,#d5dfeb);border-radius:10px;background:color-mix(in srgb,var(--card,#fff) 92%,var(--blue,#1685d8));font-size:10px}.v36-account-summary article>div{display:flex;justify-content:space-between;gap:10px}.v36-account-summary article span{color:var(--muted,#64748b);text-align:right}.v36-account-summary article p{margin:6px 0 0;line-height:1.4}.v36-empty{grid-column:1/-1;margin:0;color:var(--muted,#64748b);font-size:11px}.v36-guide-note{display:block;margin-top:10px;color:var(--muted,#64748b);line-height:1.45}
+.v36-asset-title{display:flex;align-items:center;justify-content:space-between;gap:18px}.v36-asset-title>div{display:grid;gap:2px}.v36-asset-title span{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--blue,#1685d8)}.v36-asset-title h3{margin:0;font-size:15px}.v36-asset-title p{margin:0;color:var(--muted,#64748b);font-size:10px}.v36-upload input{position:absolute;opacity:0;pointer-events:none}.v36-upload>span,.v36-asset-controls button,.v36-review-actions button,.v36-deposits button,.v36-ai-buttons button,.v36-primary{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 13px;border:1px solid var(--blue,#1685d8);border-radius:9px;background:var(--blue,#1685d8);color:#fff!important;font:750 10px inherit;cursor:pointer}
+.v36-asset-controls{display:flex;align-items:end;gap:8px;margin-top:12px}.v36-asset-controls label{display:grid;gap:4px;color:var(--muted,#64748b);font-size:9px}.v36-asset-controls input{height:34px;padding:0 10px;border:1px solid var(--line,#d5dfeb);border-radius:8px;background:var(--input-bg,#f5f8fb);color:var(--text,#173858)}
+.v36-asset-review{margin-top:12px}.v36-asset-review>p{margin:0;color:var(--muted,#64748b);font-size:11px}.v36-working{padding:12px;border-radius:9px;background:color-mix(in srgb,var(--blue,#1685d8) 8%,transparent)}.v36-error{color:#b42318!important}.v36-review-badges{display:flex;gap:6px;margin-bottom:9px}.v36-review-badges span{padding:4px 8px;border-radius:999px;background:var(--field,#eef3f8);color:var(--muted,#64748b);font-size:9px;font-weight:750}.v36-review-badges .matched{background:#dcfce7;color:#166534}.v36-review-badges .review{background:#fef3c7;color:#92400e}
+.v36-review-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.v36-review-grid label{display:grid;gap:4px;color:var(--muted,#64748b);font-size:9px}.v36-review-grid input,.v36-review-grid select{width:100%;min-width:0;height:34px;padding:0 9px;border:1px solid var(--line,#d5dfeb);border-radius:8px;background:var(--input-bg,#f5f8fb);color:var(--text,#173858)}
+.v36-deposits{margin-top:12px;border:1px solid var(--line,#d5dfeb);border-radius:10px;overflow:hidden}.v36-deposits>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 10px;background:var(--field,#f5f8fb)}.v36-deposits>header>div{display:grid;gap:2px}.v36-deposits header span{font-size:9px;color:var(--muted,#64748b)}.v36-deposits table{width:100%;border-collapse:collapse;font-size:10px}.v36-deposits th,.v36-deposits td{padding:7px 9px;border-top:1px solid var(--line,#d5dfeb);text-align:left}.v36-deposits>p{padding:10px;margin:0;color:var(--muted,#64748b);font-size:10px}.v36-review-actions{display:flex;gap:7px;margin-top:10px}.v36-review-actions button+button,.v36-deposits button{background:transparent;color:var(--blue,#1685d8)!important}
+
+.v36-modal{display:none;position:fixed;inset:0;z-index:4200;align-items:center;justify-content:center;padding:16px}.v36-modal.open{display:flex}.v36-modal-backdrop{position:absolute;inset:0;border:0;background:rgba(2,8,20,.68);backdrop-filter:blur(5px)}.v36-modal>section{position:relative;width:min(820px,calc(100vw - 28px));max-height:calc(100vh - 32px);overflow:auto;border:1px solid var(--line,#d5dfeb);border-radius:16px;background:var(--card,#fff);color:var(--text,#173858);box-shadow:0 28px 90px rgba(0,0,0,.38)}.v36-modal>section>header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 16px;border-bottom:1px solid var(--line,#d5dfeb)}.v36-modal>section>header span{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--blue,#1685d8)}.v36-modal h2{margin:2px 0 0;font-size:17px}.v36-modal>section>header>button{width:32px;height:32px;border:1px solid var(--line,#d5dfeb);border-radius:8px;background:transparent;color:inherit;font-size:20px;cursor:pointer}.v36-modal-body{padding:15px}.v36-ai-field{display:grid;gap:6px;margin-bottom:10px;color:var(--muted,#64748b);font-size:10px;font-weight:700}.v36-ai-field textarea{width:100%;min-height:190px;padding:11px;border:1px solid var(--line,#d5dfeb);border-radius:9px;background:var(--input-bg,#f5f8fb);color:var(--text,#173858);font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical}.v36-ai-buttons{display:flex;justify-content:flex-end;margin:-4px 0 12px}#v36AssetJsonStatus{color:#b42318;font-size:10px}
+
+/* Dark/OLED compatibility follows the existing theme tokens. */
+html[data-v25-surface="oled"] .v36-asset-use,html[data-v25-surface="oled"] .v36-asset-ocr,html[data-v25-surface="oled"] .v36-modal>section{--card:var(--v24-card,#111d2d);--field:var(--v24-page,#07111e);--line:var(--v24-border,#2b405c);--text:var(--v24-text,#e8f0fa);--muted:var(--v24-muted,#94a8c1);--blue:var(--v24-accent,#2D7DD2);--input-bg:var(--field-bg,#0f1829);background:var(--card);color:var(--text)}
+
+/* Light surfaces keep the same navy/teal contrast used by the Income sheet. */
+html[data-v25-surface="light"] #suite-root .v23-primary-nav,html[data-v25-surface="light"] #suite-root .v23-context-tabs{background:#1b2a40!important}
+html[data-v25-surface="light"] #suite-root .v34-bar{background:#202f46!important}
+html[data-v25-surface="light"] #suite-root .card{box-shadow:0 4px 14px rgba(23,53,88,.055)!important}
+html[data-v25-surface="light"] #suite-root .v23-primary-nav>button,html[data-v25-surface="light"] #suite-root .v23-context-tabs .tab{color:#a9bad0!important}
+html[data-v25-surface="light"] #suite-root .v23-primary-nav>button.active,html[data-v25-surface="light"] #suite-root .v23-context-tabs .tab.active{color:#66dfc2!important}
+
+@media(max-width:1100px){#suite-root .v36-full-nav-host .v251-full-index{grid-template-columns:repeat(4,minmax(0,1fr))}.v36-review-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#suite-root .v23-primary-nav{overflow-x:auto!important}#suite-root .v23-primary-nav>button{min-width:82px!important}}
+@media(max-width:760px){.v36-account-summary{grid-template-columns:1fr}.v36-asset-title{align-items:flex-start;flex-direction:column}.v36-review-grid{grid-template-columns:1fr}.v36-asset-controls{align-items:stretch;flex-direction:column}.v36-asset-controls button{width:100%}#suite-root .v36-full-nav-host .v251-full-index{grid-template-columns:repeat(2,minmax(0,1fr))}.v36-guide-lead{grid-template-columns:1fr}.v36-guide-lead p{grid-column:1}}

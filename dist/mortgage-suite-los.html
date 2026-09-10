@@ -4747,6 +4747,124 @@ body,#calc-root,#suite-root,#calc-root main,#suite-root .app,#suite-root #screen
 @media(max-width:980px){.v35-quote-presets{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.v35-quote-presets{grid-template-columns:1fr}}
 
+
+/* =====================================================================
+   v36 — compact, centered working canvas and reviewed asset intake
+   ===================================================================== */
+:root{--v36-measure:1320px}
+
+/* Shared visual rhythm: the Loan Suite now follows the Income Calculator's
+   restrained app-shell language instead of looking like a nested dashboard. */
+#suite-root{font-family:Manrope,Inter,Segoe UI,sans-serif!important;letter-spacing:-.005em}
+#suite-root .cols-main{padding-top:14px!important}
+#suite-root #screen-body{display:grid;gap:12px}
+#suite-root .card{border:1px solid color-mix(in srgb,var(--v24-border,#d4dfeb) 88%,transparent)!important;border-radius:12px!important;background:var(--v24-card,#fff)!important;box-shadow:0 3px 12px rgba(18,45,78,.045)!important;overflow:hidden}
+#suite-root .card>h3{min-height:41px!important;padding:10px 13px!important;border-bottom:1px solid color-mix(in srgb,var(--v24-border,#d4dfeb) 76%,transparent)!important;background:color-mix(in srgb,var(--v24-card,#fff) 94%,var(--v24-page,#eef3f8))!important;font-size:11.5px!important;letter-spacing:.01em!important}
+#suite-root .card>.body{padding:12px 13px!important}
+#suite-root .sec-head{margin:10px 0 5px!important;padding:0!important;border:0!important;color:var(--v24-muted,#67809c)!important;font-size:8.5px!important;font-weight:850!important;letter-spacing:.09em!important;text-transform:uppercase!important}
+#suite-root .row{gap:5px!important}
+#suite-root .row>label,#suite-root .checkrow>label{color:var(--v24-muted,#657b95)!important;font-size:9px!important;font-weight:650!important}
+#suite-root input:not([type="checkbox"]),#suite-root select,#suite-root textarea{border-radius:8px!important;box-shadow:none!important}
+#suite-root input:not([type="checkbox"]):focus,#suite-root select:focus,#suite-root textarea:focus{border-color:var(--v24-accent,#2D7DD2)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--v24-accent,#2D7DD2) 15%,transparent)!important;outline:none!important}
+#suite-root .out{min-height:33px!important;padding:7px 9px!important;border-radius:7px!important}
+#suite-root .out.jump{transition:background-color .14s ease,border-color .14s ease!important}
+#suite-root .out.jump:hover{transform:none!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 8%,var(--v24-card,#fff))!important}
+#suite-root .btn,#suite-root button{font-family:inherit}
+#suite-root .btn.small,#suite-root .inline>.btn{min-height:31px!important;border-radius:8px!important;padding-inline:11px!important;font-size:9px!important;font-weight:750!important}
+
+/* Income and Loan Suite use the same centered body measure. Chrome is
+   full-bleed, like the Income Calculator, while page content stays readable. */
+#calc-root main .wrap,#suite-root .app,#suite-root .cols-main{width:min(100%,var(--v36-measure))!important;max-width:var(--v36-measure)!important;margin-inline:auto!important}
+#suite-root .topbar,#suite-root .v34-bar,#suite-root .chrome,#suite-root .v23-primary-nav,#suite-root .v23-context-tabs,#suite-root .v36-suite-footer{width:100vw!important;max-width:none!important;margin-left:calc(50% - 50vw)!important;margin-right:calc(50% - 50vw)!important}
+#suite-root .topbar{padding-left:max(16px,calc((100vw - var(--v36-measure))/2))!important;padding-right:max(16px,calc((100vw - var(--v36-measure))/2))!important}
+#suite-root .v34-bar,#suite-root .v23-primary-nav,#suite-root .v23-context-tabs{padding-left:max(16px,calc((100vw - var(--v36-measure))/2))!important;padding-right:max(16px,calc((100vw - var(--v36-measure))/2))!important}
+#suite-root .v25-topbar{border-radius:0!important;box-shadow:none!important}
+#suite-root .v25-header-main{min-height:58px!important;padding-block:8px!important}
+#suite-root .v25-brand{gap:9px!important}
+#suite-root .v25-brand h1{font-size:13px!important;letter-spacing:-.02em!important}
+#suite-root .v24-scenario-combo{border-radius:9px!important;background:color-mix(in srgb,var(--v24-page,#07111e) 70%,var(--v24-card,#111d2d))!important;box-shadow:none!important}
+#suite-root .v34-bar{min-height:48px!important;border-bottom-color:color-mix(in srgb,var(--v24-border,#2b405c) 82%,transparent)!important;box-shadow:none!important}
+#suite-root .v23-primary-nav{min-height:54px!important;gap:6px!important;background:color-mix(in srgb,var(--v24-header,#0b1422) 95%,#000)!important}
+#suite-root .v23-primary-nav>button{min-width:92px!important;min-height:39px!important;padding:5px 12px!important;border:1px solid transparent!important;border-radius:9px!important;background:transparent!important;color:var(--v24-muted,#9db2cd)!important;font-size:10px!important;font-weight:750!important;box-shadow:none!important;transition:background-color .14s ease,border-color .14s ease,color .14s ease!important}
+#suite-root .v23-primary-nav>button:hover{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 38%,transparent)!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 7%,transparent)!important;color:var(--v24-text,#eef5ff)!important}
+#suite-root .v23-primary-nav>button.active{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 62%,transparent)!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 16%,transparent)!important;color:var(--v24-accent,#72d8b7)!important}
+#suite-root .v23-context-tabs{min-height:46px!important;gap:5px!important;background:color-mix(in srgb,var(--v24-header,#0b1422) 91%,var(--v24-card,#111d2d))!important}
+#suite-root .v23-context-tabs .tab{min-height:31px!important;padding:0 12px!important;border:1px solid transparent!important;border-radius:8px!important;background:transparent!important;color:var(--v24-muted,#9db2cd)!important;font-size:9px!important;font-weight:800!important;box-shadow:none!important}
+#suite-root .v23-context-tabs .tab.active{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 52%,transparent)!important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 13%,transparent)!important;color:var(--v24-accent,#72d8b7)!important}
+
+/* Modern paired actions — Live is primary context, Actions is the menu. */
+#suite-root .v36-live-button,#suite-root .v35-btn{height:34px!important;display:inline-flex!important;align-items:center!important;gap:7px!important;padding:0 13px!important;border-radius:9px!important;font:750 11px/1 inherit!important;letter-spacing:.01em!important;box-shadow:none!important;transform:none!important}
+#suite-root .v36-live-button{border:1px solid color-mix(in srgb,var(--v24-accent,#2D7DD2) 62%,var(--v24-border,#2b405c));background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 15%,var(--v24-card,#111d2d));color:var(--v24-text,#e8f0fa);cursor:pointer}
+#suite-root .v36-live-button:hover{background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 27%,var(--v24-card,#111d2d));border-color:var(--v24-accent,#2D7DD2)}
+.v36-pulse-icon{display:flex;align-items:end;gap:2px;width:13px;height:13px}.v36-pulse-icon i{display:block;width:2px;border-radius:2px;background:var(--v24-accent,#72d8b7)}.v36-pulse-icon i:nth-child(1){height:5px}.v36-pulse-icon i:nth-child(2){height:11px}.v36-pulse-icon i:nth-child(3){height:8px}
+
+/* Old detail groups are removed from the visible Live Summary. */
+#suite-root .rail [data-v36-rail-hidden="1"]{display:none!important}
+#suite-root .rail [data-section="rail"]>.body{display:grid;gap:5px}
+#suite-root .rail .v35-live-details{order:20;margin-top:7px;padding-top:9px}
+#suite-root .rail .v35-live-row,#suite-root .rail .v35-live-warnings button{min-height:32px;padding:6px 8px;border-radius:8px;transform:none!important}
+#suite-root .rail .v35-live-row:hover,#suite-root .rail .v35-live-warnings button:hover{box-shadow:inset 3px 0 0 var(--v24-accent,#2D7DD2),0 4px 12px rgba(0,0,0,.08)}
+#suite-root .cols-main>.rail.v31-rail{padding-left:13px!important;border-left-color:color-mix(in srgb,var(--v24-border,#2b405c) 55%,transparent)!important}
+#suite-root .cols-main>.rail.v31-rail>.card{background:transparent!important;box-shadow:none!important}
+#suite-root .rail .statuspill{border-radius:9px!important}
+
+/* Keep the open Live Summary in the 1320px worksheet grid.  Older drawer
+   rules left right/bottom/width values on the sticky rail, which pushed the
+   summary partly off-screen on wide and ultrawide displays. */
+#suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+#suite-root.v251-full-active .cols-main>.rail.v31-rail,
+#suite-root .cols-main>.rail.v31-rail{
+  right:auto!important;bottom:auto!important;width:auto!important;max-width:none!important;
+  padding:0 0 0 13px!important;border-top:0!important;border-right:0!important;
+  border-bottom:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;transform:none!important
+}
+
+/* Stop the contextual Property button from inheriting pulse animation or
+   geometry transitions from earlier emphasis layers. */
+#suite-root .v36-stable-property{animation:none!important;transition:background-color .14s ease,border-color .14s ease,color .14s ease!important;transform:none!important;contain:layout paint;min-width:86px}
+#suite-root .v36-stable-property::before,#suite-root .v36-stable-property::after{animation:none!important}
+
+/* Full form page index lives immediately under File → Documents. */
+#suite-root .v36-full-nav-host{width:100vw;margin-left:calc(50% - 50vw);padding:7px max(16px,calc((100vw - var(--v36-measure))/2));border-bottom:1px solid var(--v24-border,#2b405c);background:color-mix(in srgb,var(--v24-header,#0b1422) 93%,var(--v24-card,#111d2d));position:sticky;top:var(--v34-chrome,130px);z-index:52}
+#suite-root .v36-full-nav-host .v251-full-index{position:static!important;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px!important;width:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;backdrop-filter:none!important;overflow:visible!important}
+#suite-root .v36-full-nav-host .v251-full-index button{width:100%!important;min-width:0!important;min-height:30px!important;padding:5px 8px!important;overflow:hidden;text-overflow:ellipsis}
+
+/* Footer mirrors the Income Calculator's quiet status treatment. */
+#suite-root .v36-suite-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:24px;padding:13px max(16px,calc((100vw - var(--v36-measure))/2));border-top:1px solid var(--v24-border,#2b405c);background:color-mix(in srgb,var(--v24-header,#0b1422) 95%,#000);color:var(--v24-muted,#94a8c1)}
+.v36-suite-footer>div{display:flex;align-items:center;gap:9px;font-size:10px}.v36-suite-footer b{color:var(--v24-text,#e8f0fa)}.v36-suite-footer button{height:30px;padding:0 11px;border:1px solid var(--v24-border,#2b405c);border-radius:8px;background:transparent;color:var(--v24-text,#e8f0fa);font:750 9px inherit;cursor:pointer}.v36-suite-footer button:hover{border-color:var(--v24-accent,#2D7DD2)}
+
+/* Restore Assets to the compact Qualification subgroup. */
+#calc-root .v36-assets-tab{display:none!important}
+#calc-root.v36-qualification-active .v36-assets-tab{display:inline-flex!important}
+
+/* Asset guideline + OCR workflow. */
+.v36-guideline-button{min-height:34px!important;padding:0 13px!important;border:1px solid color-mix(in srgb,var(--blue,#1685d8) 45%,var(--line,#d5dfeb))!important;border-radius:9px!important;background:color-mix(in srgb,var(--blue,#1685d8) 8%,transparent)!important}
+.v36-asset-use,.v36-asset-ocr{margin-top:14px;padding:15px;border:1px solid var(--line,#d9e2ec);border-radius:14px;background:var(--card,#fff)}
+.v36-agency-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.v36-agency-tabs button{min-height:31px;padding:0 11px;border:1px solid var(--line,#d5dfeb);border-radius:999px;background:var(--field,#f6f9fc);color:var(--text,#173858);font:750 10px inherit;cursor:pointer}.v36-agency-tabs button.active{border-color:var(--blue,#1685d8);background:var(--blue,#1685d8);color:#fff}
+.v36-guide-lead{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:11px 12px;border-radius:10px;background:color-mix(in srgb,var(--blue,#1685d8) 7%,var(--card,#fff));font-size:11px}.v36-guide-lead>b{font-size:13px}.v36-guide-lead>span{color:var(--muted,#64748b)}.v36-guide-lead p{grid-column:1/-1;margin:2px 0;line-height:1.45}
+.v36-account-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.v36-account-summary article{padding:11px;border:1px solid var(--line,#d5dfeb);border-radius:10px;background:color-mix(in srgb,var(--card,#fff) 92%,var(--blue,#1685d8));font-size:10px}.v36-account-summary article>div{display:flex;justify-content:space-between;gap:10px}.v36-account-summary article span{color:var(--muted,#64748b);text-align:right}.v36-account-summary article p{margin:6px 0 0;line-height:1.4}.v36-empty{grid-column:1/-1;margin:0;color:var(--muted,#64748b);font-size:11px}.v36-guide-note{display:block;margin-top:10px;color:var(--muted,#64748b);line-height:1.45}
+.v36-asset-title{display:flex;align-items:center;justify-content:space-between;gap:18px}.v36-asset-title>div{display:grid;gap:2px}.v36-asset-title span{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--blue,#1685d8)}.v36-asset-title h3{margin:0;font-size:15px}.v36-asset-title p{margin:0;color:var(--muted,#64748b);font-size:10px}.v36-upload input{position:absolute;opacity:0;pointer-events:none}.v36-upload>span,.v36-asset-controls button,.v36-review-actions button,.v36-deposits button,.v36-ai-buttons button,.v36-primary{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 13px;border:1px solid var(--blue,#1685d8);border-radius:9px;background:var(--blue,#1685d8);color:#fff!important;font:750 10px inherit;cursor:pointer}
+.v36-asset-controls{display:flex;align-items:end;gap:8px;margin-top:12px}.v36-asset-controls label{display:grid;gap:4px;color:var(--muted,#64748b);font-size:9px}.v36-asset-controls input{height:34px;padding:0 10px;border:1px solid var(--line,#d5dfeb);border-radius:8px;background:var(--input-bg,#f5f8fb);color:var(--text,#173858)}
+.v36-asset-review{margin-top:12px}.v36-asset-review>p{margin:0;color:var(--muted,#64748b);font-size:11px}.v36-working{padding:12px;border-radius:9px;background:color-mix(in srgb,var(--blue,#1685d8) 8%,transparent)}.v36-error{color:#b42318!important}.v36-review-badges{display:flex;gap:6px;margin-bottom:9px}.v36-review-badges span{padding:4px 8px;border-radius:999px;background:var(--field,#eef3f8);color:var(--muted,#64748b);font-size:9px;font-weight:750}.v36-review-badges .matched{background:#dcfce7;color:#166534}.v36-review-badges .review{background:#fef3c7;color:#92400e}
+.v36-review-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.v36-review-grid label{display:grid;gap:4px;color:var(--muted,#64748b);font-size:9px}.v36-review-grid input,.v36-review-grid select{width:100%;min-width:0;height:34px;padding:0 9px;border:1px solid var(--line,#d5dfeb);border-radius:8px;background:var(--input-bg,#f5f8fb);color:var(--text,#173858)}
+.v36-deposits{margin-top:12px;border:1px solid var(--line,#d5dfeb);border-radius:10px;overflow:hidden}.v36-deposits>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 10px;background:var(--field,#f5f8fb)}.v36-deposits>header>div{display:grid;gap:2px}.v36-deposits header span{font-size:9px;color:var(--muted,#64748b)}.v36-deposits table{width:100%;border-collapse:collapse;font-size:10px}.v36-deposits th,.v36-deposits td{padding:7px 9px;border-top:1px solid var(--line,#d5dfeb);text-align:left}.v36-deposits>p{padding:10px;margin:0;color:var(--muted,#64748b);font-size:10px}.v36-review-actions{display:flex;gap:7px;margin-top:10px}.v36-review-actions button+button,.v36-deposits button{background:transparent;color:var(--blue,#1685d8)!important}
+
+.v36-modal{display:none;position:fixed;inset:0;z-index:4200;align-items:center;justify-content:center;padding:16px}.v36-modal.open{display:flex}.v36-modal-backdrop{position:absolute;inset:0;border:0;background:rgba(2,8,20,.68);backdrop-filter:blur(5px)}.v36-modal>section{position:relative;width:min(820px,calc(100vw - 28px));max-height:calc(100vh - 32px);overflow:auto;border:1px solid var(--line,#d5dfeb);border-radius:16px;background:var(--card,#fff);color:var(--text,#173858);box-shadow:0 28px 90px rgba(0,0,0,.38)}.v36-modal>section>header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 16px;border-bottom:1px solid var(--line,#d5dfeb)}.v36-modal>section>header span{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--blue,#1685d8)}.v36-modal h2{margin:2px 0 0;font-size:17px}.v36-modal>section>header>button{width:32px;height:32px;border:1px solid var(--line,#d5dfeb);border-radius:8px;background:transparent;color:inherit;font-size:20px;cursor:pointer}.v36-modal-body{padding:15px}.v36-ai-field{display:grid;gap:6px;margin-bottom:10px;color:var(--muted,#64748b);font-size:10px;font-weight:700}.v36-ai-field textarea{width:100%;min-height:190px;padding:11px;border:1px solid var(--line,#d5dfeb);border-radius:9px;background:var(--input-bg,#f5f8fb);color:var(--text,#173858);font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical}.v36-ai-buttons{display:flex;justify-content:flex-end;margin:-4px 0 12px}#v36AssetJsonStatus{color:#b42318;font-size:10px}
+
+/* Dark/OLED compatibility follows the existing theme tokens. */
+html[data-v25-surface="oled"] .v36-asset-use,html[data-v25-surface="oled"] .v36-asset-ocr,html[data-v25-surface="oled"] .v36-modal>section{--card:var(--v24-card,#111d2d);--field:var(--v24-page,#07111e);--line:var(--v24-border,#2b405c);--text:var(--v24-text,#e8f0fa);--muted:var(--v24-muted,#94a8c1);--blue:var(--v24-accent,#2D7DD2);--input-bg:var(--field-bg,#0f1829);background:var(--card);color:var(--text)}
+
+/* Light surfaces keep the same navy/teal contrast used by the Income sheet. */
+html[data-v25-surface="light"] #suite-root .v23-primary-nav,html[data-v25-surface="light"] #suite-root .v23-context-tabs{background:#1b2a40!important}
+html[data-v25-surface="light"] #suite-root .v34-bar{background:#202f46!important}
+html[data-v25-surface="light"] #suite-root .card{box-shadow:0 4px 14px rgba(23,53,88,.055)!important}
+html[data-v25-surface="light"] #suite-root .v23-primary-nav>button,html[data-v25-surface="light"] #suite-root .v23-context-tabs .tab{color:#a9bad0!important}
+html[data-v25-surface="light"] #suite-root .v23-primary-nav>button.active,html[data-v25-surface="light"] #suite-root .v23-context-tabs .tab.active{color:#66dfc2!important}
+
+@media(max-width:1100px){#suite-root .v36-full-nav-host .v251-full-index{grid-template-columns:repeat(4,minmax(0,1fr))}.v36-review-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#suite-root .v23-primary-nav{overflow-x:auto!important}#suite-root .v23-primary-nav>button{min-width:82px!important}}
+@media(max-width:760px){.v36-account-summary{grid-template-columns:1fr}.v36-asset-title{align-items:flex-start;flex-direction:column}.v36-review-grid{grid-template-columns:1fr}.v36-asset-controls{align-items:stretch;flex-direction:column}.v36-asset-controls button{width:100%}#suite-root .v36-full-nav-host .v251-full-index{grid-template-columns:repeat(2,minmax(0,1fr))}.v36-guide-lead{grid-template-columns:1fr}.v36-guide-lead p{grid-column:1}}
+
 </style>
 <!-- ===== LOS PATCH LAYER — END ===== -->
 </head>
@@ -31758,6 +31876,165 @@ setInterval(function(){
   try { markRelease(); install(); hideOriginals(); enhance(); } catch(e){}
 }, 800);
 setTimeout(function(){ try { markRelease(); install(); hideOriginals(); enhance(); } catch(e){} }, 250);
+})();
+
+
+/* =====================================================================
+   v36 — quieter loan workspace and reviewed asset-statement intake.
+   This layer changes presentation and review workflow only. Mortgage and
+   income calculations continue to run through the existing engines.
+   ===================================================================== */
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var $$=function(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));};
+var V=window.V36=window.V36||{version:'36.0',assetAgency:'AUTO',assetReview:null};
+function text(v){return String(v==null?'':v).replace(/\s+/g,' ').trim();}
+function esc(v){return String(v==null?'':v).replace(/[&<>\"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c];});}
+function num(v){var n=parseFloat(String(v==null?'':v).replace(/[$,%\s,]/g,''));return isFinite(n)?n:0;}
+function money(v){var n=num(v);return(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});}
+function suite(){try{return window.mortgageSuite&&mortgageSuite.store;}catch(e){return null;}}
+function incomeState(){try{return window.S||eval('S');}catch(e){return null;}}
+function lexical(name){try{return eval(name);}catch(e){return null;}}
+function incomeAgency(){var s=incomeState();return V.assetAgency==='AUTO'?(s&&s.agency||'FNMA'):V.assetAgency;}
+function announce(title,detail){if(window.LOS&&LOS.say)LOS.say(title,detail||'', 'good',4200);}
+
+/* The summary keeps acquisition and loan results. Live planning moves next,
+   while the verbose ratio/payment/cash/reserve/term blocks remain available
+   in their focused workspaces and Full form. */
+function simplifyRail(){
+  var rail=document.querySelector('#suite-root .cols-main>.rail'),card=rail&&rail.querySelector(':scope>.card'),body=card&&card.querySelector(':scope>.body'),live=$('v35LiveDetails');
+  if(!rail||!card||!body)return;
+  var hiding=false,cut=null;
+  Array.prototype.slice.call(body.children).forEach(function(node){
+    var label=node.classList.contains('sec-head')?text(node.textContent).toLowerCase():'';
+    if(/^(ratios?|monthly payment|leverage|cash and costs|cash to close|reserves?|terms|checks)$/.test(label)){hiding=true;if(!cut)cut=node;}
+    if(hiding)node.dataset.v36RailHidden='1';else node.removeAttribute('data-v36-rail-hidden');
+  });
+  if(live){
+    live.removeAttribute('data-v36-rail-hidden');
+    if(live.parentNode!==body||live.nextSibling!==cut)body.insertBefore(live,cut||null);
+  }
+  card.dataset.v36Simplified='1';
+}
+
+/* A compact Live control sits beside the one Actions control. Reusing the
+   existing summary action preserves all established click/edit behavior. */
+function installLiveButton(){
+  var actions=document.querySelector('#suite-root .v34-right'),anchor=$('v35Btn');if(!actions||!anchor)return;
+  var b=$('v36LiveButton');
+  if(!b){b=document.createElement('button');b.id='v36LiveButton';b.type='button';b.className='v36-live-button';b.innerHTML='<span aria-hidden="true" class="v36-pulse-icon"><i></i><i></i><i></i></span><span>Live</span>';b.title='Open the live planning summary';b.onclick=function(){if(window.V35&&V35.focusSummary)V35.focusSummary();};actions.insertBefore(b,anchor);}
+  if(b.nextSibling!==anchor)actions.insertBefore(b,anchor);
+}
+
+/* Full form gets an anchored page index directly beneath the primary File →
+   Documents navigation. It wraps into real rows instead of horizontal scroll. */
+function organizeFullNav(){
+  var root=$('suite-root'),index=document.querySelector('.v251-full-index'),primary=$('v23SuitePrimaryNav'),host=$('v36FullNavHost');
+  if(root&&root.classList.contains('v251-full-active')&&index&&primary){
+    if(!host){host=document.createElement('div');host.id='v36FullNavHost';host.className='v36-full-nav-host no-print';primary.parentNode.insertBefore(host,primary.nextSibling);}
+    if(index.parentNode!==host)host.appendChild(index);
+    host.classList.add('on');
+  }else if(host&&!(root&&root.classList.contains('v251-full-active'))){host.remove();}
+}
+
+/* The contextual Property control used to inherit several pulse/transition
+   rules. Mark it once and let CSS keep its geometry stable. */
+function stabilizeProperty(){
+  $$('#suite-root button,#suite-root .tab').forEach(function(node){if(text(node.textContent).toUpperCase()==='PROPERTY')node.classList.add('v36-stable-property');});
+}
+
+function installFooter(){
+  var root=$('suite-root');if(!root)return;var foot=$('v36SuiteFooter');
+  if(!foot){foot=document.createElement('footer');foot.id='v36SuiteFooter';foot.className='v36-suite-footer no-print';foot.innerHTML='<div><b>Mortgage Suite</b><span>Live calculations · browser autosave</span></div><button type="button" onclick="if(window.V35)V35.go(\'quote\')">Return to Quote</button>';root.appendChild(foot);}
+}
+
+/* Assets remains part of Qualification. Earlier compact navigation omitted
+   it from the visible subgroup even though the worksheet still existed. */
+function exposeAssetsTab(){
+  var root=$('calc-root'),primary=$('v23CalcPrimaryNav'),group=primary&&primary.querySelector('[data-group="qualification"]'),bar=$('tabbar');if(!root||!group||!bar)return;var tab=$('v36AssetsTab');
+  if(!tab){tab=document.createElement('button');tab.id='v36AssetsTab';tab.type='button';tab.className='tab v36-assets-tab';tab.dataset.tab='v36assets';tab.innerHTML='<span aria-hidden="true" class="v23-nav-icon i-coins"><i></i></span><span>Assets</span>';tab.onclick=function(){var switcher=lexical('switchTab');if(switcher)switcher('other');if(window.V3&&V3.sub)V3.sub('other','assets',[['other','Other income'],['assets','Assets']]);var other=$('panel-other'),assets=$('panel-assets');if(other){other.classList.remove('active');other.classList.add('los-hidden');}if(assets){assets.classList.add('active');assets.classList.remove('los-hidden');}$$('#tabbar .tab').forEach(function(x){x.classList.toggle('active',x===tab);});};bar.appendChild(tab);}
+  var active=group.getAttribute('aria-current')==='page'||group.classList.contains('active');root.classList.toggle('v36-qualification-active',active);if(active)tab.dataset.v23Visible='1';
+  var dti=document.querySelector('#calc-root nav.tabbar .tab[data-tab="dti"]');if(active&&dti&&tab.previousElementSibling!==dti)dti.parentNode.insertBefore(tab,dti.nextSibling);
+}
+
+/* ----------------------- asset guideline summary -------------------- */
+var ACCOUNT_NAMES={checking:'Checking / savings',mm:'Money market / CD',stocks:'Stocks / bonds / mutual funds',ret59:'Retirement — accessible',ret:'Retirement — early withdrawal',trust:'Trust / vested assets',other:'Other asset'};
+var GUIDES={
+ FNMA:{name:'Fannie Mae',divisor:'360 months or the note term used by the file',income:'Potential asset-depletion income only when the product permits it and ownership, access, funds-to-close, reserves and any penalties are documented.',reserve:'Verified liquid funds may support closing and reserves after required deductions.'},
+ FHLMC:{name:'Freddie Mac',divisor:'240 months in this worksheet',income:'Potential asset-depletion income only when the product permits it and eligible net assets are documented.',reserve:'Verified accessible funds may support closing and reserves after required deductions.'},
+ FHA:{name:'FHA',divisor:'Not used for effective income',income:'This worksheet does not use asset depletion as FHA effective income.',reserve:'Verified acceptable assets may still support closing funds and required reserves.'}
+};
+function accountUse(type,agency){
+  var liquid=type==='checking'||type==='mm',market=type==='stocks',ret=type==='ret59'||type==='ret',trust=type==='trust';
+  if(agency==='FHA')return{income:'No — not asset-depletion income',assets:(liquid?'Usually liquid; verify source and access':market?'Use verified current value and required haircut':ret?'Use vested accessible amount, net of restrictions':'Review ownership, access and program eligibility')};
+  return{income:liquid?'Review — product-specific depletion eligibility':market?'Potentially, after the worksheet haircut':ret?'Potentially, using vested accessible value':trust?'Review trust access and distribution terms':'Manual underwriting review',assets:liquid?'Generally usable when verified':market?'Usable after market-value haircut':ret?'Use vested accessible amount, net of penalties':'Verify ownership, access and restrictions'};
+}
+function assetRows(){var s=incomeState();return s&&s.assets&&Array.isArray(s.assets.rows)?s.assets.rows:[];}
+function assetSummaryHtml(){
+  var agency=incomeAgency(),g=GUIDES[agency]||GUIDES.FNMA,rows=assetRows();
+  return '<div class="v36-agency-tabs">'+[['AUTO','Auto'],['FNMA','Fannie Mae'],['FHLMC','Freddie Mac'],['FHA','FHA']].map(function(x){return'<button type="button" class="'+(V.assetAgency===x[0]?'active':'')+'" onclick="V36.setAssetAgency(\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div><div class="v36-guide-lead"><b>'+esc(g.name)+' planning summary</b><span>Divisor: '+esc(g.divisor)+'</span><p><strong>Income:</strong> '+esc(g.income)+'</p><p><strong>Assets:</strong> '+esc(g.reserve)+'</p></div><div class="v36-account-summary">'+(rows.length?rows.map(function(r){var u=accountUse(r.type,agency);return'<article><div><b>'+esc(r.name||ACCOUNT_NAMES[r.type]||'Asset account')+'</b><span>'+esc(ACCOUNT_NAMES[r.type]||r.type||'Other')+' · '+money(r.bal)+'</span></div><p><strong>Income:</strong> '+esc(u.income)+'</p><p><strong>Closing / reserves:</strong> '+esc(u.assets)+'</p></article>';}).join(''):'<p class="v36-empty">Add an asset account to see an account-specific use summary.</p>')+'</div><small class="v36-guide-note">Planning summary only. Confirm eligibility and documentation against the selected program and current agency guide before underwriting.</small>';
+}
+V.setAssetAgency=function(value){V.assetAgency=value;var body=$('v36AssetGuideBody');if(body)body.innerHTML=assetSummaryHtml();paintInlineAssetSummary();};
+V.openAssetGuidelines=function(){var modal=$('v36AssetGuideModal');if(!modal)return;modal.classList.add('open');$('v36AssetGuideBody').innerHTML=assetSummaryHtml();};
+V.closeAssetGuidelines=function(){var modal=$('v36AssetGuideModal');if(modal)modal.classList.remove('open');};
+function paintInlineAssetSummary(){var box=$('v36AssetUseSummary');if(box)box.innerHTML=assetSummaryHtml();}
+
+function assetShell(){
+  var panel=$('panel-assets');if(!panel)return;
+  var head=panel.querySelector('.section-head'),old=head&&head.querySelector('[onclick="openGuide(\'assets\')"]');
+  if(old){old.textContent='Agency asset guidelines';old.setAttribute('onclick','V36.openAssetGuidelines()');old.classList.add('v36-guideline-button');}
+  if(!$('v36AssetUseSummary')){var summary=document.createElement('section');summary.id='v36AssetUseSummary';summary.className='v36-asset-use';panel.appendChild(summary);}
+  if(!$('v36AssetOcr')){var ocr=document.createElement('section');ocr.id='v36AssetOcr';ocr.className='v36-asset-ocr no-print';ocr.innerHTML='<div class="v36-asset-title"><div><span>Reviewed import</span><h3>Asset statement OCR & large-deposit review</h3><p>Read a PDF or image, review the matched values, then choose whether to add the account.</p></div><label class="v36-upload"><input id="v36AssetFile" type="file" accept=".pdf,image/*,.txt" onchange="V36.readAssetFiles(this.files)"><span>Scan statement</span></label></div><div class="v36-asset-controls"><label>Large-deposit threshold <input id="v36DepositThreshold" type="text" inputmode="decimal" value="" placeholder="Auto"></label><button type="button" onclick="V36.buildLargeDepositPrompt()">Build AI prompt</button></div><div id="v36AssetReview" class="v36-asset-review"><p>No statement reviewed yet.</p></div>';panel.appendChild(ocr);}
+  paintInlineAssetSummary();
+  installAssetModals();
+}
+function installAssetModals(){
+  if(!$('v36AssetGuideModal')){var g=document.createElement('div');g.id='v36AssetGuideModal';g.className='v36-modal no-print';g.innerHTML='<button class="v36-modal-backdrop" aria-label="Close" onclick="V36.closeAssetGuidelines()"></button><section role="dialog" aria-modal="true" aria-labelledby="v36AssetGuideTitle"><header><div><span>Income & asset use</span><h2 id="v36AssetGuideTitle">Agency asset guidelines</h2></div><button type="button" onclick="V36.closeAssetGuidelines()">×</button></header><div id="v36AssetGuideBody" class="v36-modal-body"></div></section>';document.body.appendChild(g);}
+}
+function defaultThreshold(){try{var calc=lexical('calcTotals'),total=calc&&calc(),mo=total&&num(total.total);if(mo>0)return mo*.5;}catch(e){}var s=suite();return Math.max(1000,num(s&&s.activeInputs&&s.activeInputs.basePurchasePrice)*.01);}
+function amountTokens(line){var out=[],re=/\(?\$?\s*([0-9]{1,3}(?:,[0-9]{3})*(?:\.\d{2})|[0-9]+\.\d{2})\)?/g,m;while((m=re.exec(line)))out.push(num(m[1]));return out;}
+function parseAssetText(raw,name){
+  var lines=String(raw||'').split(/\r?\n/).map(text).filter(Boolean),threshold=num(($('v36DepositThreshold')||{}).value)||defaultThreshold(),balance=0,institution='',owner='',account='',start='',end='',deposits=[];
+  lines.forEach(function(line,idx){var amounts=amountTokens(line),lower=line.toLowerCase();
+    if(!institution&&idx<18&&/bank|credit union|financial|securities|investments/.test(lower))institution=line.slice(0,80);
+    if(!owner&&/account holder|primary owner|customer name/.test(lower))owner=text(line.split(/:|-/).slice(1).join(' '));
+    if(!account&&/account (number|no\.?|ending)/.test(lower)){var m=line.match(/(?:ending|number|no\.?)[^0-9]*([x*\d-]{4,})/i);if(m)account=m[1];}
+    if(/ending balance|closing balance|current balance|available balance/.test(lower)&&amounts.length)balance=amounts[amounts.length-1];
+    var dates=line.match(/\b(?:0?[1-9]|1[0-2])[\/-](?:0?[1-9]|[12]\d|3[01])[\/-](?:\d{2}|\d{4})\b/g);if(/statement period|period beginning|from/.test(lower)&&dates&&dates.length){start=dates[0];end=dates[1]||end;}if(/period ending|statement date|through/.test(lower)&&dates&&dates.length)end=dates[dates.length-1];
+    if(/deposit|credit|ach credit|direct dep|mobile dep|transfer in/.test(lower)&&amounts.length){var amount=amounts[amounts.length-1];if(amount>0)deposits.push({date:dates&&dates[0]||'',description:line.slice(0,120),amount:amount,largeDeposit:amount>=threshold,sourceHint:'',confidence:/deposit|direct dep|ach credit/.test(lower)?'High':'Review'});}
+  });
+  if(!balance){for(var j=lines.length-1;j>=0;j--){var a=amountTokens(lines[j]);if(a.length){balance=a[a.length-1];break;}}}
+  return{schemaVersion:'mortgage-suite.asset-statement.v1',fileName:name||'',institution:institution,accountName:account,accountType:'checking',owner:owner,statementStart:start,statementEnd:end,beginningBalance:0,endingBalance:balance,threshold:threshold,deposits:deposits,notes:[],reviewState:balance?'Auto-matched':'Needs Review'};
+}
+async function readOne(file){
+  var pdfReader=lexical('pdfText'),pageImages=lexical('pdfPageImages'),ocrReader=lexical('ocrImages');
+  if(/\.pdf$/i.test(file.name)){if(!pdfReader)throw new Error('PDF reader is unavailable.');var r=await pdfReader(file);var t=r.text||'';if(t.replace(/\s/g,'').length<40&&pageImages&&ocrReader)t=await ocrReader(await pageImages(r.pdf,6));return t;}
+  if(/^image\//.test(file.type)){if(!ocrReader)throw new Error('OCR engine is unavailable.');var img=await new Promise(function(resolve,reject){var i=new Image();i.onload=function(){resolve(i);};i.onerror=reject;i.src=URL.createObjectURL(file);});return ocrReader([img]);}
+  return file.text();
+}
+V.readAssetFiles=async function(files){var file=files&&files[0],box=$('v36AssetReview');if(!file||!box)return;box.innerHTML='<p class="v36-working">Reading '+esc(file.name)+'…</p>';try{var raw=await readOne(file);V.assetReview=parseAssetText(raw,file.name);V.assetReview.rawText=raw.slice(0,16000);renderAssetReview();}catch(e){box.innerHTML='<p class="v36-error">Could not read this statement: '+esc(e.message||e)+'</p>';}};
+function renderAssetReview(){
+  var r=V.assetReview,box=$('v36AssetReview');if(!r||!box)return;var large=(r.deposits||[]).filter(function(d){return d.largeDeposit;});
+  box.innerHTML='<div class="v36-review-badges"><span class="'+(r.reviewState==='Auto-matched'?'matched':'review')+'">'+esc(r.reviewState)+'</span><span>'+esc(r.fileName||'Imported JSON')+'</span></div><div class="v36-review-grid">'+[['Institution','institution'],['Account / last four','accountName'],['Owner','owner'],['Statement start','statementStart'],['Statement end','statementEnd'],['Ending balance','endingBalance']].map(function(x){return'<label><span>'+x[0]+'</span><input type="text" '+(x[1]==='endingBalance'?'inputmode="decimal"':'')+' data-v36-review="'+x[1]+'" value="'+esc(r[x[1]])+'"></label>';}).join('')+'<label><span>Account type</span><select data-v36-review="accountType">'+Object.keys(ACCOUNT_NAMES).map(function(k){return'<option value="'+k+'" '+(r.accountType===k?'selected':'')+'>'+esc(ACCOUNT_NAMES[k])+'</option>';}).join('')+'</select></label></div><div class="v36-deposits"><header><div><b>Large-deposit scan</b><span>'+large.length+' at or above '+money(r.threshold)+'</span></div><button type="button" onclick="V36.buildLargeDepositPrompt()">AI review JSON prompt</button></header>'+(large.length?'<table><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Review</th></tr></thead><tbody>'+large.map(function(d){return'<tr><td>'+esc(d.date||'—')+'</td><td>'+esc(d.description)+'</td><td>'+money(d.amount)+'</td><td>'+esc(d.confidence||'Review')+'</td></tr>';}).join('')+'</tbody></table>':'<p>No deposits met the current threshold. Review the transaction text before relying on this result.</p>')+'</div><div class="v36-review-actions"><button type="button" onclick="V36.applyAssetReview()">Add reviewed account</button><button type="button" onclick="V36.buildLargeDepositPrompt()">Open AI prompt</button></div>';
+  $$('[data-v36-review]',box).forEach(function(input){input.addEventListener('change',function(){r[input.dataset.v36Review]=input.dataset.v36Review==='endingBalance'?num(input.value):input.value;r.reviewState='Manual Override';renderAssetReview();});});if(window.V19)V19.enhanceFreeform(box);
+}
+V.applyAssetReview=function(){var r=V.assetReview,s=incomeState();if(!r||!s||!s.assets)return;var makeId=lexical('uid'),render=lexical('renderAssets'),recalc=lexical('RECALC'),row={id:(makeId?makeId():String(Date.now())),name:text((r.institution||'Asset account')+(r.accountName?' · '+r.accountName:'')),type:r.accountType||'checking',bal:num(r.endingBalance),elig:(r.accountType==='stocks'||r.accountType==='ret59'?70:r.accountType==='ret'?60:100)};s.assets.rows.push(row);if(render)render();if(recalc)recalc();setTimeout(function(){assetShell();paintInlineAssetSummary();},40);announce('Asset added','The reviewed ending balance was added without overwriting existing accounts.');};
+function promptText(){var r=V.assetReview||{threshold:num(($('v36DepositThreshold')||{}).value)||defaultThreshold(),rawText:''};return 'Review this asset statement for mortgage underwriting support. Return JSON only. Do not infer missing values. A large deposit means a positive deposit at or above the supplied editable threshold.\n\nJSON schema:\n{\n  "schemaVersion":"mortgage-suite.asset-statement.v1",\n  "institution":"",\n  "accountName":"",\n  "accountType":"checking|mm|stocks|ret59|ret|trust|other",\n  "owner":"",\n  "statementStart":"YYYY-MM-DD or blank",\n  "statementEnd":"YYYY-MM-DD or blank",\n  "beginningBalance":0,\n  "endingBalance":0,\n  "threshold":'+num(r.threshold)+',\n  "deposits":[{"date":"","description":"","amount":0,"largeDeposit":false,"sourceHint":"","confidence":"High|Review"}],\n  "notes":[]\n}\n\nStatement text:\n'+String(r.rawText||'Paste or OCR the statement text here.').slice(0,14000);}
+V.buildLargeDepositPrompt=function(){var modal=$('v36AssetAiModal');if(!modal){modal=document.createElement('div');modal.id='v36AssetAiModal';modal.className='v36-modal no-print';modal.innerHTML='<button class="v36-modal-backdrop" aria-label="Close" onclick="V36.closeAssetAI()"></button><section role="dialog" aria-modal="true"><header><div><span>Structured review</span><h2>Large-deposit AI prompt</h2></div><button type="button" onclick="V36.closeAssetAI()">×</button></header><div class="v36-modal-body"><label class="v36-ai-field"><span>Copy this prompt</span><textarea id="v36AssetPrompt"></textarea></label><div class="v36-ai-buttons"><button type="button" onclick="V36.copyAssetPrompt()">Copy prompt</button></div><label class="v36-ai-field"><span>Paste returned JSON for review</span><textarea id="v36AssetJson" placeholder="{ &quot;schemaVersion&quot;: &quot;mortgage-suite.asset-statement.v1&quot;, ... }"></textarea></label><button type="button" class="v36-primary" onclick="V36.reviewAssetJson()">Review JSON</button><p id="v36AssetJsonStatus"></p></div></section>';document.body.appendChild(modal);}modal.classList.add('open');$('v36AssetPrompt').value=promptText();};
+V.closeAssetAI=function(){var m=$('v36AssetAiModal');if(m)m.classList.remove('open');};
+V.copyAssetPrompt=function(){var t=$('v36AssetPrompt');if(!t)return;t.select();try{navigator.clipboard.writeText(t.value);}catch(e){document.execCommand('copy');}announce('Prompt copied','Paste it into your preferred assistant, then return the JSON here.');};
+V.reviewAssetJson=function(){var status=$('v36AssetJsonStatus');try{var data=JSON.parse($('v36AssetJson').value);if(data.schemaVersion!=='mortgage-suite.asset-statement.v1')throw new Error('Unsupported schema version.');if(!Array.isArray(data.deposits))throw new Error('Deposits must be an array.');V.assetReview=data;V.assetReview.fileName='AI-reviewed JSON';V.assetReview.reviewState='Needs Review';V.closeAssetAI();renderAssetReview();}catch(e){if(status)status.textContent='JSON not applied: '+(e.message||e);}};
+
+function documentsAssetPrompt(){
+  var bar=document.querySelector('#v14Prompts .v14-bar');if(!bar||$('v36AssetPromptButton'))return;var b=document.createElement('button');b.id='v36AssetPromptButton';b.type='button';b.className='btn btn-light btn-sm';b.textContent='Asset statement / large deposits';b.onclick=function(){if(window.SHELL&&SHELL.go)SHELL.go('calc');var switcher=lexical('switchTab');if(switcher)switcher('assets');setTimeout(function(){var assets=$('panel-assets');if(assets)assets.scrollIntoView({behavior:'smooth',block:'start'});V.buildLargeDepositPrompt();},120);};bar.appendChild(b);
+}
+
+function mark(){document.documentElement.dataset.losRelease='36';}
+function enhance(){try{mark();installLiveButton();simplifyRail();organizeFullNav();stabilizeProperty();installFooter();exposeAssetsTab();assetShell();documentsAssetPrompt();}catch(e){if(window.console&&console.warn)console.warn('v36 enhancement',e);}}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){V.closeAssetGuidelines();V.closeAssetAI();}});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',enhance);else enhance();
+if(window.LOS_SCHEDULER)LOS_SCHEDULER.add(enhance,950);else setInterval(enhance,950);
 })();
 
 </script>
