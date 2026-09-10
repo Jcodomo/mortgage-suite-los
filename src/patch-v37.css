@@ -1,0 +1,98 @@
+/* =====================================================================
+   v37 — collision-free sticky chrome and quieter scroll navigation
+   ===================================================================== */
+:root{
+  --v37-shell-h:52px;
+  --v37-calc-nav-h:46px;
+  --v37-suite-chrome-h:88px;
+  --v37-scroll-progress:0
+}
+
+/* The shared shell is the only element pinned to the viewport edge. */
+#shellbar{
+  isolation:isolate;
+  box-shadow:0 1px 0 color-mix(in srgb,var(--line,#d5dfeb) 72%,transparent),0 8px 22px rgba(3,15,30,.08)!important
+}
+#v37ScrollProgress{
+  position:absolute;z-index:5;left:0;right:0;bottom:-1px;height:2px;
+  pointer-events:none;transform:scaleX(var(--v37-scroll-progress));transform-origin:left center;
+  background:linear-gradient(90deg,var(--accent,#18a78c),#2f83dc);
+  opacity:.9;will-change:transform
+}
+
+/* Income Calculator: its identity, KPI and action rows scroll normally.
+   Only the two navigation rows remain pinned, directly below the shell. */
+#calc-root .appbar,
+#calc-root>.toolbar{
+  position:static!important;top:auto!important
+}
+#calc-root #v23CalcPrimaryNav{
+  position:sticky!important;top:var(--v37-shell-h)!important;z-index:96!important;
+  min-height:46px!important;padding-top:5px!important;padding-bottom:5px!important;
+  background:var(--panel,#fff)!important;backdrop-filter:none!important;
+  box-shadow:0 1px 0 var(--line,#d5dfeb)
+}
+#calc-root nav.tabbar.v23-context-tabs{
+  position:sticky!important;top:calc(var(--v37-shell-h) + var(--v37-calc-nav-h))!important;z-index:95!important;
+  min-height:42px!important;padding-top:5px!important;padding-bottom:5px!important;
+  background:var(--panel,#fff)!important;backdrop-filter:none!important;
+  box-shadow:0 8px 20px rgba(9,31,56,.07)
+}
+
+/* Loan Suite: readings and scenario controls scroll away; the File →
+   Documents navigation is one solid sticky unit below the shared shell. */
+#suite-root .topbar,
+#suite-root .v34-bar{
+  position:static!important;top:auto!important
+}
+#suite-root .chrome{
+  position:sticky!important;top:var(--v37-shell-h)!important;z-index:96!important;
+  background:var(--v24-header,#132238)!important;
+  box-shadow:0 8px 22px rgba(3,15,30,.11)!important
+}
+#suite-root .chrome>#v23SuitePrimaryNav,
+#suite-root .chrome>.v23-context-tabs{
+  position:static!important;top:auto!important;backdrop-filter:none!important
+}
+#suite-root .chrome>#v23SuitePrimaryNav{
+  min-height:46px!important;padding-top:5px!important;padding-bottom:5px!important
+}
+#suite-root .chrome>.v23-context-tabs{
+  min-height:40px!important;padding-top:4px!important;padding-bottom:4px!important
+}
+#suite-root .v23-context-tabs>.v37-promoted-copy{display:none!important}
+#suite-root .v36-full-nav-host{
+  position:static!important;top:auto!important
+}
+#suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+#suite-root.v251-full-active .cols-main>.rail.v31-rail,
+#suite-root .cols-main>.rail.v31-rail{
+  top:calc(var(--v37-shell-h) + var(--v37-suite-chrome-h) + 10px)!important;
+  max-height:calc(100vh - var(--v37-shell-h) - var(--v37-suite-chrome-h) - 22px)!important;
+  overflow:auto!important;overscroll-behavior:contain;scrollbar-width:thin
+}
+
+/* Direct navigation and validation links land below the pinned rows. */
+#calc-root main [id],
+#suite-root .sheet [id],
+#suite-root [data-section]{
+  scroll-margin-top:calc(var(--v37-shell-h) + var(--v37-suite-chrome-h) + 16px)
+}
+
+/* Small, useful focus polish without adding another control. */
+#calc-root :is(input,select,textarea,button):focus-visible,
+#suite-root :is(input,select,textarea,button):focus-visible{
+  outline:2px solid color-mix(in srgb,var(--accent,#2f83dc) 78%,white)!important;
+  outline-offset:2px
+}
+
+@media(max-width:640px){
+  #calc-root #v23CalcPrimaryNav,
+  #calc-root nav.tabbar.v23-context-tabs,
+  #suite-root .chrome{position:static!important;top:auto!important}
+  #suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+  #suite-root.v251-full-active .cols-main>.rail.v31-rail,
+  #suite-root .cols-main>.rail.v31-rail{top:auto!important;max-height:none!important;overflow:visible!important}
+}
+
+@media(prefers-reduced-motion:reduce){#v37ScrollProgress{transition:none!important}}

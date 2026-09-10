@@ -1,4 +1,4 @@
-# Mortgage Suite LOS v36
+# Mortgage Suite LOS v37
 
 A self-contained mortgage income, renovation, property, qualification, closing-cost, scenario, OCR, and document-workbench application.
 
@@ -17,7 +17,7 @@ npm run build
 
 ## Release verification
 
-- All 26 repository test files pass through `npm test`, including calculation, freeform date/number, navigation, print, and Release 36 UI checks.
+- All 27 repository test files pass through `npm test`, including calculation, freeform date/number, navigation, print, and Release 37 sticky-header checks.
 - GitHub Actions rebuilds the HTML and confirms the release artifact is non-empty.
 - The distributed HTML contains all styles, application code, calculators, and printable templates in one file.
 

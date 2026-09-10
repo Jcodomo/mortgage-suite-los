@@ -4865,6 +4865,106 @@ html[data-v25-surface="light"] #suite-root .v23-primary-nav>button.active,html[d
 @media(max-width:1100px){#suite-root .v36-full-nav-host .v251-full-index{grid-template-columns:repeat(4,minmax(0,1fr))}.v36-review-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#suite-root .v23-primary-nav{overflow-x:auto!important}#suite-root .v23-primary-nav>button{min-width:82px!important}}
 @media(max-width:760px){.v36-account-summary{grid-template-columns:1fr}.v36-asset-title{align-items:flex-start;flex-direction:column}.v36-review-grid{grid-template-columns:1fr}.v36-asset-controls{align-items:stretch;flex-direction:column}.v36-asset-controls button{width:100%}#suite-root .v36-full-nav-host .v251-full-index{grid-template-columns:repeat(2,minmax(0,1fr))}.v36-guide-lead{grid-template-columns:1fr}.v36-guide-lead p{grid-column:1}}
 
+
+/* =====================================================================
+   v37 — collision-free sticky chrome and quieter scroll navigation
+   ===================================================================== */
+:root{
+  --v37-shell-h:52px;
+  --v37-calc-nav-h:46px;
+  --v37-suite-chrome-h:88px;
+  --v37-scroll-progress:0
+}
+
+/* The shared shell is the only element pinned to the viewport edge. */
+#shellbar{
+  isolation:isolate;
+  box-shadow:0 1px 0 color-mix(in srgb,var(--line,#d5dfeb) 72%,transparent),0 8px 22px rgba(3,15,30,.08)!important
+}
+#v37ScrollProgress{
+  position:absolute;z-index:5;left:0;right:0;bottom:-1px;height:2px;
+  pointer-events:none;transform:scaleX(var(--v37-scroll-progress));transform-origin:left center;
+  background:linear-gradient(90deg,var(--accent,#18a78c),#2f83dc);
+  opacity:.9;will-change:transform
+}
+
+/* Income Calculator: its identity, KPI and action rows scroll normally.
+   Only the two navigation rows remain pinned, directly below the shell. */
+#calc-root .appbar,
+#calc-root>.toolbar{
+  position:static!important;top:auto!important
+}
+#calc-root #v23CalcPrimaryNav{
+  position:sticky!important;top:var(--v37-shell-h)!important;z-index:96!important;
+  min-height:46px!important;padding-top:5px!important;padding-bottom:5px!important;
+  background:var(--panel,#fff)!important;backdrop-filter:none!important;
+  box-shadow:0 1px 0 var(--line,#d5dfeb)
+}
+#calc-root nav.tabbar.v23-context-tabs{
+  position:sticky!important;top:calc(var(--v37-shell-h) + var(--v37-calc-nav-h))!important;z-index:95!important;
+  min-height:42px!important;padding-top:5px!important;padding-bottom:5px!important;
+  background:var(--panel,#fff)!important;backdrop-filter:none!important;
+  box-shadow:0 8px 20px rgba(9,31,56,.07)
+}
+
+/* Loan Suite: readings and scenario controls scroll away; the File →
+   Documents navigation is one solid sticky unit below the shared shell. */
+#suite-root .topbar,
+#suite-root .v34-bar{
+  position:static!important;top:auto!important
+}
+#suite-root .chrome{
+  position:sticky!important;top:var(--v37-shell-h)!important;z-index:96!important;
+  background:var(--v24-header,#132238)!important;
+  box-shadow:0 8px 22px rgba(3,15,30,.11)!important
+}
+#suite-root .chrome>#v23SuitePrimaryNav,
+#suite-root .chrome>.v23-context-tabs{
+  position:static!important;top:auto!important;backdrop-filter:none!important
+}
+#suite-root .chrome>#v23SuitePrimaryNav{
+  min-height:46px!important;padding-top:5px!important;padding-bottom:5px!important
+}
+#suite-root .chrome>.v23-context-tabs{
+  min-height:40px!important;padding-top:4px!important;padding-bottom:4px!important
+}
+#suite-root .v23-context-tabs>.v37-promoted-copy{display:none!important}
+#suite-root .v36-full-nav-host{
+  position:static!important;top:auto!important
+}
+#suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+#suite-root.v251-full-active .cols-main>.rail.v31-rail,
+#suite-root .cols-main>.rail.v31-rail{
+  top:calc(var(--v37-shell-h) + var(--v37-suite-chrome-h) + 10px)!important;
+  max-height:calc(100vh - var(--v37-shell-h) - var(--v37-suite-chrome-h) - 22px)!important;
+  overflow:auto!important;overscroll-behavior:contain;scrollbar-width:thin
+}
+
+/* Direct navigation and validation links land below the pinned rows. */
+#calc-root main [id],
+#suite-root .sheet [id],
+#suite-root [data-section]{
+  scroll-margin-top:calc(var(--v37-shell-h) + var(--v37-suite-chrome-h) + 16px)
+}
+
+/* Small, useful focus polish without adding another control. */
+#calc-root :is(input,select,textarea,button):focus-visible,
+#suite-root :is(input,select,textarea,button):focus-visible{
+  outline:2px solid color-mix(in srgb,var(--accent,#2f83dc) 78%,white)!important;
+  outline-offset:2px
+}
+
+@media(max-width:640px){
+  #calc-root #v23CalcPrimaryNav,
+  #calc-root nav.tabbar.v23-context-tabs,
+  #suite-root .chrome{position:static!important;top:auto!important}
+  #suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+  #suite-root.v251-full-active .cols-main>.rail.v31-rail,
+  #suite-root .cols-main>.rail.v31-rail{top:auto!important;max-height:none!important;overflow:visible!important}
+}
+
+@media(prefers-reduced-motion:reduce){#v37ScrollProgress{transition:none!important}}
+
 </style>
 <!-- ===== LOS PATCH LAYER — END ===== -->
 </head>
@@ -32035,6 +32135,63 @@ function enhance(){try{mark();installLiveButton();simplifyRail();organizeFullNav
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){V.closeAssetGuidelines();V.closeAssetAI();}});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',enhance);else enhance();
 if(window.LOS_SCHEDULER)LOS_SCHEDULER.add(enhance,950);else setInterval(enhance,950);
+})();
+
+
+/* =====================================================================
+   v37 — measured sticky offsets and minimal scroll progress
+   ===================================================================== */
+(function(){
+  'use strict';
+  var V=window.V37={version:'37.0'},observed=new WeakSet(),raf=0;
+  function $(id){return document.getElementById(id);}
+  function px(n,fallback){return Math.max(0,Math.round(n&&n.offsetHeight||fallback||0))+'px';}
+  function visible(n){return !!(n&&n.offsetParent!==null);}
+  function observe(n){
+    if(!n||observed.has(n)||!window.ResizeObserver)return;
+    observed.add(n);(new ResizeObserver(scheduleMeasure)).observe(n);
+  }
+  function progress(){
+    var max=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+    document.documentElement.style.setProperty('--v37-scroll-progress',String(Math.min(1,Math.max(0,scrollY/max))));
+  }
+  function scheduleProgress(){
+    if(raf)return;raf=requestAnimationFrame(function(){raf=0;progress();});
+  }
+  function measure(){
+    var shell=$('shellbar'),shellH=px(shell,52),calc=$('calc-root'),suite=$('suite-root');
+    document.documentElement.style.setProperty('--v37-shell-h',shellH);
+    if(calc){
+      var cnav=$('v23CalcPrimaryNav');
+      if(visible(cnav))calc.style.setProperty('--v37-calc-nav-h',px(cnav,46));
+      observe(cnav);
+    }
+    if(suite){
+      var chrome=suite.querySelector('.chrome');
+      if(visible(chrome))suite.style.setProperty('--v37-suite-chrome-h',px(chrome,88));
+      observe(chrome);
+    }
+    observe(shell);progress();
+  }
+  function scheduleMeasure(){requestAnimationFrame(measure);}
+  function installProgress(){
+    var shell=$('shellbar');if(!shell||$('v37ScrollProgress'))return;
+    var line=document.createElement('i');line.id='v37ScrollProgress';line.setAttribute('aria-hidden','true');shell.appendChild(line);
+  }
+  function hidePromotedCopies(){
+    var labels={'MORTGAGE RATES':1,'PROPERTY':1,'DOCUMENTS & OCR':1,'ADVANCED':1};
+    document.querySelectorAll('#suite-root .v23-context-tabs>.tab').forEach(function(tab){
+      var label=String(tab.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
+      tab.classList.toggle('v37-promoted-copy',!!labels[label]);
+    });
+  }
+  function enhance(){
+    document.documentElement.dataset.v37='1';installProgress();hidePromotedCopies();measure();
+  }
+  addEventListener('scroll',scheduleProgress,{passive:true});
+  addEventListener('resize',scheduleMeasure,{passive:true});
+  document.addEventListener('click',function(){setTimeout(function(){hidePromotedCopies();scheduleMeasure();},30);},{passive:true});
+  setTimeout(enhance,80);setTimeout(enhance,650);setTimeout(enhance,1500);
 })();
 
 </script>

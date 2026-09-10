@@ -110,7 +110,8 @@ def main():
         + "\n\n" + (PATCH_DIR / "patch-v33.css").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v34.css").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v35.css").read_text(encoding="utf-8") \
-        + "\n\n" + (PATCH_DIR / "patch-v36.css").read_text(encoding="utf-8")
+        + "\n\n" + (PATCH_DIR / "patch-v36.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v37.css").read_text(encoding="utf-8")
     js  = (PATCH_DIR / "patch-scheduler.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-va.js").read_text(encoding="utf-8") \
@@ -150,7 +151,8 @@ def main():
         + "\n\n" + (PATCH_DIR / "patch-v33.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v34.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v35.js").read_text(encoding="utf-8") \
-        + "\n\n" + (PATCH_DIR / "patch-v36.js").read_text(encoding="utf-8")
+        + "\n\n" + (PATCH_DIR / "patch-v36.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v37.js").read_text(encoding="utf-8")
 
     # 2. stylesheet, last thing in <head>
     if "</head>" not in html:
