@@ -2,7 +2,7 @@
 
 Open `index.html` for the GitHub Pages landing page. `loan-suite.html` starts the mortgage suite directly on Quote, and `income-calculator.html` starts the income calculator directly.
 
-Release 35 keeps the complete 14-page Loan Suite and continuous editable Full form while moving every file and loan tool behind one stable Actions control. The Live Summary now stays nested in the right side of the Loan Suite frame, the action panel is viewport-safe, and the header no longer competes with multiple reorder layers. Setup remains an always-open Worksheet with Quick edit, Transaction, Property, Borrower, and Rate & terms rails. Color theme, Light/Dark/OLED surface, and input tone remain independently controlled across both applications.
+Release 35.2 keeps the complete 14-page Loan Suite and continuous editable Full form while moving every file and loan tool behind one stable Actions control. The Loan Suite Live Summary is now a compact, frameless sticky rail: every visible reading opens a small popout where the user can edit the source inputs or jump to the full workspace. The Income Calculator working canvas is centered and capped at 1320px for more comfortable desktop and ultrawide use. The landing page is a minimal two-workspace chooser with one Light/Dark switch that carries into both applications. Setup remains an always-open Worksheet with Quick edit, Transaction, Property, Borrower, and Rate & terms rails.
 
 The income calculator and the renovation suite in one file, with a loan-origination
 style shell over the top: named left navigation, subtabs, five synchronized themes, continuous
@@ -79,7 +79,7 @@ dist/
 python3 build/inject.py src/mortgage-suite-allinone.html dist/mortgage-suite-los.html
 npm test                                      # all pure-logic tests
 python3 build/verify_los.py                   # legacy browser harness
-node build/verify-v35.cjs                     # 38 live UI / responsive checks
+node build/verify-v35.cjs                     # 42 live UI / responsive checks
 ```
 
 `test/run.sh` covers the parts of the layer that are just arithmetic and

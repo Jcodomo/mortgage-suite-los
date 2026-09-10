@@ -237,15 +237,18 @@ html[data-v25-surface="light"] #suite-root .v14-bar>.btn{background:#fff !import
   right:auto !important;bottom:auto !important;
   width:auto !important;max-width:none !important;
   max-height:calc(100vh - var(--v34-chrome,130px) - 28px) !important;
-  margin:0 !important;padding:10px !important;
+  margin:0 !important;padding:2px 0 8px 8px !important;
   overflow:hidden auto !important;
   z-index:24 !important;
-  border-radius:14px !important;
-  box-shadow:0 12px 30px rgba(0,0,0,.18) !important;
+  border:0 !important;border-left:1px solid color-mix(in srgb,var(--v24-border,#2b405c) 72%,transparent) !important;
+  border-radius:0 !important;background:transparent !important;
+  box-shadow:none !important;
 }
+#suite-root .cols-main>.rail.v31-rail>.card{margin:0 !important;padding:4px 8px 8px 12px !important;border:0 !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important}
+#suite-root .cols-main>.rail.v31-rail>.card>h3{margin-bottom:7px !important}
 #suite-root .v251-summary-close{display:none !important}
 #suite-root .rail.v35-summary-pulse{animation:v35-summary-pulse .68s ease}
-@keyframes v35-summary-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--v24-accent,#2D7DD2) 50%,transparent)}45%{box-shadow:0 0 0 4px color-mix(in srgb,var(--v24-accent,#2D7DD2) 35%,transparent)}100%{box-shadow:0 12px 30px rgba(0,0,0,.18)}}
+@keyframes v35-summary-pulse{0%{border-left-color:var(--v24-border,#2b405c)}45%{border-left-color:var(--v24-accent,#2D7DD2)}100%{border-left-color:var(--v24-border,#2b405c)}}
 
 @media (min-width:2400px){#suite-root.v24-summary-open .cols-main,#suite-root.v251-full-active .cols-main,#suite-root .cols-main{grid-template-columns:minmax(0,1fr) 400px !important}}
 @media (max-width:1180px){#suite-root.v24-summary-open .cols-main,#suite-root.v251-full-active .cols-main,#suite-root .cols-main{grid-template-columns:minmax(0,1fr) !important}#suite-root.v24-summary-open .cols-main>.rail.v31-rail,#suite-root.v251-full-active .cols-main>.rail.v31-rail,#suite-root .cols-main>.rail.v31-rail{position:static !important;grid-column:1 !important;max-height:none !important}}
@@ -260,3 +263,23 @@ html[data-v25-surface="light"] #suite-root .v14-bar>.btn{background:#fff !import
 }
 @media(max-width:980px){.v35-quote-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v35-borrower-range>.body>div{grid-template-columns:1fr}}
 @media(max-width:520px){.v35-quote-grid{grid-template-columns:1fr}.v35-sessionbar{grid-template-columns:1fr}.v35-sessionbar button{width:100%}}
+
+/* Keep the Income Calculator's working canvas comfortably readable on
+   large and ultrawide monitors without shrinking its full-width header. */
+#calc-root main .wrap{max-width:1320px !important;margin-inline:auto !important}
+
+/* Compact summary editing popout. It is intentionally separate from the
+   page card system so clicking a result feels immediate, not like opening
+   another full worksheet. */
+.v35-rail-editor{position:fixed;z-index:3300;max-height:calc(100vh - 24px);overflow:auto;padding:0;border:1px solid var(--v24-border,#2b405c);border-radius:13px;background:color-mix(in srgb,var(--v24-card,#111d2d) 96%,#000);color:var(--v24-text,#e8f0fa);box-shadow:0 24px 70px rgba(0,0,0,.46);font-family:inherit}
+.v35-rail-editor header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 13px;border-bottom:1px solid var(--v24-border,#2b405c);background:color-mix(in srgb,var(--v24-header,#0b1422) 92%,transparent)}
+.v35-rail-editor header>div{display:grid;gap:2px}.v35-rail-editor header small{color:var(--v24-accent,#72d8b7);font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.09em}.v35-rail-editor header b{font-size:13px}.v35-rail-editor header button{width:29px;height:29px;padding:0;border:1px solid var(--v24-border,#2b405c);border-radius:7px;background:transparent;color:var(--v24-muted,#94a8c1);font-size:17px;cursor:pointer}
+.v35-rail-current{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 13px;border-bottom:1px solid color-mix(in srgb,var(--v24-border,#2b405c) 65%,transparent);background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 6%,transparent)}.v35-rail-current span{color:var(--v24-muted,#94a8c1);font-size:9px}.v35-rail-current b{font-size:13px;color:var(--v24-accent,#72d8b7);text-align:right}
+.v35-rail-editor>p{margin:0;padding:11px 13px 0;color:var(--v24-muted,#94a8c1);font-size:9px;line-height:1.5}
+.v35-rail-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px 13px}.v35-rail-fields label{display:grid;align-content:start;gap:4px;min-width:0;color:var(--v24-muted,#94a8c1);font-size:9px;font-weight:700}.v35-rail-fields label:only-child{grid-column:1/-1}.v35-rail-fields input,.v35-rail-fields select{width:100%;min-width:0;height:36px;padding:0 10px;border:1px solid var(--field-border,var(--v24-border,#2b405c));border-radius:8px;background:var(--field-bg,#f2f5f8);color:var(--field-text,#102436);-webkit-text-fill-color:var(--field-text,#102436);font:700 11px inherit;outline:none}.v35-rail-fields input:focus,.v35-rail-fields select:focus{border-color:var(--v24-accent,#2D7DD2);box-shadow:0 0 0 3px color-mix(in srgb,var(--v24-accent,#2D7DD2) 16%,transparent)}.v35-rail-fields small{color:var(--v24-muted,#94a8c1);font-size:8px;line-height:1.35}
+.v35-rail-editor footer{display:flex;justify-content:flex-end;gap:7px;padding:10px 13px;border-top:1px solid var(--v24-border,#2b405c)}.v35-rail-editor footer button{min-height:34px;padding:0 12px;border:1px solid var(--v24-border,#2b405c);border-radius:8px;background:transparent;color:var(--v24-text,#e8f0fa);font-size:9.5px;font-weight:800;cursor:pointer}.v35-rail-editor footer button.primary{background:var(--v24-accent,#2D7DD2);border-color:var(--v24-accent,#2D7DD2);color:#fff}
+.v35-live-block{width:100%;border:0;color:var(--v24-text,#e8f0fa);font-family:inherit;text-align:left;cursor:pointer}.v35-live-block:hover{background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 9%,var(--v24-page,#07111e))}
+html[data-v25-surface="light"] .v35-rail-editor{background:#fff;color:#153653;border-color:#cad8e7;box-shadow:0 22px 60px rgba(21,52,85,.22)}
+html[data-v25-surface="light"] .v35-rail-editor header{background:#f5f8fc;border-color:#d6e1ed}html[data-v25-surface="light"] .v35-rail-editor header b{color:#153653}html[data-v25-surface="light"] .v35-rail-editor header button{color:#58718e;border-color:#cbd9e8}
+html[data-v25-surface="light"] .v35-rail-editor footer{border-color:#d6e1ed}html[data-v25-surface="light"] .v35-rail-editor footer button:not(.primary){color:#173858;border-color:#cad9e8;background:#f8fbff}
+@media(max-width:640px){#calc-root main .wrap{padding-inline:8px !important}.v35-rail-editor{left:10px !important;right:10px !important;bottom:10px !important;top:auto !important;width:auto !important}.v35-rail-fields{grid-template-columns:1fr}}

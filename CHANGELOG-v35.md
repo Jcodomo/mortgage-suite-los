@@ -1,5 +1,13 @@
 # Release 35 — every action behind one button
 
+## 35.2 — focused canvas and editable live summary
+
+- Centered the Income Calculator body at a 1320px maximum while preserving full-width navigation.
+- Removed the outer card treatment from the Loan Suite Live Summary and tightened its sticky right rail.
+- Added a consistent summary popout: each right-side result can expose its editable source inputs or open the full source workspace.
+- Replaced the landing dashboard with a minimal two-workspace chooser.
+- Added one compact Light/Dark switch on the landing page that carries its surface and input choice into both applications.
+
 Layers 26–35 on 25.1. All layers V5–V25.1 verified present. Income
 Calculator untouched.
 

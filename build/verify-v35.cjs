@@ -21,13 +21,18 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
   await landingPage.goto(pathToFileURL(LANDING).href);
   await landingPage.waitForTimeout(300);
   const landing = await landingPage.evaluate(() => ({
-    snapshot: Boolean(document.querySelector('.snapshot')),
-    cards: document.querySelectorAll('.snapshot .card').length,
+    chooser: Boolean(document.querySelector('.chooser')),
+    routes: document.querySelectorAll('.routes>a.route').length,
+    toggle: Boolean(document.getElementById('modeToggle')),
     loan: document.querySelectorAll('a[href="loan-suite.html"]').length,
     income: document.querySelectorAll('a[href="income-calculator.html"]').length,
     overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
   }));
-  ok('Landing page provides a responsive workspace snapshot and both launch paths', landing.snapshot && landing.cards >= 5 && landing.loan >= 2 && landing.income >= 2 && landing.overflow <= 1, JSON.stringify(landing));
+  ok('Landing page is a minimal two-workspace chooser', landing.chooser && landing.routes === 2 && landing.toggle && landing.loan === 1 && landing.income === 1 && landing.overflow <= 1, JSON.stringify(landing));
+  await landingPage.locator('#modeToggle').click();
+  const landingTheme = await landingPage.evaluate(() => ({ mode: document.documentElement.dataset.mode, surface: localStorage.getItem('los.v25.surface'), input: localStorage.getItem('los.v24.inputTone') }));
+  ok('Landing appearance switch carries dark surface and input tone forward', landingTheme.mode === 'dark' && landingTheme.surface === 'dark' && landingTheme.input === 'ink', JSON.stringify(landingTheme));
+  await landingPage.waitForTimeout(260);
   await landingPage.screenshot({ path: path.join(SHOT_DIR, 'landing-1920.png'), fullPage: true });
   await landingPage.close();
   const page = await context.newPage();
@@ -203,12 +208,48 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
     const cols = document.querySelector('#suite-root .cols-main');
     const rail = cols.querySelector(':scope > .rail');
     const cr = cols.getBoundingClientRect(), rr = rail.getBoundingClientRect();
+    const style = getComputedStyle(rail), card = rail.querySelector(':scope > .card'), cardStyle = card && getComputedStyle(card);
     return { open: document.getElementById('suite-root').classList.contains('v24-summary-open'),
       position: getComputedStyle(rail).position, display: getComputedStyle(rail).display,
       inside: rr.left >= cr.left && rr.right <= cr.right + 1, railWidth: rr.width,
-      columns: getComputedStyle(cols).gridTemplateColumns };
+      columns: getComputedStyle(cols).gridTemplateColumns, shadow: style.boxShadow,
+      background: style.backgroundColor, cardShadow: cardStyle && cardStyle.boxShadow,
+      cardBackground: cardStyle && cardStyle.backgroundColor };
   });
-  ok('Live summary stays visibly nestled inside the right frame', summary.open && summary.position === 'sticky' && summary.display !== 'none' && summary.inside && summary.railWidth >= 328, JSON.stringify(summary));
+  ok('Live summary stays nestled as a frameless sticky column', summary.open && summary.position === 'sticky' && summary.display !== 'none' && summary.inside && summary.railWidth >= 328 && summary.shadow === 'none' && summary.cardShadow === 'none' && summary.background === 'rgba(0, 0, 0, 0)' && summary.cardBackground === 'rgba(0, 0, 0, 0)', JSON.stringify(summary));
+
+  const summaryPrice = page.locator('#suite-root .cols-main>.rail [data-out="Purchase price"]');
+  if (await summaryPrice.count() === 1) await summaryPrice.click();
+  await page.waitForTimeout(120);
+  const editor = await page.evaluate(() => ({
+    open: Boolean(document.getElementById('v35RailEditor')),
+    field: Boolean(document.querySelector('#v35RailEditor [data-v35-rail-path="basePurchasePrice"]')),
+    apply: Boolean(document.querySelector('#v35RailEditor [data-v35-rail-apply]')),
+    go: Boolean(document.querySelector('#v35RailEditor [data-v35-rail-go]'))
+  }));
+  ok('Every right-side result can open a direct-edit or navigate popout', editor.open && editor.field && editor.apply && editor.go, JSON.stringify(editor));
+  if (editor.open) {
+    await page.screenshot({ path: path.join(SHOT_DIR, 'summary-editor-1920.png'), fullPage: false });
+    await page.locator('#v35RailEditor [data-v35-rail-path="basePurchasePrice"]').fill('625k');
+    await page.locator('#v35RailEditor [data-v35-rail-apply]').click();
+    await page.waitForTimeout(380);
+  }
+  const summaryEdit = await page.evaluate(() => ({ price: mortgageSuite.store.activeInputs.basePurchasePrice, loan: mortgageSuite.store.outputs.loan.totalLoan, popup: Boolean(document.getElementById('v35RailEditor')) }));
+  ok('Direct summary edits use the live calculation engine', summaryEdit.price === 625000 && summaryEdit.loan > 0 && !summaryEdit.popup, JSON.stringify(summaryEdit));
+  const railCoverage = await page.evaluate(() => {
+    const rail = document.querySelector('#suite-root .cols-main>.rail');
+    const rows = [...rail.querySelectorAll('.v35-live-row,.v35-live-block,.v35-live-warnings button,[data-out],[title="Open ARV inputs"]')]
+      .filter(row => getComputedStyle(row).display !== 'none');
+    const failed = [];
+    rows.forEach(row => {
+      row.click();
+      const editor = document.getElementById('v35RailEditor');
+      if (!editor || !editor.querySelector('[data-v35-rail-go]')) failed.push(row.dataset.v35Label || row.dataset.out || row.textContent.trim().slice(0,40));
+      if (window.V35) V35.closeRailEditor();
+    });
+    return { rows: rows.length, failed };
+  });
+  ok('All visible right-side readings open the shared popout', railCoverage.rows >= 20 && railCoverage.failed.length === 0, JSON.stringify(railCoverage));
 
   await clickAction('Full form');
   ok('Full form action opens the complete editable sheet', await page.evaluate(() => document.getElementById('suite-root').classList.contains('v251-full-active') && document.querySelectorAll('#v25FullSheet .v251-full-screen').length === 14));
@@ -269,9 +310,12 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
   const income = await page.evaluate(() => ({
     visible: getComputedStyle(document.getElementById('calc-root')).display !== 'none',
     errors: document.querySelectorAll('#calc-root input[type="number"], #calc-root input[type="date"]').length,
-    nav: document.querySelectorAll('#calc-root .tab, #calc-root [data-mode]').length
+    nav: document.querySelectorAll('#calc-root .tab, #calc-root [data-mode]').length,
+    width: document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().width || 0,
+    centered: Math.abs((document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().left || 0) - (innerWidth - (document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().width || 0)) / 2) < 2
   }));
-  ok('Income Calculator remains available with freeform controls', income.visible && income.errors === 0 && income.nav > 0, JSON.stringify(income));
+  ok('Income Calculator remains centered, narrower, and freeform', income.visible && income.errors === 0 && income.nav > 0 && income.width <= 1321 && income.centered, JSON.stringify(income));
+  await page.screenshot({ path: path.join(SHOT_DIR, 'income-1920.png'), fullPage: false });
 
   await page.evaluate(() => { SHELL.go('suite'); mortgageSuite.store.setMode('setup'); });
   await page.setViewportSize({ width: 1920, height: 1080 });

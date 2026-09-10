@@ -90,7 +90,7 @@ V35.focusSummary = function(){
   setTimeout(function(){rail.classList.remove('v35-summary-pulse');},700);
 };
 V35.toggle = function(){ V35.open ? V35.close() : V35.show(); };
-V35.go = function(mode){ var s=window.mortgageSuite&&mortgageSuite.store;if(!s)return;V35.close();if(mode==='rates'&&window.V251&&V251.openPage)V251.openPage('MORTGAGE RATES');else s.setMode(mode);setTimeout(function(){var body=$('screen-body');if(body)body.scrollIntoView({behavior:'smooth',block:'start'});},80); };
+V35.go = function(mode){ var s=window.mortgageSuite&&mortgageSuite.store;V35.close();V35.closeRailEditor();if(mode==='income'){if(window.SHELL&&SHELL.go)SHELL.go('calc');return;}if(!s)return;if(mode==='rates'&&window.V251&&V251.openPage)V251.openPage('MORTGAGE RATES');else s.setMode(mode);setTimeout(function(){var body=$('screen-body');if(body)body.scrollIntoView({behavior:'smooth',block:'start'});},80); };
 V35.restoreSession = function(index){try{var list=window.LOS&&LOS.AUTO?LOS.AUTO.list().slice(0,3):[];if(list[index])LOS.AUTO.restore(index);}catch(e){}V35.close();};
 V35.position = function(){
   var p=$('v35Panel'),b=$('v35Btn');if(!p||!b||!V35.open)return;if(innerWidth<=640){['left','right','top','bottom'].forEach(function(k){p.style.removeProperty(k);});return;}
@@ -176,6 +176,54 @@ function money(v){var n=num(v);return(n<0?'-':'')+'$'+Math.abs(n).toLocaleString
 function percent(v,d){var n=num(v);if(Math.abs(n)<=1)n*=100;return n.toFixed(d==null?2:d).replace(/\.00$/,'')+'%';}
 function pathGet(obj,path){return String(path).split('.').reduce(function(a,k){return a==null?undefined:a[k];},obj);}
 
+/* Every reading in the right summary opens the same small decision surface:
+   change the input that drives it here, or jump to the full workspace. The
+   calculation engine remains the only writer of calculated outputs. */
+function railSpec(label,modeHint){
+  var t=norm(label).toLowerCase(),s=store(),o=s&&s.outputs||{},isFha=Boolean(o.isFha),spec={title:norm(label)||'Live summary detail',mode:modeHint||'advanced',fields:[]};
+  function f(label,path,kind,help,options){spec.fields.push({label:label,path:path,kind:kind||'num',help:help||'',options:options||null});}
+  if(/purchase price/.test(t)){spec.mode='setup';f('Purchase price','basePurchasePrice','num');}
+  else if(/^program/.test(t)){spec.mode='setup';f('Loan program','loanProgram','select','', ['FHA','Conventional']);}
+  else if(/^interest rate|principal & interest|payment range/.test(t)){spec.mode='rates';f('Interest rate %','interestRate','pct');f('Term (years)','termYears','num');}
+  else if(/^renovation/.test(t)){spec.mode='renovation';f('Renovation included','renovation','select','',['true','false']);f('Renovation base cost','reno.baseCost','num');}
+  else if(/after-repair|arv/.test(t)){spec.mode='maxmortgage';f('After-repair value','afterRepairValue','num');}
+  else if(/required investment/.test(t)){spec.mode='setup';f('Down payment %','finalDownPaymentPct','pct');}
+  else if(/maximum base loan/.test(t)){spec.mode='maxmortgage';f('After-repair value','afterRepairValue','num');f('Down payment %','finalDownPaymentPct','pct');}
+  else if(/ufmip/.test(t)){spec.mode='maxmortgage';f('UFMIP rate %','ufmipRate','pct');}
+  else if(/mortgage insurance|\bpmi\b|\bmip\b/.test(t)){spec.mode='qualify';f(isFha?'Annual FHA MIP rate %':'Annual PMI rate %',isFha?'fhaAnnualMipRate':'pmiOverrideRate','pct');}
+  else if(/taxes & insurance|total payment/.test(t)){spec.mode='escrow';f('Annual property taxes','propertyTaxAmount','num');f('Annual homeowners insurance','insuranceAmount','num');}
+  else if(/closing costs/.test(t)){spec.mode='closing';f('Title insurance override','closing.overrides.titleInsurance','num','Leave blank to keep the suite estimate.');f('Other buyer costs','closing.overrides.other','num');}
+  else if(/seller credit/.test(t)){spec.mode='closing';f('Seller credit $','sellerConcessionAmount','num');}
+  else if(/earnest money/.test(t)){spec.mode='closing';f('Earnest money deposit','closing.earnestMoneyDeposit','num');}
+  else if(/cash to close/.test(t)){spec.mode='closing';f('Down payment %','finalDownPaymentPct','pct');f('Closing-cost cushion %','closing.cushionPct','pct');}
+  else if(/total loan/.test(t)){spec.mode='maxmortgage';f('Purchase price','basePurchasePrice','num');f('Down payment %','finalDownPaymentPct','pct');}
+  else if(/^dti|income needed|front \/ back|back-end/.test(t)){spec.mode='income';spec.note='Income and liabilities are maintained in the Income Calculator so both workspaces use the same underwriting figures.';}
+  else if(/reserve/.test(t)){spec.mode='qualify';f('Liquid assets','assets.liquidAssets','num');f('Gift funds','assets.giftFunds','num');}
+  else if(/blocking warning/.test(t)){spec.mode='advanced';spec.note='Open Advanced to review every warning and its source calculation.';}
+  else if(modeHint==='maxmortgage'){f('After-repair value','afterRepairValue','num');}
+  else if(modeHint==='closing'){f('Closing-cost cushion %','closing.cushionPct','pct');}
+  else if(modeHint==='escrow'){f('Annual property taxes','propertyTaxAmount','num');f('Annual homeowners insurance','insuranceAmount','num');}
+  return spec;
+}
+function railValue(field,inputs){
+  var v=pathGet(inputs,field.path);if(field.kind==='pct'&&v!==''&&v!=null)return String(num(v)*100);if(field.kind==='select'&&field.path==='renovation')return String(Boolean(v));return v==null?'':String(v);
+}
+V35.closeRailEditor=function(){var p=$('v35RailEditor');if(p)p.remove();};
+V35.openRailEditor=function(row,forcedLabel,forcedMode){
+  var s=store();if(!s||!row)return;var label=forcedLabel||row.dataset.v35Label||row.dataset.out||((row.querySelector&&row.querySelector('.l,span,b'))||{}).textContent||norm(row.textContent),mode=forcedMode||row.dataset.v35Mode||'',spec=railSpec(label,mode),p=$('v35RailEditor');if(p)p.remove();
+  p=document.createElement('aside');p.id='v35RailEditor';p.className='v35-rail-editor no-print';p.setAttribute('role','dialog');p.setAttribute('aria-label',spec.title+' options');
+  var fields=spec.fields.map(function(x,index){var options=x.options?'<select data-v35-rail-path="'+esc(x.path)+'" data-kind="'+esc(x.kind)+'">'+x.options.map(function(v){var current=railValue(x,s.activeInputs),label=x.path==='renovation'?(v==='true'?'Yes':'No'):v;return'<option value="'+esc(v)+'"'+(String(current)===String(v)?' selected':'')+'>'+esc(label)+'</option>';}).join('')+'</select>':'<input type="text" inputmode="'+(x.kind==='pct'||x.kind==='num'?'decimal':'text')+'" autocomplete="off" data-v35-rail-path="'+esc(x.path)+'" data-kind="'+esc(x.kind)+'" value="'+esc(railValue(x,s.activeInputs))+'">';return'<label><span>'+esc(x.label)+'</span>'+options+(x.help?'<small>'+esc(x.help)+'</small>':'')+'</label>';}).join('');
+  var valueNode=row.querySelector&&row.querySelector('.v,.value,b:last-child'),shown=valueNode?norm(valueNode.textContent):'';
+  p.innerHTML='<header><div><small>Live summary</small><b>'+esc(spec.title)+'</b></div><button type="button" data-v35-rail-close aria-label="Close">×</button></header>'+(shown?'<div class="v35-rail-current"><span>Current result</span><b>'+esc(shown)+'</b></div>':'')+(spec.note?'<p>'+esc(spec.note)+'</p>':'')+(fields?'<div class="v35-rail-fields">'+fields+'</div>':'')+'<footer>'+(fields?'<button type="button" class="primary" data-v35-rail-apply>Apply change</button>':'')+'<button type="button" data-v35-rail-go>Open '+esc(spec.mode==='income'?'Income Calculator':spec.mode==='rates'?'Mortgage Rates':spec.mode==='maxmortgage'?'Max Mortgage':spec.mode==='escrow'?'Taxes & Escrow':spec.mode.charAt(0).toUpperCase()+spec.mode.slice(1))+'</button></footer>';
+  document.body.appendChild(p);var r=row.getBoundingClientRect(),w=Math.min(390,innerWidth-24),left=Math.max(12,Math.min(innerWidth-w-12,r.left-w-12));if(left<12||r.left<420)left=Math.max(12,Math.min(innerWidth-w-12,r.right-w));p.style.width=w+'px';p.style.left=left+'px';p.style.top=Math.max(12,Math.min(innerHeight-p.offsetHeight-12,r.top))+'px';
+  var close=p.querySelector('[data-v35-rail-close]'),go=p.querySelector('[data-v35-rail-go]'),apply=p.querySelector('[data-v35-rail-apply]');close.onclick=V35.closeRailEditor;go.onclick=function(){V35.go(spec.mode);};if(apply)apply.onclick=function(){
+    $$('[data-v35-rail-path]',p).forEach(function(input){var path=input.dataset.v35RailPath,kind=input.dataset.kind,raw=input.value;if(kind==='select'&&path==='renovation')s.setField(path,raw==='true','Live summary edit');else if(window.V20&&V20.setScenario)V20.setScenario(path,raw,kind==='pct'?'pct':kind==='num'?'num':'text');else s.setField(path,raw,'Live summary edit');if(path==='propertyTaxAmount')s.setField('propertyTaxBasis','Annual','Live summary edit');if(path==='insuranceAmount')s.setField('insuranceBasis','Annual','Live summary edit');if(path==='sellerConcessionAmount')s.setField('concessionInputMode','dollar','Live summary edit');});V35.closeRailEditor();
+  };if(window.V19)V19.enhanceFreeform(p);
+};
+function wireRail(){
+  var rail=document.querySelector('#suite-root .cols-main>.rail');if(!rail||rail.dataset.v35Editor)return;rail.dataset.v35Editor='1';rail.addEventListener('click',function(e){var row=e.target.closest('.v35-live-row,.v35-live-block,.v35-live-warnings button,[data-out],[title="Open ARV inputs"]');if(!row||!rail.contains(row)||e.target.closest('.v24-explain-costs'))return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();V35.openRailEditor(row);},true);
+}
+
 function nestedTabs(){
   var s=store(),tabs=document.querySelector('#suite-root .tabs');if(!s||!tabs)return;
   $$('.tab',tabs).forEach(function(tab){var label=norm(tab.dataset.v23Key||tab.textContent).toUpperCase();tab.classList.toggle('v35-nested-source',label==='MAX MORTGAGE'||label==='ESCROW'||label==='DOCUMENTS & OCR');});
@@ -192,8 +240,8 @@ function quoteControls(){
 function liveDetails(){
   var s=store(),rail=document.querySelector('#suite-root .cols-main>.rail');if(!s||!rail)return;var i=s.activeInputs,o=s.outputs||{},a=o.aus||{},p=o.payment||{},c=o.closing||{},cash=o.cash||{},reno=o.renovationOut||{},warnings=(o.warnings||[]).filter(function(w){if(!o.renovationActive&&(w.code==='MISSING_APPRAISAL_VALUE'||w.code==='ARV_SHORTFALL'))return false;if(w.code==='MISSING_TAX_SOURCE'&&i.taxSourceType==='MLS / Zillow / Redfin Estimate')return false;return w.severity==='error'||w.severity==='warning'||w.level==='error'||w.level==='fail'||w.blocking;});
   var h=num(a.housingPayment||p.totalMonthlyPayment),debts=num(a.totalMonthlyLiabilities),fhaFront=h/.31,fhaBack=Math.max(fhaFront,(h+debts)/.43),convFront=h/.36,convBack=Math.max(convFront,(h+debts)/.50),sig=[o.programLabel,i.interestRate,reno.finalRenovationAmount,h,debts,warnings.map(function(w){return w.code;}).join('|')].join('|'),box=$('v35LiveDetails');if(box&&box.dataset.sig===sig)return;if(!box){box=document.createElement('section');box.id='v35LiveDetails';box.className='v35-live-details';rail.appendChild(box);}box.dataset.sig=sig;
-  function row(label,value,mode,cls){return'<button type="button" class="v35-live-row '+(cls||'')+'" onclick="V35.go(\''+mode+'\')"><span>'+label+'</span><b>'+value+'</b></button>';}
-  box.innerHTML='<h3>Live planning</h3>'+row('Program',esc(o.programLabel||i.loanProgram||'Loan'),'setup')+row('Interest rate',percent(i.interestRate,3),'rates')+row('Renovation',o.renovationActive?money(reno.finalRenovationAmount):'Not included','renovation')+'<div class="v35-live-block"><span>Blocking warnings</span><b class="'+(warnings.length?'bad':'pass')+'">'+warnings.length+'</b></div>'+(warnings.length?'<div class="v35-live-warnings">'+warnings.slice(0,4).map(function(w){var go=(w.goto&&w.goto.tab)||w.section||w.target||'advanced';return'<button type="button" onclick="V35.go(\''+esc(go)+'\')"><b>'+esc(w.title||'Review item')+'</b><small>'+esc(w.detail||'Open the related workspace to review.')+'</small></button>';}).join('')+'</div>':'')+'<h4>Income needed - live planning</h4><div class="v35-income-needed">'+row('FHA front / back',money(fhaFront)+' / '+money(fhaBack),'qualify')+row('Conventional front / back',money(convFront)+' / '+money(convBack),'qualify')+'</div><h4>Advanced snapshot</h4>'+row('Back-end DTI',a.totalQualifyingIncome>0?percent(a.backEndDti,1):'Enter income','advanced')+row('Cash to close range',money(cash.cashToCloseLow)+' - '+money(cash.cashToCloseHigh),'closing')+row('Payment range',money(p.paymentLow)+' - '+money(p.paymentHigh),'qualify');
+  function row(label,value,mode,cls){return'<button type="button" class="v35-live-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'"><span>'+label+'</span><b>'+value+'</b></button>';}
+  box.innerHTML='<h3>Live planning</h3>'+row('Program',esc(o.programLabel||i.loanProgram||'Loan'),'setup')+row('Interest rate',percent(i.interestRate,3),'rates')+row('Renovation',o.renovationActive?money(reno.finalRenovationAmount):'Not included','renovation')+'<button type="button" class="v35-live-block" data-v35-label="Blocking warnings" data-v35-mode="advanced"><span>Blocking warnings</span><b class="'+(warnings.length?'bad':'pass')+'">'+warnings.length+'</b></button>'+(warnings.length?'<div class="v35-live-warnings">'+warnings.slice(0,4).map(function(w){var go=(w.goto&&w.goto.tab)||w.section||w.target||'advanced';return'<button type="button" data-v35-label="'+esc(w.title||'Review item')+'" data-v35-mode="'+esc(go)+'"><b>'+esc(w.title||'Review item')+'</b><small>'+esc(w.detail||'Open the related workspace to review.')+'</small></button>';}).join('')+'</div>':'')+'<h4>Income needed - live planning</h4><div class="v35-income-needed">'+row('FHA front / back',money(fhaFront)+' / '+money(fhaBack),'income')+row('Conventional front / back',money(convFront)+' / '+money(convBack),'income')+'</div><h4>Advanced snapshot</h4>'+row('Back-end DTI',a.totalQualifyingIncome>0?percent(a.backEndDti,1):'Enter income','income')+row('Cash to close range',money(cash.cashToCloseLow)+' - '+money(cash.cashToCloseHigh),'closing')+row('Payment range',money(p.paymentLow)+' - '+money(p.paymentHigh),'rates');
 }
 
 function borrowerRange(){
@@ -205,7 +253,7 @@ function enhanceAdvancedLinks(){var s=store();if(!s||s.snapshot.mode!=='advanced
 function seedLight(){try{if(localStorage.getItem('los.v35.appearanceSeeded')==='1')return;localStorage.setItem('los.v35.appearanceSeeded','1');if(window.V24){V24.setTheme('ledger',true);V24.setInput('paper');}if(window.V25)V25.setSurface('light');}catch(e){}}
 function documentsNav(){var nav=$('v23SuitePrimaryNav'),docs=$('v28nav-documents'),full=nav&&nav.querySelector('[data-group="full"]');if(!nav||!docs||!full)return;docs.classList.remove('v28-direct');docs.classList.add('v35-documents-nav');docs.innerHTML='<span class="v23-nav-icon i-file" aria-hidden="true"><i></i></span><span>Documents</span>';docs.onclick=function(){V35.close();if(window.V251&&V251.openPage)V251.openPage('DOCUMENTS & OCR');else{var s=store();if(s)s.setMode('documents');}};if(docs.previousElementSibling!==full)nav.insertBefore(docs,full.nextSibling);}
 function watchScreen(){var body=$('screen-body');if(!body||V35.__screenObserver)return;V35.__screenObserver=new MutationObserver(function(){if(V35.__enhanceQueued)return;V35.__enhanceQueued=true;setTimeout(function(){V35.__enhanceQueued=false;enhance();},20);});V35.__screenObserver.observe(body,{childList:true,subtree:false});}
-function enhance(){seedLight();documentsNav();nestedTabs();quoteControls();liveDetails();borrowerRange();enhanceAdvancedLinks();watchScreen();}
+function enhance(){seedLight();documentsNav();nestedTabs();quoteControls();liveDetails();wireRail();borrowerRange();enhanceAdvancedLinks();watchScreen();}
 
 function markRelease(){var current=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(current)||current<35)document.documentElement.dataset.losRelease='35';}
 
@@ -214,7 +262,7 @@ document.addEventListener('mousedown', function(e){
   if (e.target.closest('#v35Panel') || e.target.closest('#v35Btn')) return;
   V35.close();
 });
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape') V35.close(); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){V35.close();V35.closeRailEditor();} });
 window.addEventListener('resize',V35.position,{passive:true});window.addEventListener('scroll',V35.position,{passive:true});
 
 setInterval(function(){
