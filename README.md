@@ -2,7 +2,7 @@
 
 Open `index.html` for the GitHub Pages landing page. `loan-suite.html` starts the mortgage suite directly on Setup, and `income-calculator.html` starts the income calculator directly.
 
-Release 24 presents the Loan Suite as five grouped workspaces and the Income Calculator as three grouped workflows. Setup now uses one always-open Worksheet with Quick edit, Transaction, Property, Borrower, and Rate & terms rails. Secondary actions are consolidated, page theme and input-field tone are controlled separately, and long pages use progressive off-screen rendering while every existing route and calculation remains available. Midnight Terminal is the default; ten page palettes and five field tones remain independently selectable.
+Release 25 presents the Loan Suite as five grouped workspaces plus a continuous Full-file view, and the Income Calculator as three grouped workflows. Setup uses one always-open Worksheet with Quick edit, Transaction, Property, Borrower, and Rate & terms rails. A two-level scenario masthead, compact icon navigation, six-number summary strip, and structured dark action menus match the Income Calculator's visual language. Color theme, Light/Dark/OLED surface, and input tone are independently controlled across both applications. Midnight Terminal with the Dark surface remains the default.
 
 The income calculator and the renovation suite in one file, with a loan-origination
 style shell over the top: named left navigation, subtabs, four synchronized themes, continuous
