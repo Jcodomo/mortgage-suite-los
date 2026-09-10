@@ -266,7 +266,7 @@ html[data-v25-surface="light"] #suite-root .v14-bar>.btn{background:#fff !import
 
 /* Keep the Income Calculator's working canvas comfortably readable on
    large and ultrawide monitors without shrinking its full-width header. */
-#calc-root main .wrap{max-width:1320px !important;margin-inline:auto !important}
+#calc-root main .wrap,#suite-root .app,#suite-root .cols-main{width:100% !important;max-width:1320px !important;margin-inline:auto !important}
 
 /* Compact summary editing popout. It is intentionally separate from the
    page card system so clicking a result feels immediate, not like opening
@@ -283,3 +283,34 @@ html[data-v25-surface="light"] .v35-rail-editor{background:#fff;color:#153653;bo
 html[data-v25-surface="light"] .v35-rail-editor header{background:#f5f8fc;border-color:#d6e1ed}html[data-v25-surface="light"] .v35-rail-editor header b{color:#153653}html[data-v25-surface="light"] .v35-rail-editor header button{color:#58718e;border-color:#cbd9e8}
 html[data-v25-surface="light"] .v35-rail-editor footer{border-color:#d6e1ed}html[data-v25-surface="light"] .v35-rail-editor footer button:not(.primary){color:#173858;border-color:#cad9e8;background:#f8fbff}
 @media(max-width:640px){#calc-root main .wrap{padding-inline:8px !important}.v35-rail-editor{left:10px !important;right:10px !important;bottom:10px !important;top:auto !important;width:auto !important}.v35-rail-fields{grid-template-columns:1fr}}
+
+/* 35.3 - the Quote screen owns the complete program preset rail. */
+.v35-quote-presets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 0 10px}
+#suite-root .v35-quote-presets button{min-width:0 !important;min-height:46px !important;display:grid !important;grid-template-columns:1fr !important;align-content:center !important;justify-items:start !important;gap:3px !important;padding:7px 10px !important;border:1px solid var(--v24-border,#2b405c) !important;border-radius:8px !important;background:color-mix(in srgb,var(--v24-page,#07111e) 74%,var(--v24-card,#111d2d)) !important;color:var(--v24-text,#e8f0fa) !important;font-family:inherit !important;text-align:left !important;cursor:pointer;box-shadow:none !important}
+#suite-root .v35-quote-presets button:hover{border-color:var(--v24-accent,#2D7DD2) !important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 9%,var(--v24-card,#111d2d)) !important}
+#suite-root .v35-quote-presets button.active{border-color:var(--v24-accent,#2D7DD2) !important;box-shadow:inset 3px 0 0 var(--v24-accent,#2D7DD2) !important}
+#suite-root .v35-quote-presets b{display:block;max-width:100%;font-size:9.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#suite-root .v35-quote-presets span{display:block;max-width:100%;font-size:8px;line-height:1.2;color:var(--v24-muted,#94a8c1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#suite-root #v30Presets{display:none !important}
+html[data-v25-surface="light"] #suite-root .v35-quote-presets button{background:#f8fbff !important;color:#173858 !important;border-color:#d4e1ee !important}
+
+/* Use the same centered 1320px working measure as the Income Calculator. */
+#suite-root .v25-header-main,#suite-root .v25-header-actions{max-width:1320px !important;margin-inline:auto !important}
+#suite-root .v23-primary-nav,#suite-root .v23-context-tabs{padding-left:max(14px,calc((100vw - 1320px)/2)) !important;padding-right:max(14px,calc((100vw - 1320px)/2)) !important}
+
+/* The browser owns page scrolling. Local scrolling remains only where it
+   is useful: data tables, modal sheets, action menus and previews. */
+html{overflow-y:scroll;scrollbar-gutter:stable}
+body,#calc-root,#suite-root,#calc-root main,#suite-root .app,#suite-root #screen-body{overflow-y:visible !important}
+#suite-root .v31-main{overflow:visible !important}
+#suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+#suite-root.v251-full-active .cols-main>.rail.v31-rail,
+#suite-root .cols-main>.rail.v31-rail{max-height:none !important;overflow:visible !important}
+
+/* Documents gets the entire centered canvas; its generators and OCR review
+   do not compete with a stale scenario summary. */
+#suite-root.v35-documents-active .cols-main{grid-template-columns:minmax(0,1fr) !important}
+#suite-root.v35-documents-active .cols-main>.rail.v31-rail{display:none !important}
+
+@media(max-width:980px){.v35-quote-presets{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.v35-quote-presets{grid-template-columns:1fr}}

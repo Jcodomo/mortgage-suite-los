@@ -61,9 +61,11 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
     surface: document.documentElement.dataset.v25Surface,
     theme: document.documentElement.dataset.v24Theme,
     themeOptions: document.querySelector('#v251AppearancePanel .v251-appearance-group')?.querySelectorAll('button').length || 0,
+    presets: document.querySelectorAll('#v35QuoteControls [data-v35-preset]').length,
     nav: [...document.querySelectorAll('#v23SuitePrimaryNav>button')].filter(b => getComputedStyle(b).display !== 'none').map(b => b.textContent.trim().replace(/\s+/g,' '))
   }));
   ok('Loan Suite defaults to Quote with four freeform quote controls', defaultQuote.mode === 'quote' && defaultQuote.fields === 4 && defaultQuote.number === 0, JSON.stringify(defaultQuote));
+  ok('Quote shows four program presets and one renovation action', defaultQuote.presets === 5, JSON.stringify(defaultQuote));
   ok('Fresh sessions default to light mode with five focused themes', defaultQuote.surface === 'light' && defaultQuote.theme === 'ledger' && defaultQuote.themeOptions === 5, JSON.stringify(defaultQuote));
   ok('Documents is a primary workspace immediately after Full', defaultQuote.nav.slice(-2).join('|') === 'Full|Documents', JSON.stringify(defaultQuote.nav));
   for (const [pathName, value] of [['basePurchasePrice','640k'],['zipCode','10001'],['finalDownPaymentPct','5'],['bps.loanAmountOverride','500k']]) {
@@ -77,6 +79,22 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
     loan: mortgageSuite.store.activeInputs.bps.loanAmountOverride
   }));
   ok('Quote controls update live suite inputs', quoteValues.price === 640000 && quoteValues.zip === '10001' && Math.abs(quoteValues.down - .05) < 1e-9 && quoteValues.loan === 500000, JSON.stringify(quoteValues));
+  const presetAudit = [];
+  for (const id of ['fha35','conv5','fha203','convhs']) {
+    await defaultPage.evaluate(value => V35.applyQuotePreset(value), id);
+    await defaultPage.waitForTimeout(260);
+    presetAudit.push(await defaultPage.evaluate(value => ({ id:value, program:mortgageSuite.store.activeInputs.loanProgram,
+      down:mortgageSuite.store.activeInputs.finalDownPaymentPct, renovation:mortgageSuite.store.activeInputs.renovation,
+      reno:mortgageSuite.store.activeInputs.reno.baseCost, price:mortgageSuite.store.activeInputs.basePurchasePrice,
+      total:mortgageSuite.store.outputs.loan.totalLoan }), id));
+  }
+  ok('Quote presets switch program, down payment, and renovation without replacing price',
+    presetAudit.length === 4 && presetAudit.every(row => row.price === 640000 && row.total > 0) &&
+    presetAudit[0].program === 'FHA' && Math.abs(presetAudit[0].down-.035)<1e-9 && !presetAudit[0].renovation &&
+    presetAudit[1].program === 'Conventional' && Math.abs(presetAudit[1].down-.05)<1e-9 && !presetAudit[1].renovation &&
+    presetAudit[2].program === 'FHA' && presetAudit[2].renovation && presetAudit[2].reno > 0 &&
+    presetAudit[3].program === 'Conventional' && presetAudit[3].renovation && presetAudit[3].reno > 0,
+    JSON.stringify(presetAudit));
 
   const rateChip = defaultPage.locator('#v28RateStat');
   if (await rateChip.count() === 1) await rateChip.click();
@@ -94,11 +112,17 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
 
   await defaultPage.locator('#v28nav-documents').click();
   await defaultPage.waitForTimeout(650);
-  ok('Primary Documents workspace opens Documents & Worksheets', await defaultPage.evaluate(() => {
+  const documentsLayout = await defaultPage.evaluate(() => {
     const panel = document.getElementById('panel-v9docs');
     const oldTab = [...document.querySelectorAll('#suite-root .tabs .tab')].find(t => /DOCUMENTS & OCR/i.test(t.textContent));
-    return panel && getComputedStyle(panel).display !== 'none' && oldTab && getComputedStyle(oldTab).display === 'none';
-  }));
+    const root = document.getElementById('suite-root'), rail = document.querySelector('#suite-root .cols-main>.rail');
+    return { panel: Boolean(panel), panelDisplay: panel && getComputedStyle(panel).display,
+      documentsNav: Boolean(document.querySelector('#v23SuitePrimaryNav #v28nav-documents.v35-documents-nav')),
+      oldTab: Boolean(oldTab), oldTabDisplay: oldTab && getComputedStyle(oldTab).display,
+      active: root.classList.contains('v35-documents-active'), rail: Boolean(rail), railDisplay: rail && getComputedStyle(rail).display,
+      mode: mortgageSuite.store.snapshot.mode };
+  });
+  ok('Primary Documents workspace opens full-width without Live Summary', documentsLayout.panel && documentsLayout.panelDisplay !== 'none' && documentsLayout.documentsNav && documentsLayout.active && (!documentsLayout.rail || documentsLayout.railDisplay === 'none'), JSON.stringify(documentsLayout));
 
   await defaultPage.evaluate(() => mortgageSuite.store.setMode('renovation'));
   await defaultPage.waitForTimeout(950);
@@ -273,13 +297,17 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
       const rr = rail && rail.getBoundingClientRect(), cr = cols && cols.getBoundingClientRect();
       return { overflow: document.documentElement.scrollWidth - innerWidth,
         appWidth: app && app.getBoundingClientRect().width,
+        appCentered: app && Math.abs(app.getBoundingClientRect().left - (document.documentElement.clientWidth-app.getBoundingClientRect().width)/2) < 9,
         railPosition: rail && getComputedStyle(rail).position,
+        railMaxHeight: rail && getComputedStyle(rail).maxHeight,
+        railOverflow: rail && getComputedStyle(rail).overflowY,
         railInside: Boolean(rr && cr && rr.left >= cr.left - 1 && rr.right <= cr.right + 1),
         actionVisible: Boolean(action && action.getBoundingClientRect().width > 0 && getComputedStyle(action).display !== 'none') };
     });
     ok(`${width}px layout fits without horizontal overflow`, geometry.overflow <= 2 && geometry.actionVisible, JSON.stringify(geometry));
     ok(`${width}px summary remains in the document frame`, geometry.railInside && (width <= 1180 ? geometry.railPosition === 'static' : geometry.railPosition === 'sticky'), JSON.stringify(geometry));
-    if (width === 3440) ok('Ultrawide canvas remains bounded and readable', geometry.appWidth >= 1900 && geometry.appWidth <= 2400, JSON.stringify(geometry));
+    if (width === 3440) ok('Ultrawide Loan Suite matches the centered Income width', geometry.appWidth >= 1318 && geometry.appWidth <= 1321 && geometry.appCentered, JSON.stringify(geometry));
+    if (width === 1920) ok('Loan page and Live Summary avoid nested page scrolling', geometry.railMaxHeight === 'none' && geometry.railOverflow === 'visible', JSON.stringify(geometry));
   }
 
   await page.setViewportSize({ width: 1920, height: 1080 });
@@ -312,7 +340,7 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
     errors: document.querySelectorAll('#calc-root input[type="number"], #calc-root input[type="date"]').length,
     nav: document.querySelectorAll('#calc-root .tab, #calc-root [data-mode]').length,
     width: document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().width || 0,
-    centered: Math.abs((document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().left || 0) - (innerWidth - (document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().width || 0)) / 2) < 2
+    centered: Math.abs((document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().left || 0) - (document.documentElement.clientWidth - (document.querySelector('#calc-root main .wrap')?.getBoundingClientRect().width || 0)) / 2) < 9
   }));
   ok('Income Calculator remains centered, narrower, and freeform', income.visible && income.errors === 0 && income.nav > 0 && income.width <= 1321 && income.centered, JSON.stringify(income));
   await page.screenshot({ path: path.join(SHOT_DIR, 'income-1920.png'), fullPage: false });

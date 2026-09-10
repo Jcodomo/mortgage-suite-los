@@ -1,5 +1,13 @@
 # Release 35 — every action behind one button
 
+## 35.3 — aligned canvases, clean scrolling, Quote presets
+
+- Matched the Loan Suite working width and centered alignment to the Income Calculator at 1320px.
+- Removed nested page-level scrolling from both workspaces while retaining local scrolling for tables, menus, previews, and dialogs.
+- Gave Documents & Worksheets the full canvas and hid the Live Summary rail while that workspace is open.
+- Moved the four program presets and renovation action to Quote.
+- Presets update program, down payment, renovation state, and the default renovation budget without overwriting the current purchase price or ZIP.
+
 ## 35.2 — focused canvas and editable live summary
 
 - Centered the Income Calculator body at a 1320px maximum while preserving full-width navigation.

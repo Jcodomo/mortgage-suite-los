@@ -90,7 +90,7 @@ V35.focusSummary = function(){
   setTimeout(function(){rail.classList.remove('v35-summary-pulse');},700);
 };
 V35.toggle = function(){ V35.open ? V35.close() : V35.show(); };
-V35.go = function(mode){ var s=window.mortgageSuite&&mortgageSuite.store;V35.close();V35.closeRailEditor();if(mode==='income'){if(window.SHELL&&SHELL.go)SHELL.go('calc');return;}if(!s)return;if(mode==='rates'&&window.V251&&V251.openPage)V251.openPage('MORTGAGE RATES');else s.setMode(mode);setTimeout(function(){var body=$('screen-body');if(body)body.scrollIntoView({behavior:'smooth',block:'start'});},80); };
+V35.go = function(mode){ var s=window.mortgageSuite&&mortgageSuite.store;V35.close();V35.closeRailEditor();V35.documentsActive=false;if(mode==='income'){if(window.SHELL&&SHELL.go)SHELL.go('calc');return;}if(!s)return;if(mode==='rates'&&window.V251&&V251.openPage)V251.openPage('MORTGAGE RATES');else s.setMode(mode);setTimeout(function(){var body=$('screen-body');if(body)body.scrollIntoView({behavior:'smooth',block:'start'});},80); };
 V35.restoreSession = function(index){try{var list=window.LOS&&LOS.AUTO?LOS.AUTO.list().slice(0,3):[];if(list[index])LOS.AUTO.restore(index);}catch(e){}V35.close();};
 V35.position = function(){
   var p=$('v35Panel'),b=$('v35Btn');if(!p||!b||!V35.open)return;if(innerWidth<=640){['left','right','top','bottom'].forEach(function(k){p.style.removeProperty(k);});return;}
@@ -232,9 +232,26 @@ function nestedTabs(){
   var sig=mode;if(old&&old.dataset.sig===sig)return;if(old)old.remove();var nav=document.createElement('nav');nav.id='v35LinkedSubnav';nav.dataset.sig=sig;nav.className='v35-linked-subtabs no-print';nav.setAttribute('aria-label',mode==='closing'||mode==='escrow'?'Closing workspaces':'Renovation workspaces');nav.innerHTML=items.map(function(x){return'<button type="button" class="'+(x[0]===mode?'active':'')+'" onclick="V35.go(\''+x[0]+'\')">'+x[1]+'</button>';}).join('');body.insertBefore(nav,body.firstChild);
 }
 
+var QUOTE_PRESETS=[
+  ['fha35','FHA 3.5%','No renovation'],
+  ['conv5','Conventional 5%','No renovation'],
+  ['fha203','FHA 203(k)','Renovation'],
+  ['convhs','HomeStyle','Renovation']
+];
+V35.applyQuotePreset=function(id){
+  var s=store(),i=s&&s.activeInputs;if(!s||!i)return;
+  var map={fha35:{program:'FHA',down:.035,reno:false},conv5:{program:'Conventional',down:.05,reno:false},fha203:{program:'FHA',down:.035,reno:true},convhs:{program:'Conventional',down:.05,reno:true}},p=map[id];
+  if(id==='renovation'){p={program:i.loanProgram==='FHA'?'FHA':'Conventional',down:num(i.finalDownPaymentPct)||(i.loanProgram==='FHA' ? .035 : .05),reno:true};}
+  if(!p)return;
+  s.setField('loanProgram',p.program,'Quote preset');s.setField('finalDownPaymentPct',p.down,'Quote preset');
+  if(window.V30&&V30.setReno)V30.setReno(p.reno,p.reno?(num(i.reno&&i.reno.baseCost)||50000):0,true);else{s.setField('renovation',p.reno,'Quote preset');s.setField('reno.baseCost',p.reno?(num(i.reno&&i.reno.baseCost)||50000):0,'Quote preset');}
+  if(window.RECALC)window.RECALC();try{s.emit();}catch(e){}
+  if(window.LOS&&LOS.say)LOS.say('Quote updated',(p.program==='FHA'?(p.reno?'FHA 203(k)':'FHA'):(p.reno?'Conventional HomeStyle':'Conventional'))+' · '+(p.down*100).toFixed(1)+'% down'+(p.reno?' · renovation included':' · no renovation'),'good',4800);
+};
 function quoteControls(){
-  var s=store(),body=$('screen-body');if(!s||s.snapshot.mode!=='quote'||!body)return;var card=body.querySelector('[data-section="quote"]'),old=$('v35QuoteControls');if(!card)return;var host=card.querySelector(':scope > .body')||card;if(!old){old=document.createElement('section');old.id='v35QuoteControls';old.className='v35-quote-controls no-print';old.innerHTML='<div class="v35-quote-title"><div><b>Quick quote inputs</b><small>Freeform values update the quote and every linked worksheet.</small></div><button type="button" onclick="mortgageSuite.store.applyZipLookup()">Fill from ZIP</button></div><div class="v35-quote-grid">'+[['Purchase price','basePurchasePrice','currency'],['ZIP code','zipCode','text'],['Down payment %','finalDownPaymentPct','percent'],['Loan amount override','bps.loanAmountOverride','currency']].map(function(x){return'<label><span>'+x[0]+'</span><input type="text" inputmode="'+(x[2]==='text'?'text':'decimal')+'" data-v35-quote="'+x[1]+'" data-kind="'+x[2]+'" autocomplete="off"></label>';}).join('')+'</div><p>The loan amount override is used for quote/pricing tools; the maximum mortgage and total loan remain the engine-calculated amounts.</p>';host.insertBefore(old,host.firstChild);$$('[data-v35-quote]',old).forEach(function(input){input.addEventListener('change',function(){var path=input.dataset.v35Quote,kind=input.dataset.kind,raw=input.value;if(window.V20&&V20.setScenario)V20.setScenario(path,raw,kind==='percent'?'pct':kind==='currency'?'num':'text');else s.setField(path,raw,'Quick quote');});});if(window.V19)V19.enhanceFreeform(old);}
+  var s=store(),body=$('screen-body');if(!s||s.snapshot.mode!=='quote'||!body)return;var card=body.querySelector('[data-section="quote"]'),old=$('v35QuoteControls');if(!card)return;var host=card.querySelector(':scope > .body')||card;if(!old){old=document.createElement('section');old.id='v35QuoteControls';old.className='v35-quote-controls no-print';old.innerHTML='<div class="v35-quote-title"><div><b>Quick quote inputs</b><small>Freeform values update the quote and every linked worksheet.</small></div><button type="button" onclick="mortgageSuite.store.applyZipLookup()">Fill from ZIP</button></div><div class="v35-quote-presets" role="group" aria-label="Loan program presets">'+QUOTE_PRESETS.map(function(x){return'<button type="button" data-v35-preset="'+x[0]+'" onclick="V35.applyQuotePreset(\''+x[0]+'\')"><b>'+x[1]+'</b><span>'+x[2]+'</span></button>';}).join('')+'<button type="button" data-v35-preset="renovation" onclick="V35.applyQuotePreset(\'renovation\')"><b>+ Renovation</b><span>Keep current program</span></button></div><div class="v35-quote-grid">'+[['Purchase price','basePurchasePrice','currency'],['ZIP code','zipCode','text'],['Down payment %','finalDownPaymentPct','percent'],['Loan amount override','bps.loanAmountOverride','currency']].map(function(x){return'<label><span>'+x[0]+'</span><input type="text" inputmode="'+(x[2]==='text'?'text':'decimal')+'" data-v35-quote="'+x[1]+'" data-kind="'+x[2]+'" autocomplete="off"></label>';}).join('')+'</div><p>The loan amount override is used for quote/pricing tools; the maximum mortgage and total loan remain the engine-calculated amounts.</p>';host.insertBefore(old,host.firstChild);$$('[data-v35-quote]',old).forEach(function(input){input.addEventListener('change',function(){var path=input.dataset.v35Quote,kind=input.dataset.kind,raw=input.value;if(window.V20&&V20.setScenario)V20.setScenario(path,raw,kind==='percent'?'pct':kind==='currency'?'num':'text');else s.setField(path,raw,'Quick quote');});});if(window.V19)V19.enhanceFreeform(old);}
   $$('[data-v35-quote]',old).forEach(function(input){if(document.activeElement===input)return;var v=pathGet(s.activeInputs,input.dataset.v35Quote);input.value=input.dataset.kind==='percent'&&v!==''&&v!=null?String(num(v)*100):(v==null?'':String(v));});
+  var i=s.activeInputs||{},reno=!!i.renovation,program=String(i.loanProgram||''),down=num(i.finalDownPaymentPct);$$('[data-v35-preset]',old).forEach(function(button){var id=button.dataset.v35Preset,on=id==='fha35'&&program==='FHA'&&!reno&&Math.abs(down-.035)<.0001||id==='conv5'&&program==='Conventional'&&!reno&&Math.abs(down-.05)<.0001||id==='fha203'&&program==='FHA'&&reno||id==='convhs'&&program==='Conventional'&&reno||id==='renovation'&&reno;button.classList.toggle('active',on);button.setAttribute('aria-pressed',on?'true':'false');});
 }
 
 function liveDetails(){
@@ -251,9 +268,15 @@ function borrowerRange(){
 function enhanceAdvancedLinks(){var s=store();if(!s||s.snapshot.mode!=='advanced')return;$$('#screen-body [data-out],#screen-body .out').forEach(function(row){if(row.dataset.v35Linked||row.onclick)return;var text=norm(row.textContent).toLowerCase(),mode=/closing|cash to close/.test(text)?'closing':/payment/.test(text)?'qualify':/rate/.test(text)?'rates':/arv|value/.test(text)?'maxmortgage':/income|dti|reserve|risk|warning/.test(text)?'advanced':'';if(!mode)return;row.dataset.v35Linked=mode;row.tabIndex=0;row.setAttribute('role','button');row.addEventListener('click',function(){V35.go(mode);});row.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();V35.go(mode);}});});}
 
 function seedLight(){try{if(localStorage.getItem('los.v35.appearanceSeeded')==='1')return;localStorage.setItem('los.v35.appearanceSeeded','1');if(window.V24){V24.setTheme('ledger',true);V24.setInput('paper');}if(window.V25)V25.setSurface('light');}catch(e){}}
-function documentsNav(){var nav=$('v23SuitePrimaryNav'),docs=$('v28nav-documents'),full=nav&&nav.querySelector('[data-group="full"]');if(!nav||!docs||!full)return;docs.classList.remove('v28-direct');docs.classList.add('v35-documents-nav');docs.innerHTML='<span class="v23-nav-icon i-file" aria-hidden="true"><i></i></span><span>Documents</span>';docs.onclick=function(){V35.close();if(window.V251&&V251.openPage)V251.openPage('DOCUMENTS & OCR');else{var s=store();if(s)s.setMode('documents');}};if(docs.previousElementSibling!==full)nav.insertBefore(docs,full.nextSibling);}
+function documentsNav(){var nav=$('v23SuitePrimaryNav'),docs=$('v28nav-documents'),full=nav&&nav.querySelector('[data-group="full"]');if(!nav||!docs||!full)return;docs.classList.remove('v28-direct');docs.classList.add('v35-documents-nav');docs.innerHTML='<span class="v23-nav-icon i-file" aria-hidden="true"><i></i></span><span>Documents</span>';docs.onclick=function(){V35.close();V35.documentsActive=true;if(window.V251&&V251.openPage)V251.openPage('DOCUMENTS & OCR');else{var s=store();if(s)s.setMode('documents');}};if(docs.previousElementSibling!==full)nav.insertBefore(docs,full.nextSibling);}
+function documentsLayout(){
+  var root=$('suite-root'),panel=$('panel-v9docs')||$('panel-docparse');if(!root)return;
+  var visible=!!(panel&&panel.offsetParent!==null&&getComputedStyle(panel).display!=='none'&&!root.classList.contains('v251-full-active'));
+  root.classList.toggle('v35-documents-active',visible||!!V35.documentsActive);
+  if(!visible&&V35.documentsActive){var mode=store()&&store().snapshot.mode;if(mode&&mode!=='documents')V35.documentsActive=false;}
+}
 function watchScreen(){var body=$('screen-body');if(!body||V35.__screenObserver)return;V35.__screenObserver=new MutationObserver(function(){if(V35.__enhanceQueued)return;V35.__enhanceQueued=true;setTimeout(function(){V35.__enhanceQueued=false;enhance();},20);});V35.__screenObserver.observe(body,{childList:true,subtree:false});}
-function enhance(){seedLight();documentsNav();nestedTabs();quoteControls();liveDetails();wireRail();borrowerRange();enhanceAdvancedLinks();watchScreen();}
+function enhance(){seedLight();documentsNav();documentsLayout();nestedTabs();quoteControls();liveDetails();wireRail();borrowerRange();enhanceAdvancedLinks();watchScreen();}
 
 function markRelease(){var current=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(current)||current<35)document.documentElement.dataset.losRelease='35';}
 
@@ -262,6 +285,11 @@ document.addEventListener('mousedown', function(e){
   if (e.target.closest('#v35Panel') || e.target.closest('#v35Btn')) return;
   V35.close();
 });
+document.addEventListener('click',function(e){
+  var tab=e.target.closest&&e.target.closest('#suite-root .tabs .tab,#v23SuitePrimaryNav>button');if(!tab)return;
+  var label=norm(tab.dataset.v23Key||tab.textContent).toUpperCase();V35.documentsActive=label==='DOCUMENTS & OCR'||label==='DOCUMENTS';
+  setTimeout(documentsLayout,80);
+},true);
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){V35.close();V35.closeRailEditor();} });
 window.addEventListener('resize',V35.position,{passive:true});window.addEventListener('scroll',V35.position,{passive:true});
 

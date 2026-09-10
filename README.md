@@ -2,7 +2,7 @@
 
 Open `index.html` for the GitHub Pages landing page. `loan-suite.html` starts the mortgage suite directly on Quote, and `income-calculator.html` starts the income calculator directly.
 
-Release 35.2 keeps the complete 14-page Loan Suite and continuous editable Full form while moving every file and loan tool behind one stable Actions control. The Loan Suite Live Summary is now a compact, frameless sticky rail: every visible reading opens a small popout where the user can edit the source inputs or jump to the full workspace. The Income Calculator working canvas is centered and capped at 1320px for more comfortable desktop and ultrawide use. The landing page is a minimal two-workspace chooser with one Light/Dark switch that carries into both applications. Setup remains an always-open Worksheet with Quick edit, Transaction, Property, Borrower, and Rate & terms rails.
+Release 35.3 keeps the complete 14-page Loan Suite and continuous editable Full form while moving every file and loan tool behind one stable Actions control. The Income Calculator and Loan Suite now share the same centered 1320px working canvas and browser-level scrolling. Documents uses the full canvas without the Live Summary rail. Quote now owns the FHA 3.5%, Conventional 5%, FHA 203(k), HomeStyle, and renovation controls; each changes the applicable program, down payment, and renovation state through the live engine without replacing the entered purchase price.
 
 The income calculator and the renovation suite in one file, with a loan-origination
 style shell over the top: named left navigation, subtabs, five synchronized themes, continuous

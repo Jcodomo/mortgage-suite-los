@@ -1,6 +1,6 @@
 {
   "name": "mortgage-suite-los",
-  "version": "35.2.0",
+  "version": "35.3.0",
   "private": true,
   "description": "Self-contained mortgage income and renovation scenario suite",
   "scripts": {
