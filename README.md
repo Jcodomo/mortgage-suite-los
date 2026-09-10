@@ -2,7 +2,7 @@
 
 Open `index.html` for the GitHub Pages landing page. `loan-suite.html` starts the mortgage suite directly on Setup, and `income-calculator.html` starts the income calculator directly.
 
-Release 25 presents the Loan Suite as five grouped workspaces plus a continuous Full-file view, and the Income Calculator as three grouped workflows. Setup uses one always-open Worksheet with Quick edit, Transaction, Property, Borrower, and Rate & terms rails. A two-level scenario masthead, compact icon navigation, six-number summary strip, and structured dark action menus match the Income Calculator's visual language. Color theme, Light/Dark/OLED surface, and input tone are independently controlled across both applications. Midnight Terminal with the Dark surface remains the default.
+Release 25.1 presents the Loan Suite as five grouped workspaces plus an organized 14-page directory and continuous editable Full-file view, and the Income Calculator as three grouped workflows. Setup uses one always-open Worksheet with Quick edit, Transaction, Property, Borrower, and Rate & terms rails. The four-band masthead, horizontal icon navigation, distinct contextual submenus, compact shared action menus, and six-number summary strip now match the Income Calculator's visual language. Color theme, Light/Dark/OLED surface, and input tone are independently controlled across both applications. Midnight Terminal with the Black OLED surface and light Paper inputs is the default.
 
 The income calculator and the renovation suite in one file, with a loan-origination
 style shell over the top: named left navigation, subtabs, four synchronized themes, continuous
@@ -58,6 +58,9 @@ src/
                                  theme icons, and universal freeform numeric entry
   patch-v22.css / patch-v22.js   stable Scenario Control Center rendering and polished
                                  MMW, maximum-loan, total-loan and amortization cards
+  patch-v23...patch-v25          consolidated workspaces, themes, worksheet and live summary
+  patch-v25-1.css / .js          wide four-band header, compact shared menus, organized
+                                 page directory, freeform fields and editable 14-page Full form
 build/
   inject.py                      applies the layer to src/ and writes dist/
   verify_los.py                  Playwright harness, 33 behavioural checks
@@ -74,6 +77,7 @@ dist/
 python3 build/inject.py src/mortgage-suite-allinone.html dist/mortgage-suite-los.html
 npm test                                      # all pure-logic tests
 python3 build/verify_los.py                   # 33 checks, writes build/shots/
+node build/verify-v25-1.cjs                   # 35 live UI / responsive checks
 ```
 
 `test/run.sh` covers the parts of the layer that are just arithmetic and

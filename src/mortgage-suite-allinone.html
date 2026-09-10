@@ -8210,6 +8210,10 @@ if (restored) toast('Autosaved file restored from this browser');
   };
   window.define.amd = true;
   window.__amdStart = function(entry){ req(entry, entry); };
+  /* Read-only module access for progressive UI layers such as the editable
+     full-file workspace. The existing loader and calculation modules remain
+     authoritative; this only exposes their already-instantiated exports. */
+  window.__amdGet = function(entry){ return req(entry, entry); };
 })();
 </script>
 <script>var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {

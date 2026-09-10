@@ -3154,6 +3154,114 @@ html[data-v24-theme] .v23-actions-panel{width:min(640px,calc(100vw - 28px))!impo
 @media(max-width:560px){#suite-root .v23-primary-nav button{padding-right:7px!important}#suite-root .v23-primary-nav button>span:last-child{display:none}.v25-full-values{grid-template-columns:1fr}.v25-full-sheet>header{display:grid}}
 @media print{#v25SurfaceButton,.v25-open-source{display:none!important}.v25-full-sheet{display:block}.v25-full-card{break-inside:avoid;margin-bottom:10px}}
 
+
+/* v25.1 - Loan Suite header and spacing aligned with the Income Calculator. */
+:root{--v251-max:1840px}
+#suite-root .v25-topbar{min-height:118px!important;padding:10px max(18px,calc((100vw - var(--v251-max))/2))!important;background:linear-gradient(180deg,#171C24,#1B2535)!important;border-bottom:1px solid #2B3A51!important;box-shadow:0 10px 30px rgba(0,0,0,.18)!important}
+#suite-root .v25-header-main,#suite-root .v25-header-actions{width:100%;max-width:var(--v251-max);margin-inline:auto!important;box-sizing:border-box}
+#suite-root .v25-header-main{min-height:52px!important;gap:10px!important;flex-wrap:nowrap!important}
+#suite-root .v25-header-actions{min-height:43px!important;gap:7px!important;padding-top:8px!important;border-top:1px solid rgba(128,160,198,.10)}
+#suite-root .v251-suite-brand{display:flex;align-items:center;gap:9px;flex:0 0 auto;min-width:max-content}
+#suite-root .v251-suite-brand>.mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#16B889;color:#06291F;font-size:11px;font-weight:900}
+#suite-root .v251-suite-brand>h1{margin:0!important;font:800 14px Manrope,'Segoe UI Variable',sans-serif!important;color:#F0F4FA!important;white-space:nowrap}
+#suite-root .v251-suite-brand>.prog{min-height:29px!important;padding:5px 10px!important;border-radius:999px!important;font-size:10px!important;white-space:nowrap}
+#suite-root .v251-retired-spacer{display:none!important}
+#suite-root .v25-scenario-control{flex:1 1 560px!important;min-width:420px!important;max-width:760px!important;height:41px!important;min-height:41px!important;padding:4px 5px 4px 40px!important;border-radius:11px!important;grid-template-columns:minmax(310px,1fr) 50px!important;background:#0A1422!important;border-color:#31506A!important}
+#suite-root .v25-scenario-control .v25-scenario-mark{top:6px!important;left:7px!important;width:28px!important;height:28px!important;background:#133247!important}
+#suite-root .v25-scenario-control>input,#suite-root .v25-scenario-control>select{height:31px!important;font-size:11px!important;background:#E2ECE8!important;color:#0D2D36!important;-webkit-text-fill-color:#0D2D36!important}
+#suite-root .v25-scenario-control>select{width:50px!important;background:#D6E5E1!important;color:transparent!important;-webkit-text-fill-color:transparent!important}
+#suite-root .v251-datefield{flex:0 0 164px!important;display:grid!important;grid-template-columns:auto minmax(112px,1fr)!important;align-items:center!important;gap:7px!important;color:#9FB4CF!important;font-size:9.5px!important;white-space:nowrap}
+#suite-root .v251-datefield input{width:100%!important;min-width:112px!important;height:36px!important;padding:7px 9px!important;border-radius:8px!important;background:#DCE8E4!important;color:#102F39!important;-webkit-text-fill-color:#102F39!important}
+
+/* Compact live totals sit on the second header band, like the Income Calculator. */
+#suite-root .v251-header-stats{display:flex;align-items:center;gap:6px;min-width:0;margin-right:auto}
+#suite-root .v251-header-stats>button{min-width:104px;min-height:31px!important;padding:5px 9px!important;border:1px solid #2C405D!important;border-radius:999px!important;background:#202C40!important;color:#AFC0D7!important;display:flex!important;align-items:center!important;gap:7px!important;box-shadow:none!important;cursor:pointer}
+#suite-root .v251-header-stats>button:first-child{background:#0D4C3B!important;border-color:#176F57!important;color:#7EE0C0!important}
+#suite-root .v251-header-stats span{font:750 8px Manrope,sans-serif!important;text-transform:uppercase;letter-spacing:.045em;white-space:nowrap}
+#suite-root .v251-header-stats b{font:700 10px var(--v24-font-num)!important;color:#F0F5FB!important;white-space:nowrap}
+#suite-root .v25-header-actions>.btn,#suite-root .v25-header-actions>.v23-action-menu>summary{min-height:33px!important;height:33px!important;padding:6px 10px!important;font-size:9.5px!important;border-radius:8px!important;white-space:nowrap}
+#suite-root #v24LiveSummary,#suite-root #v25FullForm{display:flex!important;align-items:center!important;gap:6px!important}
+#suite-root #v24LiveSummary.active{border-color:var(--v24-accent)!important;color:var(--v24-accent)!important;background:color-mix(in srgb,var(--v24-accent) 12%,#101A2A)!important}
+
+/* Primary and contextual navigation use the same horizontal icon rhythm as Income. */
+#suite-root .v23-primary-nav{max-width:none!important;min-height:55px!important;padding:8px max(18px,calc((100vw - var(--v251-max))/2))!important;gap:8px!important;background:#1E2A3D!important}
+#suite-root .v23-primary-nav button{min-width:84px!important;min-height:39px!important;padding:7px 12px!important;border-radius:9px!important;flex-direction:row!important;justify-content:center!important;gap:7px!important;font-size:10.5px!important;background:rgba(5,12,22,.18)!important}
+#suite-root .v23-primary-nav button .v23-nav-icon{width:16px!important;height:16px!important}
+#suite-root .v23-primary-nav button.active{background:#263750!important;border-color:#3C5679!important;color:#74DABA!important}
+#suite-root .v23-context-tabs{min-height:49px!important;padding:7px max(18px,calc((100vw - var(--v251-max))/2))!important;gap:7px!important;background:#233149!important;box-shadow:0 8px 22px rgba(0,0,0,.12)!important}
+#suite-root .v23-context-tabs .tab[data-v23-visible="1"]{min-height:34px!important;padding:7px 13px!important;border:1px solid #344762!important;border-radius:8px!important;background:#1B2739!important;color:#AFC0D7!important;font-size:9.5px!important}
+#suite-root .v23-context-tabs .tab[data-v23-visible="1"]:hover{background:#293B55!important;border-color:#47688D!important;color:#EEF4FA!important}
+#suite-root .v23-context-tabs .tab[data-v23-visible="1"].active{background:color-mix(in srgb,var(--v24-accent) 17%,#172536)!important;border-color:color-mix(in srgb,var(--v24-accent) 52%,#39516E)!important;color:color-mix(in srgb,var(--v24-accent) 84%,white)!important;box-shadow:inset 0 -2px 0 var(--v24-accent)!important}
+#suite-root .v24-context-summary{margin-left:auto!important;padding:6px 10px!important;border:1px solid #344762;border-radius:8px;background:#1A2637;color:#9DB2CD!important;font-size:9px!important;white-space:normal!important}
+
+/* Smaller, wider action menus: more choices per row with less vertical noise. */
+html[data-v24-theme] .v23-actions-panel{width:min(780px,calc(100vw - 36px))!important;max-height:min(72vh,670px)!important;padding:9px!important;border-radius:13px!important}
+.v25-menu-head{padding:5px 6px 9px!important;margin-bottom:2px!important}.v25-menu-head span{font-size:12px!important}.v25-menu-head small{font-size:8.5px!important}.v25-menu-head kbd{font-size:8px!important;padding:3px 5px!important}
+.v23-actions-grid{grid-template-columns:repeat(3,minmax(180px,1fr))!important;gap:6px!important}
+.v23-actions-grid>button,.v23-actions-grid .v23-action,.v23-actions-grid .btn{min-height:47px!important;padding:7px 8px!important;border-radius:9px!important;gap:8px!important}
+.v23-actions-grid button>.v23-nav-icon{width:25px!important;height:25px!important;padding:5px!important;border-radius:7px!important}
+.v25-action-copy b{font-size:9.5px!important}.v25-action-copy small{font-size:7.8px!important;line-height:1.2!important}
+#calc-root .v23-actions-panel{width:min(610px,calc(100vw - 36px))!important}
+#calc-root .v23-actions-grid{grid-template-columns:repeat(2,minmax(180px,1fr))!important}
+
+/* The three action menus intentionally share one restrained Income-style UI. */
+html[data-v24-theme] .v251-simple-menu .v23-actions-panel{width:min(590px,calc(100vw - 36px))!important;padding:8px!important;border-radius:11px!important}
+.v251-simple-menu .v25-menu-head{min-height:38px!important;padding:4px 5px 8px!important;align-items:center!important}
+.v251-simple-menu .v25-menu-head>div{gap:1px!important}.v251-simple-menu .v25-menu-head span{font-size:10.5px!important}.v251-simple-menu .v25-menu-head small{display:none!important}
+.v251-simple-menu .v23-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+.v251-simple-menu .v23-actions-grid>button,.v251-simple-menu .v23-actions-grid>.v23-action,.v251-simple-menu .v23-actions-grid .btn{min-height:38px!important;padding:6px 8px!important;border-radius:7px!important;background:#111D2D!important;border-color:#263A55!important}
+.v251-simple-menu .v23-actions-grid button>.v23-nav-icon{width:18px!important;height:18px!important;padding:2px!important;border-radius:4px!important;background:transparent!important}
+.v251-simple-menu .v25-action-copy{display:block!important}.v251-simple-menu .v25-action-copy b{font-size:9px!important;line-height:1.15!important}.v251-simple-menu .v25-action-copy small{display:none!important}
+.v251-simple-menu .v23-actions-grid .v20-session{grid-column:1/-1!important;min-height:42px!important;padding:6px!important}
+
+/* Complete page directory keeps every original and added workspace one click away. */
+.v251-page-directory{display:none;position:fixed;inset:0;z-index:2400;font-family:Manrope,'Segoe UI Variable',sans-serif}.v251-page-directory.open{display:grid;place-items:center;padding:22px}
+.v251-page-backdrop{position:absolute;inset:0;background:rgba(0,5,13,.76);backdrop-filter:blur(9px)}
+.v251-page-directory>section{position:relative;width:min(850px,calc(100vw - 44px));max-height:min(820px,calc(100vh - 44px));overflow:auto;padding:14px;border:1px solid #2A3D59;border-radius:16px;background:#091321;color:#EAF1FA;box-shadow:0 34px 110px rgba(0,0,0,.66)}
+.v251-page-directory>section>header{position:sticky;top:-14px;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:18px;margin:-14px -14px 12px;padding:15px 16px 13px;border-bottom:1px solid #253751;background:#0C1726}.v251-page-directory>section>header>div{display:grid;gap:3px}.v251-page-directory>section>header b{font-size:14px}.v251-page-directory>section>header small{font-size:9px;color:#91A6C1}.v251-page-directory>section>header button{min-height:32px!important;padding:6px 10px!important;border:1px solid #324864!important;border-radius:8px!important;background:#152338!important;color:#DDE8F5!important;font:750 9px Manrope,sans-serif!important;cursor:pointer}
+.v251-page-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.v251-page-groups>section{padding:9px;border:1px solid #233650;border-radius:11px;background:#101C2D}.v251-page-groups>section:last-child{grid-column:1/-1}.v251-page-groups h3{display:flex;align-items:center;gap:7px;margin:0 0 7px;color:#8FA6C3;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase}.v251-page-groups h3 .v23-nav-icon{width:16px;height:16px}.v251-page-groups section>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.v251-page-groups button{min-height:37px!important;padding:7px 9px!important;border:1px solid #2C405C!important;border-radius:7px!important;background:#142237!important;color:#DDE8F5!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;font:760 8.5px Manrope,sans-serif!important;letter-spacing:.025em;text-align:left;cursor:pointer;box-shadow:none!important}.v251-page-groups button:hover{border-color:#5DCAA5!important;background:#1A3041!important;color:#FFF!important}.v251-page-groups button i{color:#5DCAA5;font-size:13px;font-style:normal}
+
+/* Loan action groups get the same breathable spacing as W-2 and Self-Employment. */
+#suite-root .inline,#suite-root .actions,#suite-root .v13-actions,#suite-root .v14-bar,#suite-root .v20-quick,#suite-root .v24-preset-chips{gap:8px 9px!important;row-gap:8px!important;align-items:center!important;flex-wrap:wrap!important}
+#suite-root .inline>.btn,#suite-root .actions>.btn,#suite-root .v13-actions>.btn,#suite-root .v14-bar>.btn,#suite-root .v20-quick>.btn,#suite-root .v24-preset-chips>.btn{min-height:34px!important;margin:0!important;padding:6px 10px!important;white-space:normal!important;line-height:1.2!important}
+#suite-root .app,#suite-root .cols-main,#calc-root main .wrap{max-width:var(--v251-max)!important}
+#suite-root #screen-body{min-width:0!important;overflow:visible!important}
+#suite-root .scroll{max-width:100%!important;overflow:auto!important}
+
+/* Live summary is a reliable drawer at every resolution and is closable in place. */
+#suite-root.v24-summary-open .cols-main{grid-template-columns:minmax(0,1fr)!important}
+#suite-root.v24-summary-open .cols-main>.rail{display:block!important;position:fixed!important;z-index:1100!important;right:18px!important;top:66px!important;bottom:18px!important;width:min(410px,calc(100vw - 36px))!important;max-width:none!important;overflow:auto!important;background:var(--v24-page)!important;padding:10px!important;border:1px solid var(--v24-border)!important;border-radius:14px!important;box-shadow:0 28px 90px rgba(0,0,0,.48)!important}
+.v251-summary-close{position:sticky;top:0;z-index:3;width:100%;min-height:35px;margin:0 0 8px;border:1px solid var(--v24-border);border-radius:8px;background:var(--v24-card);color:var(--v24-text);font:750 10px Manrope,sans-serif;cursor:pointer}
+#suite-root:not(.v24-summary-open) .v251-summary-close{display:none!important}
+
+/* Full form is the real editable renderer for every Loan Suite screen. */
+#suite-root.v251-full-active .cols-main{display:block!important;grid-template-columns:minmax(0,1fr)!important}
+#suite-root.v251-full-active .cols-main>.rail{display:none!important}
+.v251-editable-full{max-width:var(--v251-max)!important;padding:2px 0 44px!important;gap:14px!important}
+.v251-full-head{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:18px 20px!important;border:1px solid var(--v24-border);border-radius:14px;background:linear-gradient(135deg,var(--v24-card),color-mix(in srgb,var(--v24-accent) 8%,var(--v24-card)))}
+.v251-full-head span{font:800 9px Manrope,sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--v24-accent)}.v251-full-head h2{margin:5px 0!important;font-size:22px!important}.v251-full-head p{margin:0;max-width:760px;color:var(--v24-muted);font-size:10px}.v251-full-head>div:last-child{display:grid;justify-items:end;gap:4px;text-align:right}.v251-full-head>div:last-child b{padding:6px 9px;border-radius:8px;background:color-mix(in srgb,var(--v24-accent) 15%,transparent);color:var(--v24-accent);font-size:10px}.v251-full-head small{color:var(--v24-muted);font-size:8.5px}
+.v251-full-index{position:sticky;top:54px;z-index:50;display:flex;gap:6px;padding:8px;border:1px solid var(--v24-border);border-radius:12px;background:color-mix(in srgb,var(--v24-header) 94%,transparent);backdrop-filter:blur(16px);overflow-x:auto;scrollbar-width:thin}
+.v251-full-index button{flex:0 0 auto!important;min-height:31px!important;padding:5px 9px!important;border:1px solid var(--v24-border)!important;border-radius:7px!important;background:var(--v24-card)!important;color:var(--v24-muted)!important;font:750 9px Manrope,sans-serif!important;cursor:pointer!important;box-shadow:none!important}.v251-full-index button:hover{color:var(--v24-accent)!important;border-color:var(--v24-accent)!important}
+.v251-full-screen{scroll-margin-top:108px;border:1px solid var(--v24-border);border-radius:15px;background:color-mix(in srgb,var(--v24-card) 55%,transparent);overflow:hidden}
+.v251-screen-head{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:12px 14px;border-bottom:1px solid var(--v24-border);background:color-mix(in srgb,var(--v24-card) 88%,var(--v24-page))}.v251-screen-head span{font:850 12px Manrope,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--v24-text)}.v251-screen-head p{margin:3px 0 0;color:var(--v24-muted);font-size:9px}.v251-screen-head button{min-height:31px!important;padding:5px 9px!important;border:1px solid var(--v24-border)!important;border-radius:7px!important;background:transparent!important;color:var(--v24-accent)!important;font:750 9px Manrope,sans-serif!important;cursor:pointer!important;white-space:nowrap!important;box-shadow:none!important}
+.v251-screen-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px}.v251-screen-grid>.card{margin:0!important;min-width:0!important}.v251-screen-grid>[data-section="setup"],.v251-screen-grid>[data-section="summary"],.v251-screen-grid>[data-section="advanced"]{grid-column:1/-1}.v251-editable-full .card.collapsible>.body{display:block!important}.v251-editable-full .card.closed>.body{display:block!important}.v251-editable-full input,.v251-editable-full select,.v251-editable-full textarea{max-width:100%!important}
+.v251-full-screen>.v251-legacy-panel{display:block!important;position:static!important;inset:auto!important;width:auto!important;max-width:none!important;height:auto!important;margin:0!important;padding:10px!important;overflow:visible!important;background:transparent!important}.v251-full-screen>.v251-legacy-panel>.section-head{display:none!important}.v251-full-screen>.v251-legacy-panel .card{margin:0 0 10px!important}.v251-full-screen>.v251-legacy-panel .card:last-child{margin-bottom:0!important}
+.v251-quote-card{grid-column:1/-1}.v251-quote-card>.body{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}.v251-quote-card>.body>div{display:grid;gap:4px;padding:11px;border:1px solid var(--v24-border);border-radius:9px;background:color-mix(in srgb,var(--v24-card) 82%,var(--v24-page))}.v251-quote-card span{font:800 8px Manrope,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--v24-muted)}.v251-quote-card b{font:750 13px var(--v24-font-num);color:var(--v24-text)}
+
+/* One appearance control; the removed icons remain callable from this menu. */
+.v251-retired-appearance{display:none!important}.v251-appearance-menu{position:relative!important;display:block!important;padding:3px!important}.v251-appearance-menu>#v23ThemeButton{display:grid!important;width:34px!important;height:32px!important;border-radius:7px!important}html body #shellbar #v23Appearance.v251-appearance-menu.open>#v23ThemeButton{background:#fff!important;color:#0A1422!important;-webkit-text-fill-color:#0A1422!important}
+.v251-appearance-panel{display:none;position:absolute;z-index:1600;right:0;top:41px;width:min(520px,calc(100vw - 24px));padding:10px;border:1px solid #2C405D;border-radius:12px;background:#08111E;color:#E7EEF8;box-shadow:0 26px 80px rgba(0,0,0,.52);font-family:Manrope,'Segoe UI Variable',sans-serif}.v251-appearance-menu.open>.v251-appearance-panel{display:grid;gap:10px}
+.v251-appearance-panel>header{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 8px;border-bottom:1px solid #22324A}.v251-appearance-panel>header>div{display:grid;gap:2px}.v251-appearance-panel>header b{font-size:11px}.v251-appearance-panel>header small{font-size:8px;color:#91A5BF}.v251-appearance-panel kbd{padding:3px 5px;border:1px solid #30435F;border-radius:5px;background:#101C2D;color:#91A5BF;font-size:8px}
+.v251-appearance-group{display:grid;gap:5px}.v251-appearance-group>span{font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#91A5BF}.v251-appearance-group>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.v251-appearance-group button{min-height:34px!important;padding:5px 6px!important;border:1px solid #263A55!important;border-radius:7px!important;background:#111D2D!important;color:#CAD7E7!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;font:700 8px Manrope,sans-serif!important;box-shadow:none!important;cursor:pointer}.v251-appearance-group button:hover,.v251-appearance-group button.selected{border-color:#67D7B5!important;color:#fff!important;background:#193047!important}.v251-appearance-group button.selected{box-shadow:inset 0 -2px 0 #67D7B5!important}.v251-appearance-group i{width:10px;height:10px;border-radius:50%;background:#5DCAA5;box-shadow:0 0 0 1px rgba(255,255,255,.2)}
+.v251-appearance-group i[data-swatch="ledger"]{background:#2D7DD2}.v251-appearance-group i[data-swatch="slate"]{background:#0F6E56}.v251-appearance-group i[data-swatch="bank"]{background:#3577B8}.v251-appearance-group i[data-swatch="graphite"]{background:#A9B4C2}.v251-appearance-group i[data-swatch="terminal"]{background:#5DCAA5}.v251-appearance-group i[data-swatch="federal"]{background:#3478F6}.v251-appearance-group i[data-swatch="clay"]{background:#B36B45}.v251-appearance-group i[data-swatch="violet"]{background:#8B78E6}.v251-appearance-group i[data-swatch="evergreen"]{background:#2F9B6E}.v251-appearance-group i[data-swatch="steel"]{background:#E5A948}.v251-appearance-group i[data-swatch="light"],.v251-appearance-group i[data-swatch="paper"]{background:#FFF}.v251-appearance-group i[data-swatch="dark"],.v251-appearance-group i[data-swatch="ink"]{background:#162238}.v251-appearance-group i[data-swatch="oled"]{background:#000}.v251-appearance-group i[data-swatch="mist"]{background:#E8EDF3}.v251-appearance-group i[data-swatch="mint"]{background:#DDF4E9}.v251-appearance-group i[data-swatch="sand"]{background:#F2E8D1}
+#suite-root button:active,#calc-root button:active,#suite-root summary:active,#calc-root summary:active{background:#fff!important;color:#0A1422!important;-webkit-text-fill-color:#0A1422!important;transform:translateY(0)!important}
+
+@media(min-width:2100px){:root{--v251-max:2040px}.v251-screen-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.v251-screen-grid>[data-section="setup"],.v251-screen-grid>[data-section="summary"],.v251-screen-grid>[data-section="advanced"]{grid-column:1/-1}}
+@media(max-width:1420px){#suite-root .v25-header-main{flex-wrap:wrap!important}#suite-root .v25-scenario-control{order:5;flex:1 1 100%!important;max-width:none!important}#suite-root .v25-header-actions{flex-wrap:wrap!important}#suite-root .v251-header-stats{flex:1 1 100%;order:5}.v23-actions-grid{grid-template-columns:repeat(2,minmax(180px,1fr))!important}}
+@media(max-width:1050px){.v251-screen-grid{grid-template-columns:1fr}.v251-screen-grid>[data-section]{grid-column:1!important}.v251-quote-card>.body{grid-template-columns:repeat(3,minmax(0,1fr))}#suite-root .v251-datefield{flex:1 1 180px!important}#suite-root .v25-scenario-control{min-width:100%!important}.v23-actions-grid,#calc-root .v23-actions-grid{grid-template-columns:repeat(2,minmax(150px,1fr))!important}}
+@media(max-width:700px){#suite-root .v251-suite-brand>h1{font-size:12px!important}#suite-root .v25-scenario-control{grid-template-columns:minmax(190px,1fr) 48px!important}#suite-root .v251-header-stats{overflow-x:auto}.v23-actions-grid,#calc-root .v23-actions-grid{grid-template-columns:1fr!important}.v251-full-head{display:grid}.v251-full-head>div:last-child{justify-items:start;text-align:left}.v251-quote-card>.body{grid-template-columns:1fr 1fr}.v251-appearance-group>div{grid-template-columns:repeat(2,minmax(0,1fr))}.v251-page-groups{grid-template-columns:1fr}.v251-page-groups>section:last-child{grid-column:1}.v251-page-groups section>div{grid-template-columns:1fr}}
+@media print{.v251-full-index,.v251-screen-head button,.v251-summary-close,.v251-page-directory{display:none!important}.v251-full-screen{break-inside:auto!important}.v251-editable-full input,.v251-editable-full select,.v251-editable-full textarea{border-color:#999!important;background:#fff!important;color:#000!important}}
+
 </style>
 <!-- ===== LOS PATCH LAYER — END ===== -->
 </head>
@@ -10073,6 +10181,10 @@ if (restored) toast('Autosaved file restored from this browser');
   };
   window.define.amd = true;
   window.__amdStart = function(entry){ req(entry, entry); };
+  /* Read-only module access for progressive UI layers such as the editable
+     full-file workspace. The existing loader and calculation modules remain
+     authoritative; this only exposes their already-instantiated exports. */
+  window.__amdGet = function(entry){ return req(entry, entry); };
 })();
 </script>
 <script>var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -27224,7 +27336,7 @@ V.enhanceFreeform=function(root){
     el.addEventListener('blur',function(){normalizeField(el);},true);
   });
 };
-function releaseStamp(){document.documentElement.dataset.losRelease='19';}
+function releaseStamp(){var current=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(current)||current<19)document.documentElement.dataset.losRelease='19';}
 function boot(){V.enhanceFreeform(document);releaseStamp();if(window.V17&&V17.paintThemeButtons)V17.paintThemeButtons();return true;}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();setInterval(boot,350);
 })();
@@ -27642,7 +27754,7 @@ function integrateSetup(){
   var blurb=main.previousElementSibling;if(blurb&&blurb.classList.contains('blurb'))blurb.style.display='none';updateQuick();
 }
 function stabilizeLegacySetup(){if(!window.V20||!V20.renderSetup||V20.renderSetup.__v24)return;var original=V20.renderSetup;V20.renderSetup=function(force){var s=st();if(!force&&s&&s.snapshot.mode==='setup'&&$('v24WorksheetQuick')){updateQuick();updateMetrics($('v24StatStrip'));return;}return original(force);};V20.renderSetup.__v24=true;}
-function contextSummary(){var s=st(),tabs=document.querySelector('#suite-root .tabs');if(!s||!tabs)return;var nav=$('v23SuitePrimaryNav');if(nav&&nav.parentNode!==tabs)tabs.insertBefore(nav,tabs.firstChild);var el=$('v24ContextSummary');if(!el){el=document.createElement('span');el.id='v24ContextSummary';el.className='v24-context-summary';tabs.appendChild(el);}var i=s.activeInputs,o=s.outputs,state=i.state==='New York'?'NY':i.state||'State',county=i.nyCounty||'County',units=N(i.units)||1;el.textContent=[state,county,units+' '+(units===1?'family':'units'),money(o.purchase.finalPurchasePrice),(N(i.finalDownPaymentPct)*100).toFixed(2)+'% down'].join(' · ');}
+function contextSummary(){var s=st(),tabs=document.querySelector('#suite-root .tabs');if(!s||!tabs)return;var nav=$('v23SuitePrimaryNav');if(nav&&nav.parentNode!==tabs&&!window.V251)tabs.insertBefore(nav,tabs.firstChild);var el=$('v24ContextSummary');if(!el){el=document.createElement('span');el.id='v24ContextSummary';el.className='v24-context-summary';tabs.appendChild(el);}var i=s.activeInputs,o=s.outputs,state=i.state==='New York'?'NY':i.state||'State',county=i.nyCounty||'County',units=N(i.units)||1;el.textContent=[state,county,units+' '+(units===1?'family':'units'),money(o.purchase.finalPurchasePrice),(N(i.finalDownPaymentPct)*100).toFixed(2)+'% down'].join(' · ');}
 function arrangeHeader(){
   var top=document.querySelector('#suite-root .topbar'),toolbar=document.querySelector('#suite-root .toolbar');if(!top||!toolbar)return;if($('v25HeaderMain')){toolbar.classList.add('v24-retired-toolbar');return;}var bar=$('v24ScenarioBar');if(!bar){bar=document.createElement('div');bar.id='v24ScenarioBar';bar.className='v24-scenario-bar';var label=toolbar.querySelector(':scope > .tlabel'),pick=toolbar.querySelector(':scope > select.f.pick'),name=toolbar.querySelector(':scope > input.f.namebox');if(label)label.remove();if(pick)bar.appendChild(pick);if(name)bar.appendChild(name);var spacer=top.querySelector('.spacer');top.insertBefore(bar,spacer||null);}var dates=$$('.datefield',top),after=dates.length?dates[dates.length-1]:null,save=$('v23QuickSave'),actions=$('v23SuiteActions');if(save&&save.parentNode!==top)top.insertBefore(save,after&&after.parentNode===top?after.nextSibling:null);if(actions&&actions.parentNode!==top)top.insertBefore(actions,save&&save.parentNode===top?save.nextSibling:null);toolbar.classList.add('v24-retired-toolbar');
 }
@@ -27712,6 +27824,195 @@ function stabilizeWorksheet(){var card=document.querySelector('#suite-root [data
 function keyboardClose(){if(V.keyboardBound)return;V.keyboardBound=true;document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;$$('.v23-action-menu[open],.v23-sync-menu[open]').forEach(function(x){x.open=false;});});}
 function boot(){try{document.documentElement.dataset.losRelease='25';if(!document.documentElement.dataset.v25Surface)V.setSurface(safeGet('los.v25.surface','dark'));installSurface();modernHeader();modernMenus();installFullNav();arrangeHeaderRows();installSummaryStrip();stabilizeWorksheet();keyboardClose();if(window.V19)V19.enhanceFreeform(document);}catch(e){if(console&&console.warn)console.warn('v25 enhancement',e);}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();if(window.LOS_SCHEDULER)LOS_SCHEDULER.add(boot,1500);else setInterval(boot,1500);
+})();
+
+
+/* v25.1 - Income-calculator-aligned loan header and editable full-file view. */
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var $$=function(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));};
+var V=window.V251={version:'25.1',fullActive:false};
+var THEMES=[['ledger','Navy'],['slate','Slate'],['bank','Bank'],['graphite','Graphite'],['terminal','Terminal'],['federal','Federal'],['clay','Clay'],['violet','Violet'],['evergreen','Evergreen'],['steel','Steel']];
+var SURFACES=[['light','Light'],['dark','Dark'],['oled','Black OLED']];
+var INPUTS=[['paper','Paper'],['mist','Mist'],['mint','Mint'],['sand','Sand'],['ink','Ink']];
+var PAGE_GROUPS=[
+  {key:'file',label:'File',icon:'file',pages:['QUOTE','SETUP','PROPERTY']},
+  {key:'loan',label:'Loan',icon:'home',pages:['RENOVATION','MAX MORTGAGE','MORTGAGE RATES']},
+  {key:'costs',label:'Costs',icon:'coins',pages:['CLOSING','ESCROW']},
+  {key:'underwriting',label:'Underwriting',icon:'check',pages:['QUALIFY','RENTAL','ADVANCED']},
+  {key:'results',label:'Results',icon:'chart',pages:['SCENARIOS','SUMMARY','DOCUMENTS & OCR']}
+];
+function store(){try{return window.mortgageSuite&&mortgageSuite.store;}catch(e){return null;}}
+function app(){try{return window.mortgageSuite&&mortgageSuite.app;}catch(e){return null;}}
+function safeSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function safeGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:v;}catch(e){return d;}}
+function esc(v){return String(v==null?'':v).replace(/[&<>\"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c];});}
+function N(v){var n=parseFloat(String(v==null?'':v).replace(/[$,%\s,]/g,''));return isFinite(n)?n:0;}
+function money(v){var n=N(v);return(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:0});}
+function pct(v){var n=N(v);if(Math.abs(n)<=1)n*=100;return n.toFixed(2).replace(/\.00$/,'')+'%';}
+function icon(kind){return'<span class="v23-nav-icon i-'+kind+'" aria-hidden="true"><i></i></span>';}
+
+function headerStat(key,label,target,kind){
+  var b=document.createElement('button');b.type='button';b.dataset.v251Stat=key;b.dataset.v251Target=target;
+  b.innerHTML='<span>'+esc(label)+'</span><b>—</b>';b.onclick=function(){V.openSource(target);};
+  b.dataset.v251Kind=kind||'money';return b;
+}
+function buildHeader(){
+  var main=$('v25HeaderMain'),actions=$('v25HeaderActions');if(!main||!actions)return;
+  var brand=$('v251SuiteBrand');
+  if(!brand){
+    brand=document.createElement('div');brand.id='v251SuiteBrand';brand.className='v251-suite-brand';
+    var mark=main.querySelector(':scope > .mark'),title=main.querySelector(':scope > h1'),program=main.querySelector(':scope > .prog');
+    [mark,title,program].forEach(function(node){if(node)brand.appendChild(node);});main.insertBefore(brand,main.firstChild);
+  }
+  var scenario=$('v24ScenarioBar');if(scenario&&scenario.parentNode!==main)main.appendChild(scenario);
+  var dates=$$('.datefield',main);dates.forEach(function(d){d.classList.add('v251-datefield');});
+  var spacer=main.querySelector(':scope > .spacer');if(spacer)spacer.classList.add('v251-retired-spacer');
+  var stats=$('v251HeaderStats');
+  if(!stats){
+    stats=document.createElement('div');stats.id='v251HeaderStats';stats.className='v251-header-stats';
+    stats.appendChild(headerStat('loan','Total loan','maxmortgage'));
+    stats.appendChild(headerStat('payment','Payment','qualify'));
+    stats.appendChild(headerStat('cash','Cash to close','closing'));
+    stats.appendChild(headerStat('dti','Back DTI','advanced','percent'));
+    actions.insertBefore(stats,actions.firstChild);
+  }
+  ['v23QuickSave','v23SuiteActions','v24LoanTools','v24LiveSummary','v25FullForm'].forEach(function(id){var node=$(id);if(node)actions.appendChild(node);});
+  var live=$('v24LiveSummary'),full=$('v25FullForm');
+  if(live){live.innerHTML=icon('chart')+'<span>Live summary</span>';live.onclick=V.toggleSummary;live.setAttribute('aria-controls','suite-root');}
+  if(full){full.innerHTML=icon('full')+'<span>Full form</span>';full.onclick=V.openFull;}
+  var rail=document.querySelector('#suite-root .cols-main>.rail'),close=$('v251SummaryClose');
+  if(rail&&!close){close=document.createElement('button');close.id='v251SummaryClose';close.type='button';close.className='v251-summary-close no-print';close.textContent='Close live summary';close.onclick=V.toggleSummary;rail.insertBefore(close,rail.firstChild);}
+  updateHeader();
+}
+function updateHeader(){
+  var s=store(),stats=$('v251HeaderStats');if(!s||!stats)return;var o=s.outputs||{},aus=o.aus||{},pay=o.payment||{},cash=o.cash||{},loan=o.loan||{};
+  var values={loan:money(loan.totalLoan),payment:money(pay.totalMonthlyPayment),cash:money(cash.cashToClose),dti:pct(aus.backEndDti)};
+  Object.keys(values).forEach(function(k){var b=stats.querySelector('[data-v251-stat="'+k+'"] b');if(b)b.textContent=values[k];});
+  var live=$('v24LiveSummary'),open=$('suite-root')&&$('suite-root').classList.contains('v24-summary-open');if(live){live.classList.toggle('active',!!open);live.setAttribute('aria-pressed',open?'true':'false');}
+}
+V.toggleSummary=function(){
+  var root=$('suite-root');if(!root)return;var open=!root.classList.contains('v24-summary-open');root.classList.toggle('v24-summary-open',open);safeSet('los.v24.summaryOpen',open?'1':'0');updateHeader();
+};
+
+function screens(){try{return window.__amdGet&&window.__amdGet('src/ui/sections');}catch(e){return null;}}
+function fullNav(screensList){
+  var nav=document.createElement('nav');nav.className='v251-full-index no-print';nav.setAttribute('aria-label','Full form sections');
+  screensList.forEach(function(screen){var b=document.createElement('button');b.type='button';b.textContent=screen.label;b.onclick=function(){var target=$('v251Screen-'+screen.id);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};nav.appendChild(b);});return nav;
+}
+function fullHeader(s){
+  var h=document.createElement('header');h.className='v251-full-head';var i=s.activeInputs||{};
+  h.innerHTML='<div><span>Editable full file</span><h2>'+esc(i.borrowerName||i.name||'Unnamed scenario')+'</h2><p>Every Loan Suite section is available below. Typed currency, percentages, dates, commas, k and m shorthand remain freeform.</p></div><div><b>'+esc(s.outputs&&s.outputs.programLabel||i.loanProgram||'Loan')+'</b><small>Changes recalculate and autosave immediately</small></div>';return h;
+}
+var EXTRA_FULL={
+  property:{id:'property',label:'PROPERTY',page:'PROPERTY',panel:'panel-property',render:function(){if(window.LOANSUITE&&LOANSUITE.PROP)LOANSUITE.PROP.render();}},
+  rates:{id:'rates',label:'MORTGAGE RATES',page:'MORTGAGE RATES',panel:'panel-rates',render:function(){if(window.RATES)RATES.render();}},
+  documents:{id:'documents',label:'DOCUMENTS & OCR',page:'DOCUMENTS & OCR',panel:'panel-docparse',render:function(){if(window.DOCP)DOCP.render();}}
+};
+function restoreLegacyPanels(){
+  ['panel-property','panel-rates','panel-docparse'].forEach(function(id){var panel=$(id),placeholder=panel&&panel.__v251Placeholder;if(!panel||!placeholder||!placeholder.parentNode)return;placeholder.parentNode.insertBefore(panel,placeholder);placeholder.parentNode.removeChild(placeholder);panel.__v251Placeholder=null;panel.classList.remove('v251-legacy-panel');panel.style.removeProperty('display');});
+}
+function mountLegacyPanel(screen,section){
+  try{screen.render();}catch(e){}var panel=$(screen.panel);if(!panel)return;
+  if(!panel.__v251Placeholder&&panel.parentNode){var placeholder=document.createComment('v25.1 '+screen.id+' panel');panel.parentNode.insertBefore(placeholder,panel);panel.__v251Placeholder=placeholder;}
+  panel.classList.add('v251-legacy-panel');panel.style.setProperty('display','block','important');section.appendChild(panel);
+}
+function quoteCard(s){var i=s.activeInputs||{},o=s.outputs||{},loan=o.loan||{},pay=o.payment||{},cash=o.cash||{};var card=document.createElement('div');card.className='card v251-quote-card';card.innerHTML='<div class="body"><div><span>Purchase price</span><b>'+money(i.basePurchasePrice)+'</b></div><div><span>Total loan</span><b>'+money(loan.totalLoan)+'</b></div><div><span>Interest rate</span><b>'+pct(i.interestRate)+'</b></div><div><span>Total payment</span><b>'+money(pay.totalMonthlyPayment)+'</b></div><div><span>Closing costs</span><b>'+money(o.closing&&o.closing.buyerClosingCosts)+'</b></div><div><span>Cash to close</span><b>'+money(cash.cashToClose)+'</b></div></div>';return card;}
+function fullScreens(mod){
+  var base={};(mod.SCREENS||[]).forEach(function(screen){base[screen.id]=screen;});
+  return [{id:'quote',label:'QUOTE',virtual:'quote'},base.setup,EXTRA_FULL.property,base.renovation,base.maxmortgage,EXTRA_FULL.rates,base.closing,base.escrow,base.qualify,base.rental,base.advanced,base.scenarios,base.summary,EXTRA_FULL.documents].filter(Boolean);
+}
+function buildEditableFull(){
+  var s=store(),a=app(),mod=screens(),body=$('screen-body');if(!s||!a||!mod||!body)return false;
+  restoreLegacyPanels();a.refreshers=a.refreshers.slice(0,a.railCount||a.shellCount);while(body.firstChild)body.removeChild(body.firstChild);
+  var list=fullScreens(mod);
+  var sheet=document.createElement('section');sheet.id='v25FullSheet';sheet.className='v25-full-sheet v251-editable-full';sheet.appendChild(fullHeader(s));sheet.appendChild(fullNav(list));
+  list.forEach(function(screen){
+    var section=document.createElement('section');section.id='v251Screen-'+screen.id;section.className='v251-full-screen';section.dataset.v251Screen=screen.id;
+    var head=document.createElement('header'),focused=screen.page?' data-v251-page="'+esc(screen.page)+'"':' data-v251-open="'+esc(screen.id)+'"';head.className='v251-screen-head';head.innerHTML='<div><span>'+esc(screen.label)+'</span><p>'+esc(screen.blurb||(screen.virtual?'Live scenario outcome; its editable source fields follow below.':'Live loan-file controls and results.'))+'</p></div><button type="button"'+focused+'>Open focused tab</button>';section.appendChild(head);
+    if(screen.panel)mountLegacyPanel(screen,section);else{var grid=document.createElement('div');grid.className='v251-screen-grid';if(screen.virtual)grid.appendChild(quoteCard(s));else{(screen.columns||[]).forEach(function(column){(column||[]).forEach(function(card){grid.appendChild(a.renderCard(card));});});(screen.bottom||[]).forEach(function(card){grid.appendChild(a.renderCard(card));});}section.appendChild(grid);}sheet.appendChild(section);
+  });
+  body.appendChild(sheet);a.renderedMode=s.snapshot.mode;a.refresh();
+  $$('[data-v251-open]',sheet).forEach(function(b){b.onclick=function(){V.openSource(b.dataset.v251Open);};});
+  $$('[data-v251-page]',sheet).forEach(function(b){b.onclick=function(){V.openPage(b.dataset.v251Page);};});
+  if(window.V19)V19.enhanceFreeform(sheet);return true;
+}
+function paintFullNav(){var nav=$('v23SuitePrimaryNav');if(!nav)return;$$('button[data-group]',nav).forEach(function(b){var on=V.fullActive&&b.dataset.group==='full';b.classList.toggle('active',on);b.setAttribute('aria-current',on?'page':'false');});}
+V.openFull=function(){
+  var root=$('suite-root');if(!root)return;V.fullActive=true;if(window.V25)V25.fullActive=false;root.classList.add('v25-full-active','v251-full-active');if(buildEditableFull()){paintFullNav();window.scrollTo({top:0,behavior:'smooth'});}
+};
+V.openSource=function(mode){
+  var s=store(),a=app(),root=$('suite-root');V.fullActive=false;if(window.V25)V25.fullActive=false;if(root)root.classList.remove('v25-full-active','v251-full-active');
+  restoreLegacyPanels();if(!s||!a)return;if(s.snapshot.mode===mode)a.renderScreen();else s.setMode(mode);window.scrollTo({top:0,behavior:'smooth'});
+};
+function bindFull(){
+  var nav=$('v23SuitePrimaryNav'),full=nav&&nav.querySelector('[data-group="full"]'),top=$('v25FullForm');if(full)full.onclick=V.openFull;if(top)top.onclick=V.openFull;
+  if(nav&&!nav.dataset.v251Bound){nav.dataset.v251Bound='1';nav.addEventListener('click',function(e){var b=e.target.closest('button[data-group]');if(b&&b.dataset.group!=='full'&&V.fullActive){V.openSource(store().snapshot.mode);}},true);}
+  var tabs=document.querySelector('#suite-root .tabs');if(tabs&&!tabs.dataset.v251Bound){tabs.dataset.v251Bound='1';tabs.addEventListener('click',function(e){if(e.target.closest('.tab')&&V.fullActive)V.openSource(store().snapshot.mode);},true);}
+}
+function pageKey(value){return String(value||'').trim().replace(/\s+/g,' ').toUpperCase();}
+function pageTab(label){var key=pageKey(label);return $$('#suite-root .tabs .tab').filter(function(tab){return pageKey(tab.dataset.v23Key||tab.textContent)===key;})[0]||null;}
+function pageGroup(label){var key=pageKey(label);return PAGE_GROUPS.filter(function(group){return group.pages.indexOf(key)>=0;})[0]||PAGE_GROUPS[0];}
+function keepRenovationAvailable(){
+  var mod=screens();if(!mod||!mod.SCREENS)return;
+  var renovation=mod.SCREENS.filter(function(screen){return screen.id==='renovation';})[0];if(!renovation)return;
+  renovation.visible=null;
+  (renovation.columns||[]).forEach(function(column){(column||[]).forEach(function(card){if(card&&card.id==='renovation')card.visible=null;});});
+}
+function organizePageTabs(){
+  var tabs=$$('#suite-root .tabs .tab');if(!tabs.length)return;
+  tabs.forEach(function(tab){var key=pageKey(tab.textContent);tab.dataset.v23Key=key;tab.setAttribute('aria-label',key.replace('& OCR','and OCR'));});
+  var nav=$('v23SuitePrimaryNav'),active=nav&&nav.querySelector('button[data-group].active'),group=PAGE_GROUPS.filter(function(item){return item.key===(active&&active.dataset.group||'file');})[0]||PAGE_GROUPS[0];
+  tabs.forEach(function(tab){tab.dataset.v23Visible=group.pages.indexOf(pageKey(tab.dataset.v23Key))>=0?'1':'0';});
+}
+V.closePageDirectory=function(){var directory=$('v251PageDirectory');if(directory)directory.classList.remove('open');};
+V.openPage=function(label){
+  if(V.fullActive){V.fullActive=false;if($('suite-root'))$('suite-root').classList.remove('v25-full-active','v251-full-active');restoreLegacyPanels();}
+  V.closePageDirectory();$$('.v23-action-menu[open],.v23-sync-menu[open]').forEach(function(menu){menu.open=false;});
+  var group=pageGroup(label),groupButton=document.querySelector('#v23SuitePrimaryNav button[data-group="'+group.key+'"]');if(groupButton)groupButton.click();
+  setTimeout(function(){organizePageTabs();var tab=pageTab(label);if(tab){tab.dataset.v23Visible='1';tab.click();window.scrollTo({top:0,behavior:'smooth'});}},20);
+};
+function pageDirectoryMarkup(){return '<div class="v251-page-backdrop" onclick="V251.closePageDirectory()"></div><section role="dialog" aria-modal="true" aria-labelledby="v251PageDirectoryTitle"><header><div><b id="v251PageDirectoryTitle">All Loan Suite pages</b><small>Every original and added workspace, organized by workflow</small></div><button type="button" onclick="V251.closePageDirectory()">Close</button></header><div class="v251-page-groups">'+PAGE_GROUPS.map(function(group){return '<section><h3>'+icon(group.icon)+esc(group.label)+'</h3><div>'+group.pages.map(function(page){return '<button type="button" data-v251-page="'+esc(page)+'"><span>'+esc(page.replace('DOCUMENTS & OCR','DOCUMENTS AND OCR'))+'</span><i aria-hidden="true">&rarr;</i></button>';}).join('')+'</div></section>';}).join('')+'</div></section>';}
+function installPageDirectory(){
+  var tools=$('v24LoanTools'),grid=tools&&tools.querySelector('.v23-actions-grid');if(!grid)return;
+  var button=$('v251PageDirectoryButton');if(!button){button=document.createElement('button');button.id='v251PageDirectoryButton';button.type='button';button.className='v23-action v251-page-directory-button';button.dataset.v25Decorated='1';button.innerHTML=icon('full')+'<span class="v25-action-copy"><b>All pages</b><small>Open the complete workspace directory</small></span>';button.onclick=function(){tools.open=false;var directory=$('v251PageDirectory');if(directory)directory.classList.add('open');};grid.insertBefore(button,grid.firstChild);}
+  var directory=$('v251PageDirectory');if(!directory){directory=document.createElement('div');directory.id='v251PageDirectory';directory.className='v251-page-directory no-print';directory.innerHTML=pageDirectoryMarkup();document.body.appendChild(directory);$$('[data-v251-page]',directory).forEach(function(item){item.onclick=function(){V.openPage(item.dataset.v251Page);};});}
+}
+function simplifyMenus(){
+  [['v23SuiteActions','File actions'],['v24LoanTools','Loan tools'],['v23CalcActions','Income file actions']].forEach(function(pair){
+    var details=$(pair[0]);if(!details)return;details.classList.add('v251-simple-menu');var panel=details.querySelector('.v23-actions-panel');if(panel)panel.setAttribute('aria-label',pair[1]);
+  });
+}
+function appearanceButtons(title,items,handler,current){return'<div class="v251-appearance-group"><span>'+title+'</span><div>'+items.map(function(item){return'<button type="button" data-value="'+item[0]+'" class="'+(current===item[0]?'selected':'')+'"><i data-swatch="'+item[0]+'"></i>'+item[1]+'</button>';}).join('')+'</div></div>';}
+function paintAppearanceMenu(){
+  var panel=$('v251AppearancePanel');if(!panel)return;var theme=document.documentElement.dataset.v24Theme||'terminal',surface=document.documentElement.dataset.v25Surface||'oled',tone=document.documentElement.dataset.inputTone||'paper';
+  panel.innerHTML='<header><div><b>Appearance</b><small>Theme, surface and field color</small></div><kbd>Esc</kbd></header>'+appearanceButtons('Color theme',THEMES,'theme',theme)+appearanceButtons('Surface',SURFACES,'surface',surface)+appearanceButtons('Input fields',INPUTS,'input',tone);
+  $$('.v251-appearance-group',panel).forEach(function(group,idx){$$('button',group).forEach(function(button){button.onclick=function(e){e.stopPropagation();var value=button.dataset.value;if(idx===0&&window.V24)V24.setTheme(value);if(idx===1&&window.V25)V25.setSurface(value);if(idx===2&&window.V24)V24.setInput(value);paintAppearanceMenu();};});});
+}
+function installAppearanceMenu(){
+  var wrap=$('v23Appearance'),button=$('v23ThemeButton');if(!wrap||!button)return;
+  if(safeGet('los.v251.appearanceSeeded','')!=='1'){safeSet('los.v251.appearanceSeeded','1');if(window.V24){V24.setTheme('terminal',true);V24.setInput('paper');}if(window.V25)V25.setSurface('oled');}
+  var surface=$('v25SurfaceButton'),input=$('v23InputButton');[surface,input].forEach(function(node){if(node){node.classList.add('v251-retired-appearance');node.setAttribute('aria-hidden','true');node.tabIndex=-1;}});
+  function setOpen(open){wrap.classList.toggle('open',open);button.setAttribute('aria-expanded',open?'true':'false');if(open){button.style.setProperty('background','#fff','important');button.style.setProperty('color','#0A1422','important');}else{button.style.removeProperty('background');button.style.removeProperty('color');}}
+  wrap.classList.add('v251-appearance-menu');button.onclick=function(e){e.stopPropagation();setOpen(!wrap.classList.contains('open'));paintAppearanceMenu();};button.setAttribute('aria-haspopup','true');button.title='Appearance options';button.setAttribute('aria-label','Appearance options');
+  var panel=$('v251AppearancePanel');if(!panel){panel=document.createElement('div');panel.id='v251AppearancePanel';panel.className='v251-appearance-panel';wrap.appendChild(panel);}paintAppearanceMenu();
+  if(!V.appearanceBound){V.appearanceBound=true;document.addEventListener('click',function(e){if(!e.target.closest('#v23Appearance'))setOpen(false);});document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});}
+}
+function separateNavBands(){var nav=$('v23SuitePrimaryNav'),tabs=document.querySelector('#suite-root .tabs'),chrome=tabs&&tabs.parentNode;if(nav&&tabs&&chrome&&nav.parentNode!==chrome)chrome.insertBefore(nav,tabs);}
+function enhanceDate(el){
+  if(!el||el.type!=='date'||el.__v251Date||!window.V15)return;el.__v251Date=true;
+  var inputHandler=el.oninput,changeHandler=el.onchange,inputInline=el.getAttribute('oninput')||'',changeInline=el.getAttribute('onchange')||'',iso=V15.parseDate(el.value)||'';
+  el.dataset.v251Iso=iso;el.type='text';el.placeholder='MM/DD/YYYY';el.autocomplete='off';el.value=V15.prettyDate(iso);el.removeAttribute('oninput');el.removeAttribute('onchange');el.oninput=null;el.onchange=null;
+  el.addEventListener('blur',function(){var parsed=V15.parseDate(el.value);if(!parsed&&el.value.trim()){el.classList.add('v15-date-bad');el.value=V15.prettyDate(el.dataset.v251Iso);setTimeout(function(){el.classList.remove('v15-date-bad');},850);return;}el.dataset.v251Iso=parsed;el.value=parsed;try{if(inputHandler)inputHandler.call(el,new Event('input',{bubbles:false}));else if(changeHandler)changeHandler.call(el,new Event('change',{bubbles:false}));else if(inputInline)Function(inputInline).call(el);else if(changeInline)Function(changeInline).call(el);}catch(e){}el.value=V15.prettyDate(parsed);});
+  el.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();el.blur();}if(e.key==='Escape'){el.value=V15.prettyDate(el.dataset.v251Iso);el.blur();}});
+}
+function enhanceDates(root){if(root&&root.matches&&root.matches('input[type="date"]'))enhanceDate(root);$$('input[type="date"]',root||document).forEach(enhanceDate);}
+function observeFreeform(){
+  if(V.observer||!window.MutationObserver)return;V.observer=new MutationObserver(function(records){records.forEach(function(record){Array.prototype.forEach.call(record.addedNodes||[],function(node){if(node.nodeType===1){if(window.V19)V19.enhanceFreeform(node);enhanceDates(node);}});});});V.observer.observe(document.body,{childList:true,subtree:true});
+}
+function boot(){try{document.documentElement.dataset.losRelease='25.1';keepRenovationAvailable();installAppearanceMenu();buildHeader();bindFull();installPageDirectory();simplifyMenus();separateNavBands();organizePageTabs();observeFreeform();if(window.V19)V19.enhanceFreeform(document);enhanceDates(document);if(V.fullActive&&!$('v25FullSheet'))buildEditableFull();updateHeader();}catch(e){if(console&&console.warn)console.warn('v25.1 enhancement',e);}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();if(window.LOS_SCHEDULER)LOS_SCHEDULER.add(boot,900);else setInterval(boot,900);
 })();
 
 </script>

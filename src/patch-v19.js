@@ -31,7 +31,7 @@ V.enhanceFreeform=function(root){
     el.addEventListener('blur',function(){normalizeField(el);},true);
   });
 };
-function releaseStamp(){document.documentElement.dataset.losRelease='19';}
+function releaseStamp(){var current=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(current)||current<19)document.documentElement.dataset.losRelease='19';}
 function boot(){V.enhanceFreeform(document);releaseStamp();if(window.V17&&V17.paintThemeButtons)V17.paintThemeButtons();return true;}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();setInterval(boot,350);
 })();
