@@ -3,24 +3,150 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Mortgage Suite workspace for income, renovation, qualification, closing costs, scenarios, and documents.">
   <title>Mortgage Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
-    :root{color-scheme:dark;font-family:'Plus Jakarta Sans',Segoe UI,Arial,sans-serif;background:#071522;color:#eef7ff}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:26px;background:radial-gradient(circle at 18% 5%,rgba(38,111,170,.42),transparent 34%),radial-gradient(circle at 85% 90%,rgba(25,76,124,.27),transparent 34%),linear-gradient(145deg,#071522,#040b12)}main{width:min(900px,100%);background:linear-gradient(150deg,rgba(14,41,67,.94),rgba(8,25,42,.96));border:1px solid rgba(128,187,232,.22);border-radius:26px;padding:clamp(26px,5vw,52px);box-shadow:0 34px 90px rgba(0,0,0,.42);overflow:hidden;position:relative}main:after{content:'';position:absolute;width:280px;height:280px;border-radius:50%;right:-130px;top:-150px;border:52px solid rgba(77,163,225,.08)}.eyebrow{color:#76c7ff;font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}h1{font-size:clamp(34px,6vw,62px);line-height:1.02;margin:14px 0 18px;max-width:13ch;letter-spacing:-.045em}p{color:#b8cce0;line-height:1.65;max-width:64ch;font-size:15px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}a{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 19px;border-radius:11px;text-decoration:none;font-size:13px;font-weight:800;color:#061421;background:linear-gradient(135deg,#76c7ff,#4ca4e2);box-shadow:0 8px 24px rgba(49,141,208,.24);transition:.16s ease}a:hover{transform:translateY(-1px);filter:brightness(1.06)}a.secondary{color:#eaf6ff;background:rgba(255,255,255,.055);border:1px solid rgba(145,198,237,.26);box-shadow:none}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:34px}.facts div{padding:15px;border-radius:13px;background:rgba(6,21,35,.54);border:1px solid rgba(119,173,216,.16)}.facts b,.facts span{display:block}.facts b{font-family:Manrope,sans-serif;font-size:13px}.facts span{color:#8fa9c0;font-size:10.5px;line-height:1.45;margin-top:5px}@media(max-width:620px){body{padding:14px}main{padding:25px;border-radius:20px}.facts{grid-template-columns:1fr}h1{max-width:none}}
+    :root{font-family:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;color:#102a50;background:#edf3fa;color-scheme:light;--navy:#0d2d55;--navy-2:#133d70;--blue:#1768e5;--blue-2:#0f57ca;--line:#d6e1ef;--soft:#f5f8fc;--muted:#667b98;--green:#138a62;--shadow:0 18px 50px rgba(25,55,94,.12)}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:linear-gradient(180deg,#eef4fb 0,#f8fbff 48%,#edf3f9 100%);color:#102a50}
+    a{color:inherit}
+    .topbar{min-height:64px;padding:10px clamp(16px,3vw,48px);display:flex;align-items:center;gap:18px;background:linear-gradient(125deg,#0a2344,#123967);color:#fff;box-shadow:0 8px 28px rgba(7,30,62,.2)}
+    .brand{display:flex;align-items:center;gap:11px;min-width:max-content;text-decoration:none}
+    .brand-mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#52b9ff,#2d79d4);font:800 12px Manrope,sans-serif;box-shadow:inset 0 1px rgba(255,255,255,.34),0 8px 16px rgba(0,0,0,.18)}
+    .brand-copy{display:grid;line-height:1.15}.brand-copy b{font:800 15px Manrope,sans-serif}.brand-copy small{margin-top:3px;color:#adc8e7;font-size:9.5px;letter-spacing:.02em}
+    .top-note{flex:1;max-width:520px;margin:auto;display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid rgba(180,215,250,.18);border-radius:10px;background:rgba(255,255,255,.07);color:#b9cde4;font-size:11px}
+    .top-note:before{content:'';width:10px;height:10px;border:2px solid #a8c6e8;border-radius:50%;box-shadow:5px 5px 0 -4px #a8c6e8;flex:none}
+    .top-actions{display:flex;gap:8px}
+    .button{min-height:40px;padding:10px 16px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-size:11px;font-weight:800;transition:.16s ease}
+    .button.primary{background:linear-gradient(135deg,#2478f0,#125bd1);color:#fff;box-shadow:0 8px 20px rgba(21,98,214,.24)}
+    .button.secondary{border:1px solid rgba(168,205,241,.32);background:rgba(255,255,255,.07);color:#eef7ff}
+    .button:hover{transform:translateY(-1px);filter:brightness(1.04)}
+    .page{width:min(1510px,calc(100% - 32px));margin:0 auto;padding:26px 0 40px}
+    .hero{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}
+    .eyebrow{color:#1768e5;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+    h1{margin:8px 0 8px;font:800 clamp(28px,4vw,46px)/1.06 Manrope,sans-serif;letter-spacing:-.035em;color:#0c2c59}
+    .hero p{max-width:780px;margin:0;color:#607695;font-size:13px;line-height:1.65}
+    .hero-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+    .hero-actions .secondary{border-color:#b8cae1;background:#fff;color:#17365f}
+    .snapshot{display:grid;grid-template-columns:180px minmax(0,1fr) 286px;min-height:670px;overflow:hidden;border:1px solid #c9d7e8;border-radius:20px;background:#fff;box-shadow:var(--shadow)}
+    .side{padding:16px 11px;background:linear-gradient(180deg,#0c2e58,#102a4d);color:#c9dcf0}
+    .side-title{padding:5px 9px 14px;color:#7fa8d3;font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+    .nav{display:grid;gap:4px}.nav div{min-height:35px;padding:8px 10px;border-radius:8px;display:flex;align-items:center;gap:9px;font-size:10px;font-weight:650}
+    .nav div:before{content:'';width:7px;height:7px;border:1.5px solid currentColor;border-radius:2px;opacity:.8}
+    .nav div.active{background:linear-gradient(135deg,#2877d7,#235ea6);color:#fff;box-shadow:inset 0 1px rgba(255,255,255,.16)}
+    .nav-gap{height:8px}.side-foot{margin-top:18px;padding:13px 9px 0;border-top:1px solid rgba(181,210,240,.15);color:#8faecc;font-size:9px;line-height:1.5}
+    .workspace{min-width:0;padding:19px;background:#f4f8fd}
+    .workspace-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:13px}
+    .workspace-head h2{margin:0;font:800 19px Manrope,sans-serif;color:#123365}.workspace-head p{margin:4px 0 0;color:#7084a0;font-size:10px}
+    .status{padding:6px 9px;border-radius:999px;background:#e2f5ec;color:#087650;font-size:9px;font-weight:800}
+    .main-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:11px}
+    .card{min-width:0;padding:14px;border:1px solid var(--line);border-radius:13px;background:#fff;box-shadow:0 5px 16px rgba(26,60,103,.045)}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.card-head b{font:800 12px Manrope,sans-serif;color:#14366a}.card-head span{font-size:8.5px;color:#2470d4}
+    .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.field{display:grid;gap:4px}.field.wide{grid-column:1/-1}.field span{color:#677d9a;font-size:8.5px}.field div{min-height:34px;padding:8px 10px;border:1px solid #cfdbea;border-radius:8px;background:#f9fbfe;color:#9aabc0;font-size:10px}.field div.ready{color:#183961;background:#eef5ff;border-color:#bdd3ed}
+    .mini-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.metric{padding:10px;border:1px solid #d8e4f0;border-radius:9px;background:#f7faff}.metric span,.metric b{display:block}.metric span{color:#7288a4;font-size:8px;text-transform:uppercase;letter-spacing:.04em}.metric b{margin-top:5px;color:#153867;font:800 11px Manrope,sans-serif}
+    .readiness{display:grid;gap:7px}.readiness div{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 9px;border-radius:8px;background:#f5f8fc;color:#5c7391;font-size:9px}.readiness b{color:#0c7653;font-size:9px}.readiness i{width:7px;height:7px;margin-right:6px;display:inline-block;border-radius:50%;background:#2aac7c}
+    .feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-top:11px}.feature{min-height:128px;display:flex;flex-direction:column}.feature p{margin:4px 0 12px;color:#7084a0;font-size:9px;line-height:1.5}.feature-list{display:grid;gap:5px;margin-top:auto}.feature-list span{padding:7px 8px;border:1px solid #d8e4f1;border-radius:7px;background:#f8fbff;color:#345170;font-size:8.5px;font-weight:650}
+    .rail{padding:16px 14px;border-left:1px solid #d9e3ef;background:#fbfdff}
+    .rail-card{padding:13px;border:1px solid #d6e2ef;border-radius:12px;background:#fff;margin-bottom:10px}
+    .rail-card h3{margin:0 0 9px;font:800 11px Manrope,sans-serif;color:#14366a}.rail-card p{margin:0;color:#7488a2;font-size:9px;line-height:1.55}
+    .scenario-empty{padding:13px;border:1px dashed #b8cbe1;border-radius:9px;background:#f6faff;color:#6b819d;font-size:9px;line-height:1.55}.scenario-empty b{display:block;margin-bottom:3px;color:#214a7d}
+    .rail-link{margin-top:9px;width:100%;min-height:34px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;border:1px solid #c8d8ea;border-radius:8px;background:#fff;color:#1d4d86;text-decoration:none;font-size:9px;font-weight:800}.rail-link:hover{border-color:#1f70da;background:#f1f7ff}
+    .checks{display:grid;gap:7px}.checks div{display:flex;gap:8px;color:#607795;font-size:9px;line-height:1.45}.checks div:before{content:'✓';width:17px;height:17px;display:grid;place-items:center;flex:none;border-radius:50%;background:#e1f5ec;color:#0b8059;font-size:9px;font-weight:900}
+    .footer-note{margin:15px 4px 0;color:#7287a1;font-size:9.5px;text-align:center}
+    @media(max-width:1080px){.snapshot{grid-template-columns:150px minmax(0,1fr)}.rail{grid-column:1/-1;border-left:0;border-top:1px solid #d9e3ef;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.rail-card{margin:0}.feature-grid{grid-template-columns:1fr 1fr}.feature:last-child{grid-column:1/-1}}
+    @media(max-width:760px){.top-note{display:none}.topbar{flex-wrap:wrap}.top-actions{margin-left:auto}.hero{align-items:flex-start;flex-direction:column}.hero-actions{justify-content:flex-start}.snapshot{grid-template-columns:1fr}.side{padding:10px}.side-title,.side-foot{display:none}.nav{display:flex;overflow:auto}.nav div{flex:0 0 auto}.workspace{padding:13px}.main-grid,.feature-grid{grid-template-columns:1fr}.feature:last-child{grid-column:auto}.rail{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.field.wide{grid-column:auto}}
+    @media(max-width:520px){.page{width:min(100% - 18px,1510px);padding-top:18px}.topbar{padding:10px}.brand-copy small{display:none}.top-actions{width:100%}.top-actions .button{flex:1}.hero-actions{width:100%}.hero-actions .button{flex:1}.snapshot{border-radius:14px}.mini-row{grid-template-columns:1fr}.workspace-head{align-items:flex-start}.status{white-space:nowrap}}
   </style>
 </head>
 <body>
-  <main>
-    <div class="eyebrow">Mortgage Suite &middot; Release 35</div>
-    <h1>One clear workspace for every mortgage scenario.</h1>
-    <p>Move from income and property setup through renovation, qualification, closing costs, and documents without losing the calculations underneath. The streamlined workspaces share live data, five focused color themes, Light/Dark/OLED surfaces, and five independent field styles.</p>
-    <div class="actions">
-      <a href="loan-suite.html">Open Mortgage Suite Quote</a>
-      <a class="secondary" href="income-calculator.html">Open Income Calculator</a>
-    </div>
-    <div class="facts"><div><b>Freeform entry</b><span>Currency, percentages, dates, ZIP, and address</span></div><div><b>Live calculations</b><span>MMW, ARV, escrow, PMI/MIP, and scenarios</span></div><div><b>Document tools</b><span>LE, P&amp;L, lease, addendum, and estimates</span></div></div>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Mortgage Suite home">
+      <span class="brand-mark">MS</span>
+      <span class="brand-copy"><b>Mortgage Suite</b><small>Loan · Income · Renovation · Documents</small></span>
+    </a>
+    <div class="top-note">One synchronized workspace for a complete mortgage scenario</div>
+    <nav class="top-actions" aria-label="Launch applications">
+      <a class="button secondary" href="income-calculator.html">Income Calculator</a>
+      <a class="button primary" href="loan-suite.html">Loan Suite</a>
+    </nav>
+  </header>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Mortgage Suite · Release 35</div>
+        <h1>A clear view of the whole file.</h1>
+        <p>Use the snapshot to see how income, property, renovation, qualification, closing costs, and documents stay connected. Open either workspace below to begin or continue a saved scenario.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="button primary" href="loan-suite.html">Open Mortgage Suite Quote</a>
+        <a class="button secondary" href="income-calculator.html">Open Income Calculator</a>
+      </div>
+    </section>
+    <section class="snapshot" aria-label="Mortgage Suite workspace snapshot">
+      <aside class="side">
+        <div class="side-title">Workspace snapshot</div>
+        <div class="nav">
+          <div>Quote</div><div>Setup</div><div class="active">Property</div><div>Income</div><div>Qualification</div><div>Renovation</div><div>Closing &amp; Escrow</div><div>Scenarios</div><div>Documents</div><div>Results</div>
+        </div>
+        <div class="side-foot">Every workspace uses the same live file data and calculation engine.</div>
+      </aside>
+      <div class="workspace">
+        <div class="workspace-head">
+          <div><h2>Property &amp; loan workspace</h2><p>Freeform entry, optional lookup, and synchronized calculations.</p></div>
+          <span class="status">Ready to start</span>
+        </div>
+        <div class="main-grid">
+          <article class="card">
+            <div class="card-head"><b>Property information</b><span>Manual or lookup</span></div>
+            <div class="fields">
+              <label class="field wide"><span>Property address</span><div>Enter a street address</div></label>
+              <label class="field"><span>ZIP code</span><div>Enter ZIP</div></label>
+              <label class="field"><span>City · State · County</span><div>Fill manually or from ZIP</div></label>
+              <label class="field"><span>Purchase price</span><div>Enter an amount</div></label>
+              <label class="field"><span>After-repair value</span><div>Optional for non-renovation</div></label>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-head"><b>Loan snapshot</b><span>Updates live</span></div>
+            <div class="mini-row">
+              <div class="metric"><span>Program</span><b>Auto select</b></div>
+              <div class="metric"><span>Payment</span><b>Calculated</b></div>
+              <div class="metric"><span>Cash to close</span><b>Calculated</b></div>
+            </div>
+            <div class="readiness" style="margin-top:10px">
+              <div><span><i></i>Freeform dates and numbers</span><b>Ready</b></div>
+              <div><span><i></i>PMI / FHA MIP</span><b>Linked</b></div>
+              <div><span><i></i>Live scenario comparison</span><b>Available</b></div>
+            </div>
+          </article>
+        </div>
+        <div class="feature-grid">
+          <article class="card feature"><div class="card-head"><b>Income &amp; qualification</b><span>Live</span></div><p>W-2, self-employment, rental, VA, other income, DTI, AUS checks, and qualifying income.</p><div class="feature-list"><span>Income worksheets</span><span>Front / back DTI and income needed</span></div></article>
+          <article class="card feature"><div class="card-head"><b>Closing &amp; renovation</b><span>Connected</span></div><p>Itemized fees, escrow dates, MMW, contractor estimates, ARV checks, and cash-to-close ranges.</p><div class="feature-list"><span>Closing costs and escrow</span><span>Renovation and Max Mortgage</span></div></article>
+          <article class="card feature"><div class="card-head"><b>Documents &amp; OCR</b><span>Organized</span></div><p>Review extracted data and open every worksheet or focused print generator from one workspace.</p><div class="feature-list"><span>Loan Estimate and credit review</span><span>P&amp;L, lease, addendum, and estimates</span></div></article>
+        </div>
+      </div>
+      <aside class="rail">
+        <article class="rail-card">
+          <h3>Current workspace</h3>
+          <div class="scenario-empty"><b>No scenario shown on the landing page</b>Your saved file remains inside the Loan Suite and restores when you open it.</div>
+          <a class="rail-link" href="loan-suite.html"><span>Open Loan Suite</span><span>→</span></a>
+        </article>
+        <article class="rail-card">
+          <h3>At a glance</h3>
+          <div class="checks"><div>Five focused color themes with Light, Dark, and OLED surfaces.</div><div>Editable Full Form plus focused workspaces.</div><div>Autosave, JSON import/export, and three recent sessions.</div></div>
+        </article>
+        <article class="rail-card">
+          <h3>Start with income</h3>
+          <p>Build qualifying income first, then synchronize it into the active loan scenario.</p>
+          <a class="rail-link" href="income-calculator.html"><span>Open Income Calculator</span><span>→</span></a>
+        </article>
+      </aside>
+    </section>
+    <p class="footer-note">All calculations remain inside the full Mortgage Suite and Income Calculator workspaces.</p>
   </main>
 </body>
 </html>

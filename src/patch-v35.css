@@ -114,6 +114,98 @@
 
 .v35-borrower-range{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 28%,var(--v24-border,#2b405c)) !important}.v35-borrower-range>.body>p{margin:0 0 9px;color:var(--v24-muted,#94a8c1);font-size:10px}.v35-borrower-range>.body>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.v35-borrower-range button{display:grid;gap:5px;padding:10px;border:1px solid var(--v24-border,#2b405c);border-radius:9px;background:color-mix(in srgb,var(--v24-card,#111d2d) 82%,var(--v24-page,#07111e));color:var(--v24-text,#e8f0fa);text-align:left;cursor:pointer}.v35-borrower-range button:hover{border-color:var(--v24-accent,#2D7DD2)}.v35-borrower-range button span{font-size:9px;color:var(--v24-muted,#94a8c1)}.v35-borrower-range button b{font-size:12px}[data-v35-linked]{cursor:pointer}[data-v35-linked]:hover{outline:1px solid color-mix(in srgb,var(--v24-accent,#2D7DD2) 44%,transparent);outline-offset:2px}
 
+/* Light surfaces need their own menu treatment. Earlier releases used
+   fixed dark menu colors, which made popover copy disappear when a user
+   selected a light field palette. These rules keep every floating surface
+   crisp and readable without changing the chosen accent color. */
+html[data-v25-surface="light"] .v35-panel,
+html[data-v25-surface="light"] .v29-pop,
+html[data-v25-surface="light"] .v30-card,
+html[data-v25-surface="light"] .v23-actions-panel,
+html[data-v25-surface="light"] .v23-sync-panel,
+html[data-v25-surface="light"] .v251-appearance-panel,
+html[data-v25-surface="light"] .v251-page-directory>section{
+  background:#fff !important;color:#112f52 !important;border-color:#cbd9e8 !important;
+  box-shadow:0 24px 70px rgba(23,55,91,.22) !important;
+}
+html[data-v25-surface="light"] .v35-head,
+html[data-v25-surface="light"] .v35-sessionbar,
+html[data-v25-surface="light"] .v251-appearance-panel>header,
+html[data-v25-surface="light"] .v251-page-directory>section>header{
+  background:#f5f8fc !important;color:#14345b !important;border-color:#d6e1ed !important;
+}
+html[data-v25-surface="light"] .v35-head small,
+html[data-v25-surface="light"] .v35-grp,
+html[data-v25-surface="light"] .v251-appearance-panel small,
+html[data-v25-surface="light"] .v251-appearance-group>span,
+html[data-v25-surface="light"] .v29-pop-hd,
+html[data-v25-surface="light"] .v29-pop-sub,
+html[data-v25-surface="light"] .v29-pop-note{color:#667c98 !important}
+html[data-v25-surface="light"] .v35-sessionbar select,
+html[data-v25-surface="light"] .v29-pop input,
+html[data-v25-surface="light"] .v29-pop select{
+  background:#f7fafe !important;border-color:#b9cce0 !important;color:#143653 !important;
+  -webkit-text-fill-color:#143653 !important;
+}
+html[data-v25-surface="light"] .v35-sessionbar button,
+html[data-v25-surface="light"] .v35-panel .v35-item,
+html[data-v25-surface="light"] .v29-pick,
+html[data-v25-surface="light"] .v29-pop .btn-light,
+html[data-v25-surface="light"] .v251-appearance-group button,
+html[data-v25-surface="light"] .v251-page-groups button,
+html[data-v25-surface="light"] .v251-simple-menu .v23-actions-grid>button,
+html[data-v25-surface="light"] .v251-simple-menu .v23-actions-grid>.v23-action,
+html[data-v25-surface="light"] .v251-simple-menu .v23-actions-grid .btn{
+  background:#f8fbff !important;border-color:#cfdeed !important;color:#173858 !important;
+  -webkit-text-fill-color:#173858 !important;box-shadow:none !important;
+}
+html[data-v25-surface="light"] .v35-panel .v35-item:hover,
+html[data-v25-surface="light"] .v29-pick:hover,
+html[data-v25-surface="light"] .v251-appearance-group button:hover,
+html[data-v25-surface="light"] .v251-appearance-group button.selected,
+html[data-v25-surface="light"] .v251-page-groups button:hover{
+  background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 9%,#fff) !important;
+  border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 65%,#b9cce0) !important;
+  color:#102e4e !important;-webkit-text-fill-color:#102e4e !important;
+}
+html[data-v25-surface="light"] .v251-page-groups>section{background:#f6f9fd !important;border-color:#d6e2ef !important}
+html[data-v25-surface="light"] .v251-page-groups h3{color:#5d7492 !important}
+html[data-v25-surface="light"] .v29-pop-wide{min-height:33px;border-radius:8px !important}
+html[data-v25-surface="light"] .v29-pop-list{padding-top:7px;border-top:1px solid #dce6f0}
+
+/* Subitem rows read as interactive controls instead of spreadsheet lines. */
+.v35-live-row,.v35-live-warnings button{
+  position:relative;border-color:color-mix(in srgb,var(--v24-border,#2b405c) 86%,transparent);
+  box-shadow:inset 3px 0 0 color-mix(in srgb,var(--v24-accent,#2D7DD2) 62%,transparent);
+  transition:transform .14s ease,border-color .14s ease,background .14s ease,box-shadow .14s ease;
+}
+.v35-live-row::after{content:'›';margin-left:2px;color:var(--v24-accent,#2D7DD2);font-size:14px;font-weight:800}
+.v35-live-row:hover,.v35-live-warnings button:hover{transform:translateX(2px);box-shadow:inset 3px 0 0 var(--v24-accent,#2D7DD2)}
+.v35-live-row b{margin-left:auto}
+.v35-live-warnings button{box-shadow:inset 3px 0 0 #d88a1b}
+.v35-income-needed .v35-live-row{background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 8%,var(--v24-card,#111d2d))}
+.v35-linked-subtabs{padding:5px;gap:5px;border-radius:12px;box-shadow:0 5px 16px rgba(16,42,74,.07)}
+.v35-linked-subtabs button{position:relative;min-height:34px;padding:0 15px;border:1px solid transparent}
+.v35-linked-subtabs button.active{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 72%,transparent);box-shadow:0 4px 12px color-mix(in srgb,var(--v24-accent,#2D7DD2) 18%,transparent)}
+#suite-root .v24-preset-chips>.btn,#suite-root .v20-quick>.btn,#suite-root .v14-bar>.btn{
+  border-radius:999px !important;border:1px solid color-mix(in srgb,var(--v24-border,#2b405c) 88%,transparent) !important;
+  background:color-mix(in srgb,var(--v24-card,#111d2d) 86%,var(--v24-page,#07111e)) !important;
+  color:var(--v24-text,#e8f0fa) !important;box-shadow:0 3px 9px rgba(15,38,68,.06) !important;
+}
+#suite-root .v24-preset-chips>.btn:hover,#suite-root .v20-quick>.btn:hover,#suite-root .v14-bar>.btn:hover{
+  border-color:var(--v24-accent,#2D7DD2) !important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 10%,var(--v24-card,#111d2d)) !important;
+}
+html[data-v25-surface="light"] .v35-live-row,
+html[data-v25-surface="light"] .v35-live-warnings button,
+html[data-v25-surface="light"] .v35-borrower-range button,
+html[data-v25-surface="light"] .v35-linked-subtabs{
+  background:#f8fbff !important;color:#173858 !important;border-color:#d4e1ee !important;
+}
+html[data-v25-surface="light"] .v35-live-row span{color:#5f7591 !important}
+html[data-v25-surface="light"] #suite-root .v24-preset-chips>.btn,
+html[data-v25-surface="light"] #suite-root .v20-quick>.btn,
+html[data-v25-surface="light"] #suite-root .v14-bar>.btn{background:#fff !important;color:#173858 !important;border-color:#cbdbea !important}
+
 /* ---- the readings bar now holds only readings and one button ------- */
 #suite-root .v34-bar{ gap:12px; }
 #suite-root .v34-right{ gap:8px; flex:0 0 auto; }

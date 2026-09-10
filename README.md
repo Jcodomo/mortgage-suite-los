@@ -79,7 +79,7 @@ dist/
 python3 build/inject.py src/mortgage-suite-allinone.html dist/mortgage-suite-los.html
 npm test                                      # all pure-logic tests
 python3 build/verify_los.py                   # legacy browser harness
-node build/verify-v35.cjs                     # 36 live UI / responsive checks
+node build/verify-v35.cjs                     # 38 live UI / responsive checks
 ```
 
 `test/run.sh` covers the parts of the layer that are just arithmetic and

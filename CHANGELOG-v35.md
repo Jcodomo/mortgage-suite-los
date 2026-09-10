@@ -71,3 +71,14 @@ layer verified present.
   MLS/Zillow/Redfin planning-source warning.
 - Passed calculation, feature-preservation, browser, responsive, and
   timed no-flicker checks with zero page errors.
+
+## Landing and light-mode polish
+
+- Rebuilt the landing page around a clean, no-sample workspace snapshot
+  while retaining prominent Loan Suite and Income Calculator launch paths.
+- Restyled light-surface rate, Actions, session, appearance, page-directory,
+  and legacy menu panels for consistent readable contrast.
+- Turned Live Summary entries, linked Renovation/Closing subtabs, and compact
+  row actions into visually distinct interactive controls.
+- Browser QA now covers 38 workflows and responsive checks with zero page
+  errors; all 25 automated test files continue to pass.

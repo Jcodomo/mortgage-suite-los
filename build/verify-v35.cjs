@@ -5,6 +5,7 @@ const { pathToFileURL } = require('url');
 
 const FILE = path.resolve(process.argv[2] || 'dist/mortgage-suite-los.html');
 const SHOT_DIR = path.resolve(process.argv[3] || 'artifacts/v35-final');
+const LANDING = path.resolve(path.dirname(FILE), '..', 'index.html');
 const EXECUTABLE = process.env.PLAYWRIGHT_BROWSER_PATH ||
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGAGE RATES','CLOSING','ESCROW','QUALIFY','RENTAL','ADVANCED','SCENARIOS','SUMMARY','DOCUMENTS & OCR'];
@@ -13,8 +14,22 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
   const checks = [];
   const errors = [];
   const ok = (name, pass, detail = '') => checks.push([name, Boolean(pass), detail]);
+  fs.mkdirSync(SHOT_DIR, { recursive: true });
   const browser = await chromium.launch({ headless: true, executablePath: EXECUTABLE });
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+  const landingPage = await context.newPage();
+  await landingPage.goto(pathToFileURL(LANDING).href);
+  await landingPage.waitForTimeout(300);
+  const landing = await landingPage.evaluate(() => ({
+    snapshot: Boolean(document.querySelector('.snapshot')),
+    cards: document.querySelectorAll('.snapshot .card').length,
+    loan: document.querySelectorAll('a[href="loan-suite.html"]').length,
+    income: document.querySelectorAll('a[href="income-calculator.html"]').length,
+    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
+  }));
+  ok('Landing page provides a responsive workspace snapshot and both launch paths', landing.snapshot && landing.cards >= 5 && landing.loan >= 2 && landing.income >= 2 && landing.overflow <= 1, JSON.stringify(landing));
+  await landingPage.screenshot({ path: path.join(SHOT_DIR, 'landing-1920.png'), fullPage: true });
+  await landingPage.close();
   const page = await context.newPage();
   page.on('pageerror', error => errors.push(String(error)));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
@@ -57,6 +72,20 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
     loan: mortgageSuite.store.activeInputs.bps.loanAmountOverride
   }));
   ok('Quote controls update live suite inputs', quoteValues.price === 640000 && quoteValues.zip === '10001' && Math.abs(quoteValues.down - .05) < 1e-9 && quoteValues.loan === 500000, JSON.stringify(quoteValues));
+
+  const rateChip = defaultPage.locator('#v28RateStat');
+  if (await rateChip.count() === 1) await rateChip.click();
+  await defaultPage.waitForTimeout(120);
+  const lightRate = await defaultPage.evaluate(() => {
+    const panel = document.getElementById('v29RatePop');
+    const input = document.getElementById('v29RateInput');
+    if (!panel || !input) return null;
+    const p = getComputedStyle(panel), f = getComputedStyle(input);
+    return { visible: p.display !== 'none', panelBg: p.backgroundColor, panelText: p.color, fieldBg: f.backgroundColor, fieldText: f.color };
+  });
+  ok('Light-mode rate menu has readable panel and field contrast', lightRate && lightRate.visible && lightRate.panelBg === 'rgb(255, 255, 255)' && lightRate.panelText !== lightRate.panelBg && lightRate.fieldText !== lightRate.fieldBg, JSON.stringify(lightRate));
+  await defaultPage.screenshot({ path: path.join(SHOT_DIR, 'rate-menu-light.png') });
+  await defaultPage.evaluate(() => window.V29 && V29.closeRate());
 
   await defaultPage.locator('#v28nav-documents').click();
   await defaultPage.waitForTimeout(650);
@@ -244,7 +273,6 @@ const EXPECTED = ['QUOTE','SETUP','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGA
   }));
   ok('Income Calculator remains available with freeform controls', income.visible && income.errors === 0 && income.nav > 0, JSON.stringify(income));
 
-  fs.mkdirSync(SHOT_DIR, { recursive: true });
   await page.evaluate(() => { SHELL.go('suite'); mortgageSuite.store.setMode('setup'); });
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.waitForTimeout(700);

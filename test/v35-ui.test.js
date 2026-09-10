@@ -5,6 +5,7 @@ const root = path.resolve(__dirname, '..');
 const js = fs.readFileSync(path.join(root, 'src', 'patch-v35.js'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'src', 'patch-v35.css'), 'utf8');
 const inject = fs.readFileSync(path.join(root, 'build', 'inject.py'), 'utf8');
+const landing = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 
 const checks = [
   ['Release 35 marker is monotonic', /current<35/.test(js) && /losRelease='35'/.test(js)],
@@ -24,6 +25,9 @@ const checks = [
   ['Advanced view includes borrower planning ranges', /v35BorrowerRange/.test(js) && /Borrower planning range/.test(js)],
   ['fresh Release 35 sessions default to light mode', /los\.v35\.appearanceSeeded/.test(js) && /setSurface\('light'\)/.test(js)],
   ['Documents is its own primary workspace after Full', /v35-documents-nav/.test(js) && /<span>Documents<\/span>/.test(js)],
+  ['landing includes a no-sample workspace snapshot and both launch paths', /class="snapshot"/.test(landing) && /No scenario shown on the landing page/.test(landing) && /loan-suite\.html/.test(landing) && /income-calculator\.html/.test(landing)],
+  ['light surfaces explicitly restyle menus and rate popovers', /data-v25-surface="light"\] \.v35-panel/.test(css) && /data-v25-surface="light"\] \.v29-pop/.test(css) && /data-v25-surface="light"\] \.v251-appearance-panel/.test(css)],
+  ['live summary and linked subitems use interactive row styling', /\.v35-live-row::after/.test(css) && /\.v35-linked-subtabs button\.active/.test(css) && /v24-preset-chips/.test(css)],
   ['all Release 26 through 35 layers are injected', Array.from({length:10},(_,i)=>`patch-v${i+26}`).every(name=>inject.includes(name))],
   ['all prior release layers remain injected', Array.from({length:21},(_,i)=>`patch-v${i+5}`).every(name=>inject.includes(name))]
 ];
