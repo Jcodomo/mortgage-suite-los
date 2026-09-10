@@ -4,7 +4,7 @@
 var $=function(id){return document.getElementById(id);};
 var $$=function(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));};
 var V=window.V251={version:'25.1',fullActive:false};
-var THEMES=[['ledger','Navy'],['slate','Slate'],['bank','Bank'],['graphite','Graphite'],['terminal','Terminal'],['federal','Federal'],['clay','Clay'],['violet','Violet'],['evergreen','Evergreen'],['steel','Steel']];
+var THEMES=[['ledger','Navy'],['slate','Slate'],['bank','Bank'],['graphite','Graphite'],['terminal','Terminal']];
 var SURFACES=[['light','Light'],['dark','Dark'],['oled','Black OLED']];
 var INPUTS=[['paper','Paper'],['mist','Mist'],['mint','Mint'],['sand','Sand'],['ink','Ink']];
 var PAGE_GROUPS=[
@@ -49,10 +49,10 @@ function buildHeader(){
     stats.appendChild(headerStat('dti','Back DTI','advanced','percent'));
     actions.insertBefore(stats,actions.firstChild);
   }
-  ['v23QuickSave','v23SuiteActions','v24LoanTools','v24LiveSummary','v25FullForm'].forEach(function(id){var node=$(id);if(node)actions.appendChild(node);});
+  ['v23QuickSave','v23SuiteActions','v24LoanTools','v24LiveSummary','v25FullForm'].forEach(function(id){var node=$(id);if(node&&!node.classList.contains('v35-stowed'))actions.appendChild(node);});
   var live=$('v24LiveSummary'),full=$('v25FullForm');
-  if(live){live.innerHTML=icon('chart')+'<span>Live summary</span>';live.onclick=V.toggleSummary;live.setAttribute('aria-controls','suite-root');}
-  if(full){full.innerHTML=icon('full')+'<span>Full form</span>';full.onclick=V.openFull;}
+  if(live&&!window.V35){live.innerHTML=icon('chart')+'<span>Live summary</span>';live.onclick=V.toggleSummary;live.setAttribute('aria-controls','suite-root');}
+  if(full&&!window.V35){full.innerHTML=icon('full')+'<span>Full form</span>';full.onclick=V.openFull;}
   var rail=document.querySelector('#suite-root .cols-main>.rail'),close=$('v251SummaryClose');
   if(rail&&!close){close=document.createElement('button');close.id='v251SummaryClose';close.type='button';close.className='v251-summary-close no-print';close.textContent='Close live summary';close.onclick=V.toggleSummary;rail.insertBefore(close,rail.firstChild);}
   updateHeader();
@@ -182,6 +182,6 @@ function enhanceDates(root){if(root&&root.matches&&root.matches('input[type="dat
 function observeFreeform(){
   if(V.observer||!window.MutationObserver)return;V.observer=new MutationObserver(function(records){records.forEach(function(record){Array.prototype.forEach.call(record.addedNodes||[],function(node){if(node.nodeType===1){if(window.V19)V19.enhanceFreeform(node);enhanceDates(node);}});});});V.observer.observe(document.body,{childList:true,subtree:true});
 }
-function boot(){try{document.documentElement.dataset.losRelease='25.1';keepRenovationAvailable();installAppearanceMenu();buildHeader();bindFull();installPageDirectory();simplifyMenus();separateNavBands();organizePageTabs();observeFreeform();if(window.V19)V19.enhanceFreeform(document);enhanceDates(document);if(V.fullActive&&!$('v25FullSheet'))buildEditableFull();updateHeader();}catch(e){if(console&&console.warn)console.warn('v25.1 enhancement',e);}}
+function boot(){try{var release=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(release)||release<25.1)document.documentElement.dataset.losRelease='25.1';keepRenovationAvailable();installAppearanceMenu();buildHeader();bindFull();installPageDirectory();simplifyMenus();separateNavBands();organizePageTabs();observeFreeform();if(window.V19)V19.enhanceFreeform(document);enhanceDates(document);if(V.fullActive&&!$('v25FullSheet'))buildEditableFull();updateHeader();}catch(e){if(console&&console.warn)console.warn('v25.1 enhancement',e);}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();if(window.LOS_SCHEDULER)LOS_SCHEDULER.add(boot,900);else setInterval(boot,900);
 })();

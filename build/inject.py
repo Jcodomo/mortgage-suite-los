@@ -99,7 +99,17 @@ def main():
         + "\n\n" + (PATCH_DIR / "patch-v23.css").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v24.css").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v25.css").read_text(encoding="utf-8") \
-        + "\n\n" + (PATCH_DIR / "patch-v25-1.css").read_text(encoding="utf-8")
+        + "\n\n" + (PATCH_DIR / "patch-v25-1.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v26.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v27.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v28.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v29.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v30.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v31.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v32.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v33.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v34.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v35.css").read_text(encoding="utf-8")
     js  = (PATCH_DIR / "patch-scheduler.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-va.js").read_text(encoding="utf-8") \
@@ -128,7 +138,17 @@ def main():
         + "\n\n" + (PATCH_DIR / "patch-v23.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v24.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v25.js").read_text(encoding="utf-8") \
-        + "\n\n" + (PATCH_DIR / "patch-v25-1.js").read_text(encoding="utf-8")
+        + "\n\n" + (PATCH_DIR / "patch-v25-1.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v26.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v27.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v28.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v29.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v30.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v31.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v32.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v33.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v34.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v35.js").read_text(encoding="utf-8")
 
     # 2. stylesheet, last thing in <head>
     if "</head>" not in html:

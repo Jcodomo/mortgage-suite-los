@@ -14,7 +14,7 @@ const checks=[
   ['every loan destination retained',suiteTabs.every(x=>suiteBlock.includes("'"+x+"'"))],
   ['every income destination retained',calcTabs.every(x=>calcBlock.includes("'"+x+"'"))],
   ['separate theme and input controls',/id="v23ThemeButton"/.test(js)&&/id="v23InputButton"/.test(js)&&/cycleTheme/.test(js)&&/cycleInput/.test(js)],
-  ['ten page themes',/THEMES=\['ledger','slate','bank','graphite','terminal','federal','clay','violet','evergreen','steel'\]/.test(js)],
+  ['five retained page themes',/THEMES=\['ledger','slate','bank','graphite','terminal'\]/.test(js)],
   ['five input tones',/INPUTS=\['paper','mist','mint','sand','ink'\]/.test(js)],
   ['scenario quick edit is progressive',/v23ScenarioQuickEdit/.test(js)&&/v23-scenario-edit/.test(css)],
   ['suite actions remain reachable',/Export scenario JSON/.test(js)&&/Import scenario JSON/.test(js)&&/Live comparison/.test(js)&&/Documents & OCR/.test(js)],

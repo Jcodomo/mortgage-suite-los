@@ -1,0 +1,102 @@
+/* =====================================================================
+   v32 — uniform controls, snug rhythm, rail flush to the content
+   ===================================================================== */
+
+/* ---- 1. ONE BUTTON TREATMENT ABOVE THE TABS -----------------------
+   There were three in the same 90 pixels: a filled one, an outlined one
+   and a bare text one. Same height, radius, padding, weight and border
+   for all of them; only the accent differs, and only on the two that
+   should lead.                                                        */
+#suite-root .v32-btn,
+#suite-root .v32-ctl,
+#suite-root .v23-action-menu > summary{
+  height:32px !important;
+  min-height:32px !important;
+  padding:0 13px !important;
+  border-radius:9px !important;
+  border:1px solid color-mix(in srgb, var(--v24-header-text,#dbe6f7) 22%, transparent) !important;
+  background:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 8%, transparent) !important;
+  color:var(--v24-header-text,#dbe6f7) !important;
+  font-size:12px !important;
+  font-weight:650 !important;
+  letter-spacing:0 !important;
+  line-height:30px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  white-space:nowrap !important;
+  box-shadow:none !important;
+  cursor:pointer;
+  transition:background .12s ease, border-color .12s ease;
+}
+#suite-root .v32-btn:hover,
+#suite-root .v32-ctl:hover,
+#suite-root .v23-action-menu > summary:hover{
+  background:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 16%, transparent) !important;
+  border-color:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 38%, transparent) !important;
+}
+/* the two that lead */
+#suite-root .v32-primary{
+  background:color-mix(in srgb, var(--v24-accent,#2D7DD2) 90%, transparent) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+#suite-root .v32-primary:hover{
+  background:var(--v24-accent,#2D7DD2) !important;
+}
+/* kill the leftover state tints from earlier layers */
+#suite-root .v24-live-button.v27-on,
+#suite-root .v32-btn.v27-on{
+  background:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 8%, transparent) !important;
+  color:var(--v24-header-text,#dbe6f7) !important;
+  border-color:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 22%, transparent) !important;
+}
+#suite-root .v24-live-button.v27-on::before{ display:none !important; }
+#suite-root .v32-btn svg,
+#suite-root .v32-ctl svg,
+#suite-root .v32-btn .v23-nav-icon{ width:14px !important; height:14px !important; flex:none; }
+
+/* ---- 2. SPACING ---------------------------------------------------- */
+#suite-root .v32-row{ gap:8px !important; }
+#suite-root .v251-header-stats{ gap:7px !important; margin-right:4px; }
+#suite-root .v24-retired-toolbar,
+#suite-root .toolbar{ gap:8px !important; }
+
+/* ---- 3. SNUG VERTICAL RHYTHM --------------------------------------
+   The older layout fitted the masthead, the scenario row and the tabs
+   into roughly the height this build was giving the masthead alone.
+   Tightened back toward that: less padding per band, and the content
+   starts higher.                                                      */
+#suite-root .topbar{ min-height:46px !important; padding-top:5px !important; padding-bottom:5px !important; }
+#suite-root .v24-stat-strip{ min-height:38px !important; padding-top:4px !important; padding-bottom:4px !important; margin:0 !important; }
+#suite-root .v23-primary-nav{ min-height:40px !important; padding-top:4px !important; padding-bottom:4px !important; }
+.v23-context-tabs{ top:124px !important; min-height:36px !important; padding-top:4px !important; padding-bottom:4px !important; }
+#suite-root:not(:has(.v24-stat-strip)) .v23-context-tabs{ top:86px !important; }
+#suite-root .blurb{ margin:8px 0 4px !important; font-size:11.5px !important; }
+#suite-root .cols-main{ margin-top:10px !important; }
+
+/* uniform tab pills so the strip reads as one control set */
+.v23-context-tabs .tab,
+#suite-root .tabs .tab{
+  height:28px !important; padding:0 13px !important;
+  border-radius:999px !important; font-size:11px !important;
+  line-height:26px !important; letter-spacing:.04em !important;
+}
+
+/* ---- 4. RAIL FLUSH WITH THE CONTENT -------------------------------
+   In the older layout the rail's top lined up with the top of the first
+   card rather than floating below it. Sticky offset matched to the new
+   band heights and the card given the same top margin as the content. */
+#suite-root .rail.v31-rail{
+  top:132px !important;
+  max-height:calc(100vh - 150px) !important;
+  padding-top:0 !important;
+}
+#suite-root .rail.v31-rail > .card{ margin-top:0 !important; }
+.v31-rail-toggle{
+  height:26px !important; padding:0 9px !important; margin-bottom:6px !important;
+  font-size:9px !important; line-height:24px !important;
+}
+@media (max-width:1180px){
+  #suite-root .rail.v31-rail{ top:auto !important; }
+}

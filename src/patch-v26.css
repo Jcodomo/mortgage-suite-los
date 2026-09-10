@@ -1,0 +1,181 @@
+/* =====================================================================
+   v26 — suite chrome to the Income Calculator's rhythm, and a theme
+         bridge that actually reaches the engines.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------- 1
+   THEME BRIDGE
+
+   The ten themes each define eight colour tokens plus two fonts. The
+   existing bridge forwards sixteen engine tokens; the engines use about
+   forty-seven. Everything unbridged kept falling back to the base light
+   or dark palette, so a theme recoloured the chrome and left the panels,
+   the state colours and — most visibly — the INPUT FIELDS behind.
+
+   Every remaining token is derived from the eight, so the ten themes
+   stay the single source and nothing has to be hand-tuned per theme.
+   ------------------------------------------------------------------ */
+html[data-v24-theme] #suite-root,
+html[data-v24-theme] #calc-root{
+  --surface-3: color-mix(in srgb, var(--v24-card) 86%, var(--v24-text));
+  --text-strong: color-mix(in srgb, var(--v24-text) 88%, var(--v24-card));
+  --accent-soft: color-mix(in srgb, var(--v24-accent) 14%, var(--v24-card));
+  --accent-ink: var(--v24-card);
+
+  --calc-bg:   color-mix(in srgb, var(--v24-card) 92%, var(--v24-accent));
+  --calc-line: color-mix(in srgb, var(--v24-border) 76%, var(--v24-accent));
+  --calc-ink:  var(--v24-text);
+
+  --pass-bg:   color-mix(in srgb, var(--v24-card) 88%, #17a06a);
+  --pass-line: color-mix(in srgb, var(--v24-border) 60%, #17a06a);
+  --pass-ink:  color-mix(in srgb, var(--v24-text) 45%, #17a06a);
+
+  --final-bg:   color-mix(in srgb, var(--v24-card) 78%, #17a06a);
+  --final-bg-2: color-mix(in srgb, var(--v24-card) 86%, #17a06a);
+  --final-ink:  var(--v24-text);
+  --final-sub:  var(--v24-muted);
+
+  --warn-bg:   color-mix(in srgb, var(--v24-card) 88%, #d0342c);
+  --warn-line: color-mix(in srgb, var(--v24-border) 60%, #d0342c);
+  --warn-ink:  color-mix(in srgb, var(--v24-text) 40%, #d0342c);
+
+  --amber-bg:   color-mix(in srgb, var(--v24-card) 88%, #d99620);
+  --amber-line: color-mix(in srgb, var(--v24-border) 60%, #d99620);
+  --amber-ink:  color-mix(in srgb, var(--v24-text) 40%, #d99620);
+
+  --off-bg:   color-mix(in srgb, var(--v24-card) 94%, var(--v24-page));
+  --off-line: var(--v24-border);
+  --off-ink:  var(--v24-muted);
+
+  --brand-1: var(--v24-header);
+  --brand-2: color-mix(in srgb, var(--v24-header) 82%, var(--v24-accent));
+  --major-1: color-mix(in srgb, var(--v24-card) 90%, var(--v24-header));
+  --major-2: color-mix(in srgb, var(--v24-card) 82%, var(--v24-header));
+  --major-ink: var(--v24-text);
+  --major-sub: var(--v24-muted);
+  --subhead-bg:   color-mix(in srgb, var(--v24-card) 93%, var(--v24-page));
+  --subhead-line: var(--v24-border);
+  --subhead-ink:  var(--v24-muted);
+}
+
+/* Input surfaces, derived per surface mode.
+   The convention the sheet relies on is that a tinted cell is one you
+   type into. On DARK themes that means the field must sit LIGHTER than
+   its panel; on LIGHT themes there is nowhere lighter to go, so the warm
+   tint carries the signal instead. Both are derived from the theme's own
+   card colour, so all ten stay consistent without hand-tuning. */
+html[data-v25-surface="dark"][data-v24-theme] #suite-root,
+html[data-v25-surface="dark"][data-v24-theme] #calc-root{
+  --input-bg:    color-mix(in srgb, var(--v24-card) 68%, #FFD98A 32%);
+  --input-line:  color-mix(in srgb, var(--v24-border) 40%, #E8C25A 60%);
+  --input-ink:   #241d05;
+  --input-focus: #E8C25A;
+  --input-focus-bg: color-mix(in srgb, var(--v24-card) 58%, #FFD98A 42%);
+}
+html[data-v25-surface="light"][data-v24-theme] #suite-root,
+html[data-v25-surface="light"][data-v24-theme] #calc-root{
+  --input-bg:    color-mix(in srgb, var(--v24-card) 88%, #FFE08A 12%);
+  --input-line:  color-mix(in srgb, var(--v24-border) 62%, #D9A93F 38%);
+  --input-ink:   var(--v24-text);
+  --input-focus: #C08A16;
+  --input-focus-bg: color-mix(in srgb, var(--v24-card) 80%, #FFE08A 20%);
+}
+/* the fields themselves, in both shells */
+html[data-v24-theme] #suite-root .cell-input,
+html[data-v24-theme] #suite-root input:not([type=checkbox]):not([type=radio]),
+html[data-v24-theme] #suite-root select,
+html[data-v24-theme] #suite-root textarea{
+  background: var(--input-bg) !important;
+  border-color: var(--input-line) !important;
+  color: var(--input-ink) !important;
+}
+html[data-v24-theme] #suite-root input:focus,
+html[data-v24-theme] #suite-root select:focus,
+html[data-v24-theme] #suite-root textarea:focus{
+  background: var(--input-focus-bg) !important;
+  border-color: var(--input-focus) !important;
+  outline: 2px solid color-mix(in srgb, var(--input-focus) 45%, transparent);
+  outline-offset: -1px;
+}
+
+/* ---------------------------------------------------------------- 2
+   THE CHROME STACK
+
+   The calculator reads cleanly because it is four bands of fixed height
+   in a fixed order: masthead, stat strip, group nav, context tabs. The
+   suite had the same pieces arriving from four different patch layers
+   at four different heights, so the sticky offsets never lined up and
+   the rows drifted. Same rhythm, stated once.
+   ------------------------------------------------------------------ */
+#suite-root .topbar{
+  min-height:52px !important;
+  padding:7px max(16px,calc((100vw - 1520px)/2)) !important;
+  gap:10px !important;
+  align-items:center !important;
+}
+#suite-root .v24-stat-strip{
+  min-height:44px !important;
+  padding:5px max(16px,calc((100vw - 1520px)/2)) !important;
+  gap:8px !important;
+  border-bottom:1px solid var(--line) !important;
+}
+#suite-root .v23-primary-nav{
+  min-height:46px !important;
+  padding:6px max(16px,calc((100vw - 1520px)/2)) !important;
+  gap:6px !important;
+}
+.v23-context-tabs{
+  top:142px !important;              /* 52 + 44 + 46, measured not guessed */
+  min-height:40px !important;
+  padding:5px max(16px,calc((100vw - 1520px)/2)) !important;
+}
+/* when the stat strip is absent the tabs move up by its height */
+#suite-root:not(:has(.v24-stat-strip)) .v23-context-tabs{ top:98px !important; }
+
+/* ---------------------------------------------------------------- 3
+   SCENARIO CONTROL
+
+   The name field carried min-width:320px with flex-basis 320px inside a
+   nowrap row, so on anything under a very wide window it pushed the
+   as-of and closing dates down to unusable slivers — visible in the
+   screenshot as two empty rounded stubs. It now shrinks properly and the
+   date fields hold a floor width instead.
+   ------------------------------------------------------------------ */
+#suite-root .v24-scenario-bar{ flex:1 1 auto !important; min-width:0 !important; gap:7px !important; }
+#suite-root .v24-scenario-bar > input{
+  flex:1 1 200px !important;
+  min-width:150px !important;
+  text-overflow:ellipsis;
+}
+#suite-root .v24-scenario-bar > select{ flex:0 1 170px !important; min-width:96px !important; }
+#suite-root .topbar input[type=date],
+#suite-root .topbar .v25-date,
+#suite-root .v24-scenario-bar input[type=date]{
+  min-width:132px !important; flex:0 0 auto !important;
+}
+#suite-root .topbar label,
+#suite-root .topbar .tlabel{ white-space:nowrap; font-size:10px; letter-spacing:.05em; }
+
+/* ---------------------------------------------------------------- 4
+   ACTION MENUS
+
+   The panels were taller than the viewport with no scroll, so the
+   bottom entries — including the session restore row — were simply
+   unreachable. Constrained to the space actually available.
+   ------------------------------------------------------------------ */
+.v23-actions-panel{
+  max-height:min(70vh, 620px) !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+}
+.v23-actions-grid{ align-content:start; }
+.v26-dupe{ display:none !important; }
+/* a nested menu-wrap inside the grid was rendering its whole contents
+   inline, which is where the second copy of every entry came from */
+.v23-actions-grid .menu-wrap .menu{
+  position:static !important; display:none !important;
+}
+.v23-actions-grid .menu-wrap.v26-open .menu{
+  display:block !important; box-shadow:none !important; border:0 !important;
+  padding-left:10px !important;
+}

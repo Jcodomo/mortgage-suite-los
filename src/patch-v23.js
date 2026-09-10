@@ -16,7 +16,7 @@ var CALC_GROUPS=[
   {key:'qualification',label:'Qualification',icon:'check',tabs:['dti','aus','summary']},
   {key:'documents',label:'Documents',icon:'file',tabs:['docs']}
 ];
-var THEMES=['ledger','slate','bank','graphite','terminal','federal','clay','violet','evergreen','steel'],THEME_LABEL={ledger:'Navy ledger',slate:'Slate and teal',bank:'Bank paper',graphite:'Graphite mono',terminal:'Midnight terminal',federal:'Federal blue',clay:'Clay and sand',violet:'Violet fintech',evergreen:'Evergreen ledger',steel:'Steel and amber'};
+var THEMES=['ledger','slate','bank','graphite','terminal'],THEME_LABEL={ledger:'Navy ledger',slate:'Slate and teal',bank:'Bank paper',graphite:'Graphite mono',terminal:'Midnight terminal'};
 var INPUTS=['paper','mist','mint','sand','ink'],INPUT_LABEL={paper:'Paper fields',mist:'Mist fields',mint:'Mint fields',sand:'Sand fields',ink:'Ink fields'};
 function norm(s){return String(s||'').trim().replace(/\s+/g,' ').toUpperCase();}
 function safeGet(key,fallback){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
@@ -148,7 +148,7 @@ function compactScenarioCenter(){
   return true;
 }
 function closePeerMenus(e){var d=e.target&&e.target.closest&&e.target.closest('details');$$('.v23-action-menu[open],.v23-sync-menu[open]').forEach(function(x){if(x!==d)x.open=false;});}
-function boot(){try{document.documentElement.dataset.losRelease='23';installAppearance();installSuiteNav();installCalcNav();installSuiteActions();installCalcActions();compactScenarioCenter();enableLazyLayout();retireLegacyThemes();stabilizePayStatement();paintAppearance();if(window.V19)V19.enhanceFreeform(document);}catch(e){if(console&&console.warn)console.warn('v23 enhancement',e);}}
+function boot(){try{var release=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(release)||release<23)document.documentElement.dataset.losRelease='23';installAppearance();installSuiteNav();installCalcNav();installSuiteActions();installCalcActions();compactScenarioCenter();enableLazyLayout();retireLegacyThemes();stabilizePayStatement();paintAppearance();if(window.V19)V19.enhanceFreeform(document);}catch(e){if(console&&console.warn)console.warn('v23 enhancement',e);}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('summary'))closePeerMenus(e);});
 if(window.LOS_SCHEDULER){LOS_SCHEDULER.add(boot,1400);LOS_SCHEDULER.seal();}else setInterval(boot,1400);

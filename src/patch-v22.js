@@ -36,6 +36,6 @@ V.enforceDirectRoute=function(){
   V.routeApplied=true;
   return true;
 };
-function boot(){try{document.documentElement.dataset.losRelease='22';V.enforceDirectRoute();installStableSetup();V.polishMetrics();}catch(e){if(console&&console.warn)console.warn('v22 enhancement',e);}}
+function boot(){try{var release=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(release)||release<22)document.documentElement.dataset.losRelease='22';V.enforceDirectRoute();installStableSetup();V.polishMetrics();}catch(e){if(console&&console.warn)console.warn('v22 enhancement',e);}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();setInterval(boot,1200);
 })();

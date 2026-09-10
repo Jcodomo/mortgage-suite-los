@@ -14,10 +14,10 @@ const checks=[
   ['release stamp',/losRelease='22'/.test(js)],
   ['metric cards use theme tokens',/var\(--panel\)/.test(css)&&/var\(--calc-bg\)/.test(css)&&/var\(--accent\)/.test(css)],
   ['metric cards remain responsive',/@media\(max-width:520px\)/.test(css)],
-  ['landing identifies current release',/Release (?:22|23|24|25)/.test(landing)],
+  ['landing identifies current release',/Release (?:22|23|24|25(?:\.1)?|35)/.test(landing)],
   ['landing links loan entry page',/loan-suite\.html/.test(landing)],
   ['landing links income entry page',/income-calculator\.html/.test(landing)],
-  ['loan entry routes to setup',/app=suite(?:&|&amp;)tab=setup/.test(loan)],
+  ['loan entry routes to quote',/app=suite(?:&|&amp;)tab=quote/.test(loan)],
   ['income entry routes to calculator',/app=income/.test(income)]
 ];
 let failed=0;for(const [name,ok] of checks){console.log((ok?'PASS  ':'FAIL  ')+name);if(!ok)failed++;}assert.equal(failed,0);console.log(`\nv22 UI: ${checks.length} passed, 0 failed`);

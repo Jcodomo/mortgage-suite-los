@@ -1,0 +1,155 @@
+/* =====================================================================
+   v33 — the action row, from phone to ultrawide
+   ===================================================================== */
+
+/* the rail's second header is gone with its control */
+#v31RailToggle, .v31-rail-toggle{ display:none !important; }
+#suite-root .rail.v31-rail{ padding-top:0 !important; }
+
+/* ---- the row ------------------------------------------------------- */
+#suite-root .v33-row{
+  display:flex !important;
+  align-items:center !important;
+  flex-wrap:nowrap !important;
+  gap:8px !important;
+  min-width:0 !important;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:0 !important;
+  position:relative;
+}
+#suite-root .v33-row::-webkit-scrollbar{ display:none; }
+#suite-root .v33-row > *{ flex:0 0 auto !important; }
+
+/* A row that scrolls says so, rather than clipping a button mid-word. */
+#suite-root .v33-row.v33-overflow{
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent);
+          mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent);
+}
+
+/* ---- stat chips: fixed shape so numbers never shift the row -------- */
+#suite-root .v33-stats{ display:flex; align-items:center; gap:7px; min-width:0; }
+#suite-root .v33-chip{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:0 !important;
+  height:36px !important;
+  padding:0 12px !important;
+  border-radius:9px !important;
+  border:1px solid color-mix(in srgb, var(--v24-header-text,#dbe6f7) 20%, transparent) !important;
+  background:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 7%, transparent) !important;
+  color:var(--v24-header-text,#dbe6f7) !important;
+  cursor:pointer;
+  line-height:1.15 !important;
+}
+#suite-root .v33-chip > span{
+  font-size:8.5px !important; font-weight:700 !important;
+  text-transform:uppercase !important; letter-spacing:.07em !important;
+  opacity:.66 !important; white-space:nowrap !important;
+}
+#suite-root .v33-chip > b{
+  font-size:13px !important; font-weight:750 !important;
+  font-variant-numeric:tabular-nums !important;   /* digits share a width */
+  white-space:nowrap !important;
+}
+#suite-root .v33-chip:hover{
+  border-color:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 40%, transparent) !important;
+}
+/* the rate chip leads, because it is the one that opens something */
+#suite-root #v28RateStat{
+  border-color:color-mix(in srgb, var(--v24-accent,#2D7DD2) 52%, transparent) !important;
+  background:color-mix(in srgb, var(--v24-accent,#2D7DD2) 13%, transparent) !important;
+}
+
+/* ---- action buttons: one shape, icon-capable ----------------------- */
+#suite-root .v33-row .v32-btn,
+#suite-root .v33-row .v23-action-menu > summary{
+  height:36px !important;
+  min-height:36px !important;
+  padding:0 14px !important;
+  border-radius:9px !important;
+  font-size:12px !important;
+  line-height:34px !important;
+  gap:7px !important;
+}
+#suite-root .v33-row .v32-primary{ font-weight:700 !important; }
+
+/* ---- bands ---------------------------------------------------------
+   Labels go before anything scrolls, and buttons never shrink below a
+   44px hit target on the small bands.                                 */
+
+/* 4K / ultrawide */
+#suite-root .v33-row.v33-xl{ gap:10px !important; }
+#suite-root .v33-xl .v33-chip{ height:40px !important; padding:0 15px !important; }
+#suite-root .v33-xl .v33-chip > b{ font-size:14px !important; }
+#suite-root .v33-xl .v32-btn,
+#suite-root .v33-xl .v23-action-menu > summary{
+  height:40px !important; line-height:38px !important; padding:0 17px !important; font-size:12.5px !important;
+}
+
+/* 1080p - 1440p: the reference size */
+#suite-root .v33-row.v33-lg{ gap:8px !important; }
+
+/* laptop */
+#suite-root .v33-row.v33-md{ gap:6px !important; }
+#suite-root .v33-md .v33-chip{ padding:0 10px !important; }
+#suite-root .v33-md .v32-btn,
+#suite-root .v33-md .v23-action-menu > summary{ padding:0 11px !important; font-size:11.5px !important; }
+
+/* small: short labels, chips lose their captions */
+#suite-root .v33-sm .v33-chip > span{ display:none !important; }
+#suite-root .v33-sm .v33-chip{ height:34px !important; padding:0 10px !important; }
+#suite-root .v33-sm .v32-btn,
+#suite-root .v33-sm .v23-action-menu > summary{
+  height:34px !important; line-height:32px !important; padding:0 10px !important; font-size:11px !important;
+}
+
+/* phone: icons only for the actions, chips keep their numbers */
+#suite-root .v33-xs .v33-chip > span{ display:none !important; }
+#suite-root .v33-xs .v33-chip{ height:34px !important; padding:0 9px !important; }
+#suite-root .v33-xs .v33-chip > b{ font-size:12px !important; }
+#suite-root .v33-xs .v32-btn,
+#suite-root .v33-xs .v23-action-menu > summary{
+  width:40px !important; min-width:40px !important;   /* stays a real target */
+  height:40px !important; padding:0 !important;
+  justify-content:center !important;
+}
+#suite-root .v33-xs .v32-btn > span:not(.v23-nav-icon),
+#suite-root .v33-xs .v23-action-menu > summary > span:not(.v23-nav-icon){
+  display:none !important;
+}
+/* a button with no icon still needs something visible, so its first
+   letter stands in rather than the button going blank */
+#suite-root .v33-xs .v32-btn:not(:has(svg)):not(:has(.v23-nav-icon))::after{
+  content:attr(data-initial);
+  font-size:13px; font-weight:800;
+}
+
+/* ---- the shell at the extremes ------------------------------------- */
+@media (min-width:2400px){
+  /* ultrawide: keep the working column from stretching to unreadable
+     line lengths while the bar itself still spans the screen */
+  #suite-root .cols-main{ max-width:2280px !important; margin-left:auto !important; margin-right:auto !important; }
+  #suite-root .topbar, #suite-root .v24-stat-strip,
+  #suite-root .v23-primary-nav, .v23-context-tabs{
+    padding-left:max(22px, calc((100vw - 2280px)/2)) !important;
+    padding-right:max(22px, calc((100vw - 2280px)/2)) !important;
+  }
+}
+@media (max-width:860px){
+  #suite-root .topbar{ flex-wrap:wrap !important; row-gap:6px !important; }
+  #suite-root .v25-header-main{ width:100%; }
+  #suite-root .v25-header-actions{ width:100%; }
+}
+@media (max-width:640px){
+  #suite-root .topbar, #suite-root .v24-stat-strip,
+  #suite-root .v23-primary-nav, .v23-context-tabs{
+    padding-left:10px !important; padding-right:10px !important;
+  }
+  #suite-root .wrap, #suite-root .cols-main{ margin-left:10px !important; margin-right:10px !important; }
+  .v23-context-tabs{ top:auto !important; position:static !important; }
+}

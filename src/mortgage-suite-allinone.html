@@ -12066,7 +12066,7 @@ define("src/core/calc/warnings", ["require", "exports", "src/core/data/transferT
             add('INSUFFICIENT_DOWN_PAYMENT', 'warning', 'No down payment entered', 'A 0% down payment is not valid for FHA or Conventional purchase financing.', 'purchase');
         }
         // ---- value / appraisal -------------------------------------------------
-        if (inputs.afterRepairValue <= 0 && loan.maximumBaseLoan > 0) {
+        if (program.renovationActive && inputs.afterRepairValue <= 0 && loan.maximumBaseLoan > 0) {
             add('MISSING_APPRAISAL_VALUE', 'warning', 'No after-repair value entered', `No value cap has been applied. The transaction needs an ARV of at least ${(0, num_12.currency)(value.minimumArvNeeded)} to support the current loan.`, 'value');
         }
         else if (value.valueCushion !== null && value.valueCushion < 0) {
@@ -12094,10 +12094,7 @@ define("src/core/calc/warnings", ["require", "exports", "src/core/data/transferT
             }
         }
         // ---- tax data quality --------------------------------------------------
-        if (inputs.taxSourceType === 'MLS / Zillow / Redfin Estimate') {
-            add('MISSING_TAX_SOURCE', 'error', 'Estimated tax source in use', 'MLS / Zillow / Redfin figures are planning estimates only and must not be used for a Loan Estimate or Closing Disclosure. Order a tax certificate.', 'escrow');
-        }
-        else if (inputs.taxSourceType === 'Manual' && inputs.propertyTaxAmount > 0) {
+        if (inputs.taxSourceType === 'Manual' && inputs.propertyTaxAmount > 0) {
             add('MISSING_TAX_SOURCE', 'warning', 'Tax source not documented', 'Select the actual tax source (title certificate, assessor, or tax card) before disclosure.', 'escrow');
         }
         if (inputs.taxHasExemption) {

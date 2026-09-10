@@ -45,6 +45,6 @@ function polishSessions(){var w=$('v20Sessions');if(!w)return;w.title='Restore o
 function iconSvg(){return'<svg class="v21-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M12 4v16"/></svg>';}
 function polishIcons(){$$('.btn').forEach(function(b){if(b.dataset.v21Icon||b.querySelector('.v21-icon')||b.id==='themeBtn')return;var t=(b.textContent||'').trim();if(!/^(Pull market rents|Open full annual schedule|Restore|Use rent|Open ARV)/i.test(t))return;b.dataset.v21Icon='1';b.insertAdjacentHTML('afterbegin',iconSvg());});}
 
-function boot(){try{document.documentElement.dataset.losRelease='21';installRenoBehavior();if(window.V20)V20.searchRent=V.lookupRent;keepReno();paintFit();rentCard();summaryAmortization();payPreview();polishSessions();polishIcons();}catch(e){if(console&&console.warn)console.warn('v21 enhancement',e);}return true;}
+function boot(){try{var release=parseFloat(document.documentElement.dataset.losRelease||'0');if(!isFinite(release)||release<21)document.documentElement.dataset.losRelease='21';installRenoBehavior();if(window.V20)V20.searchRent=V.lookupRent;keepReno();paintFit();rentCard();summaryAmortization();payPreview();polishSessions();polishIcons();}catch(e){if(console&&console.warn)console.warn('v21 enhancement',e);}return true;}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();setInterval(boot,700);
 })();

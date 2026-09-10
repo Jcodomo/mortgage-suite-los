@@ -1,0 +1,99 @@
+/* =====================================================================
+   v27 — nav additions, promoted actions, day/night switch, rent panel
+   ===================================================================== */
+
+/* ---- direct workspace buttons, right of Full --------------------- */
+#suite-root .v27-direct{ margin-left:2px; }
+#suite-root .v27-direct::before{
+  content:''; width:1px; height:16px; margin-right:8px;
+  background:color-mix(in srgb, currentColor 24%, transparent);
+  display:inline-block; vertical-align:middle;
+}
+#suite-root .v27-direct + .v27-direct::before{ display:none; margin-right:0; }
+/* the copy still sitting in a group's context row is redundant now */
+#suite-root .tabs .tab.v27-hidden-tab{ display:none !important; }
+
+/* ---- promoted actions row ---------------------------------------- */
+#suite-root .v27-promoted-row{
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  padding-left:8px; margin-left:2px;
+  border-left:1px solid color-mix(in srgb, var(--v24-header-text,#dbe6f7) 22%, transparent);
+}
+#suite-root .v27-promoted{
+  white-space:nowrap; font-size:11.5px !important; padding:6px 11px !important;
+}
+
+/* ---- live summary, pinned ---------------------------------------- */
+#suite-root .v24-live-button.v27-on{
+  border-color:var(--v24-accent, #2D7DD2) !important;
+  color:var(--v24-accent, #2D7DD2) !important;
+  background:color-mix(in srgb, var(--v24-accent,#2D7DD2) 14%, transparent) !important;
+}
+#suite-root .v24-live-button.v27-on::before{
+  content:''; display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:currentColor; margin-right:6px; vertical-align:middle;
+}
+
+/* ---- day / night switch, left of the theme control ---------------
+   A switch rather than another icon button: it has two states and the
+   control should look like it has two states.                        */
+.v27-daynight{
+  border:0; background:transparent; padding:0 6px 0 0; cursor:pointer;
+  display:inline-flex; align-items:center;
+}
+.v27-dn-track{
+  width:38px; height:20px; border-radius:999px; position:relative;
+  background:color-mix(in srgb, currentColor 20%, transparent);
+  border:1px solid color-mix(in srgb, currentColor 34%, transparent);
+  transition:background .16s ease, border-color .16s ease;
+  display:inline-block;
+}
+.v27-dn-knob{
+  position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%;
+  background:currentColor; opacity:.85;
+  transition:transform .16s ease;
+}
+.v27-daynight.on .v27-dn-track{
+  background:color-mix(in srgb, #2D7DD2 46%, transparent);
+  border-color:color-mix(in srgb, #2D7DD2 62%, transparent);
+}
+.v27-daynight.on .v27-dn-knob{ transform:translateX(18px); opacity:1; }
+
+/* The dark surface reads blue rather than neutral grey, which is what
+   was asked for. Pulled toward navy from whatever the active theme's
+   own page colour is, so a theme still shows through instead of every
+   theme collapsing to the same blue. OLED is left alone — its whole
+   point is true black. */
+html[data-v25-surface="dark"] #suite-root,
+html[data-v25-surface="dark"] #calc-root{
+  --bg:   color-mix(in srgb, var(--v24-page, #111A2B) 74%, #0B1B33 26%);
+  --bg-2: color-mix(in srgb, var(--v24-page, #111A2B) 74%, #0B1B33 26%);
+  --panel:   color-mix(in srgb, var(--v24-card, #182338) 78%, #12294A 22%);
+  --panel-2: color-mix(in srgb, var(--v24-card, #182338) 70%, #12294A 30%);
+  --surface:   color-mix(in srgb, var(--v24-page, #111A2B) 74%, #0B1B33 26%);
+  --surface-2: color-mix(in srgb, var(--v24-card, #182338) 78%, #12294A 22%);
+}
+html[data-v25-surface="dark"] body{
+  background:color-mix(in srgb, var(--v24-page, #111A2B) 70%, #08152A 30%) !important;
+}
+
+/* ---- rent panel --------------------------------------------------- */
+.v27-rent{
+  margin-top:14px; padding-top:12px;
+  border-top:1px dotted var(--line-2, var(--line, #2a3142));
+}
+.v27-rent-hd{
+  font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--accent, #2D7DD2); margin-bottom:8px;
+}
+.v27-rent-row{ display:flex; gap:7px; align-items:center; margin-bottom:10px; }
+.v27-rent-tbl{ width:100%; }
+.v27-rent-tbl td.num, .v27-rent-tbl th.num{
+  text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.v27-src{ font-size:10.5px; color:var(--muted, #8a93a8); margin-top:7px; }
+.v27-caveat{
+  font-size:10.5px; line-height:1.55; color:var(--muted, #8a93a8);
+  margin-top:8px; padding-left:9px; border-left:2px solid var(--amber-line, #b07d15);
+}
+.v27-dim{ font-size:11.5px; color:var(--muted, #8a93a8); }

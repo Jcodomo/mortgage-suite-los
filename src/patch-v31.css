@@ -1,0 +1,97 @@
+/* =====================================================================
+   v31 — the rail as a permanent, collapsible right column
+   ===================================================================== */
+
+/* The grid is declared once here and nothing else is allowed to change
+   whether the rail exists — only how wide its column is. That is the
+   difference between collapsing and the popping in and out it was
+   doing before. */
+#suite-root .cols-main{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 344px !important;
+  gap:16px !important;
+  align-items:start !important;
+}
+@media (min-width:1600px){
+  #suite-root .cols-main{ grid-template-columns:minmax(0,1fr) 392px !important; }
+}
+#suite-root.v31-rail-collapsed .cols-main{
+  grid-template-columns:minmax(0,1fr) 34px !important;
+}
+
+/* A grid child sizes to its widest unbreakable content unless told
+   otherwise, which is how a long scenario name or a wide table used to
+   push the rail off the screen. */
+#suite-root .cols-main > *{ min-width:0 !important; }
+#suite-root .v31-main{ min-width:0 !important; overflow-x:auto; }
+
+#suite-root .rail.v31-rail{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  transform:none !important;
+  grid-column:2 !important;
+  position:sticky !important;
+  top:150px !important;
+  max-height:calc(100vh - 170px) !important;
+  overflow:hidden auto !important;
+  width:auto !important;
+  min-width:0 !important;
+  transition:none;
+}
+
+/* ---- the collapse control ------------------------------------------ */
+.v31-rail-toggle{
+  display:flex; align-items:center; gap:7px; width:100%;
+  padding:7px 9px; margin-bottom:8px; cursor:pointer;
+  border:1px solid var(--line); border-radius:9px;
+  background:var(--panel-2, transparent); color:inherit;
+  font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+}
+.v31-rail-toggle:hover{ border-color:var(--accent); }
+.v31-chev{
+  width:0; height:0; flex:none;
+  border-top:5px solid transparent; border-bottom:5px solid transparent;
+  border-left:6px solid currentColor;
+  transform:rotate(180deg); transition:transform .15s ease;
+}
+#suite-root.v31-rail-collapsed .v31-chev{ transform:rotate(0deg); }
+
+/* Collapsed: the strip stays, everything inside it except the chevron
+   goes. The column is still there, so the main content never reflows
+   between one and two columns. */
+#suite-root.v31-rail-collapsed .rail.v31-rail{
+  padding:6px 4px !important;
+  overflow:hidden !important;
+}
+#suite-root.v31-rail-collapsed .rail.v31-rail > *:not(.v31-rail-toggle){ display:none !important; }
+#suite-root.v31-rail-collapsed .v31-rail-toggle{
+  flex-direction:column; gap:9px; padding:8px 3px; margin:0;
+  writing-mode:vertical-rl; justify-content:flex-start;
+}
+#suite-root.v31-rail-collapsed .v31-lbl{ font-size:9px; letter-spacing:.1em; }
+#suite-root.v31-rail-collapsed .v31-chev{ writing-mode:horizontal-tb; }
+
+/* Below the two-column breakpoint the rail sits under the content
+   rather than squeezing it, and the collapse control is hidden because
+   there is no column left to collapse. */
+@media (max-width:1180px){
+  #suite-root .cols-main,
+  #suite-root.v31-rail-collapsed .cols-main{ grid-template-columns:minmax(0,1fr) !important; }
+  #suite-root .rail.v31-rail{
+    grid-column:1 !important; position:static !important; max-height:none !important;
+  }
+  #suite-root.v31-rail-collapsed .rail.v31-rail > *:not(.v31-rail-toggle){ display:revert !important; }
+  #suite-root.v31-rail-collapsed .v31-rail-toggle{
+    flex-direction:row; writing-mode:horizontal-tb; padding:7px 9px; margin-bottom:8px;
+  }
+}
+
+/* ---- header row: stop it wrapping into two rows mid-use ------------ */
+#suite-root .v25-header-actions{
+  flex-wrap:nowrap !important;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+#suite-root .v25-header-actions::-webkit-scrollbar{ display:none; }
+#suite-root .v25-header-actions > *{ flex:0 0 auto; }

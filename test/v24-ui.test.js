@@ -5,7 +5,7 @@ const css=fs.readFileSync(path.join(root,'src','patch-v24.css'),'utf8');
 const inject=fs.readFileSync(path.join(root,'build','inject.py'),'utf8');
 const checks=[
   ['release 24 stamp',/dataset\.losRelease='24'/.test(js)],
-  ['ten curated themes',/THEMES=\['ledger','slate','bank','graphite','terminal','federal','clay','violet','evergreen','steel'\]/.test(js)],
+  ['five retained curated themes',/THEMES=\['ledger','slate','bank','graphite','terminal'\]/.test(js)],
   ['five independent input presets',/INPUTS=\['paper','mist','mint','sand','ink'\]/.test(js)],
   ['Midnight terminal seeds first',/theme='terminal';tone='ink'/.test(js)],
   ['exact Midnight page surface',/--v24-page:#111A2B/.test(css)],

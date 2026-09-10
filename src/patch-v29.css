@@ -1,0 +1,114 @@
+/* =====================================================================
+   v29 — full-bleed chrome, expanded rail, rate popover
+   ===================================================================== */
+
+/* ---- 1. FULL-WIDTH BAR ---------------------------------------------
+   v26 centred the chrome on a 1520px column, which left the header
+   floating in the middle of a wide screen while the bar behind it ran
+   edge to edge. The bands now use the full width with a plain gutter,
+   the way the Income Calculator's masthead does, and the content canvas
+   is widened to match so the page does not narrow under a wide bar.  */
+#suite-root .topbar,
+#suite-root .v24-stat-strip,
+#suite-root .v23-primary-nav,
+.v23-context-tabs{
+  padding-left:22px !important;
+  padding-right:22px !important;
+  max-width:none !important;
+  width:100% !important;
+  box-sizing:border-box !important;
+}
+#suite-root .chrome{ max-width:none !important; width:100% !important; }
+#suite-root .wrap,
+#suite-root .cols-main{
+  max-width:none !important;
+  width:auto !important;
+  margin-left:22px !important;
+  margin-right:22px !important;
+}
+@media (max-width:900px){
+  #suite-root .topbar, #suite-root .v24-stat-strip,
+  #suite-root .v23-primary-nav, .v23-context-tabs{
+    padding-left:12px !important; padding-right:12px !important;
+  }
+  #suite-root .wrap, #suite-root .cols-main{ margin-left:12px !important; margin-right:12px !important; }
+}
+/* the rail gets a little more room now the page is wider */
+@media (min-width:1500px){
+  #suite-root .cols-main{ grid-template-columns:minmax(0,1fr) 380px !important; }
+}
+
+/* ---- 2. EXPANDED LIVE SUMMARY --------------------------------------- */
+.v29-extra{
+  margin-top:12px; padding-top:11px;
+  border-top:1px solid var(--line-2, var(--line));
+}
+.v29-head{
+  font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--accent, #2D7DD2); margin:13px 0 5px;
+}
+.v29-head:first-child{ margin-top:0; }
+.v29-row{
+  display:grid; grid-template-columns:1fr auto; align-items:baseline;
+  gap:8px; padding:2px 0;
+}
+.v29-row .l{ font-size:11.5px; color:var(--ink-2, var(--text)); min-width:0; }
+.v29-row .v{
+  font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap;
+  color:var(--text-strong, var(--ink));
+}
+.v29-row .s{
+  grid-column:1 / -1; font-size:10px; color:var(--muted); line-height:1.4; margin-top:-1px;
+}
+.v29-row.strong{
+  margin-top:4px; padding-top:5px; border-top:1px solid var(--line-2, var(--line));
+}
+.v29-row.strong .v{ font-size:14px; font-weight:800; }
+.v29-row.good .v{ color:#1f9d55; }
+.v29-row.warn .v{ color:#c0392b; }
+
+.v29-bar{
+  position:relative; height:14px; border-radius:999px; margin:3px 0 7px;
+  background:color-mix(in srgb, var(--line) 60%, transparent); overflow:hidden;
+}
+.v29-bar i{ position:absolute; inset:0 auto 0 0; display:block; border-radius:999px; }
+.v29-bar.ok i{ background:color-mix(in srgb,#1f9d55 62%,transparent); }
+.v29-bar.tight i{ background:color-mix(in srgb,#d99620 68%,transparent); }
+.v29-bar.over i{ background:color-mix(in srgb,#c0392b 68%,transparent); }
+.v29-bar span{
+  position:relative; z-index:1; display:block; line-height:14px; padding-left:8px;
+  font-size:9px; font-weight:700; letter-spacing:.03em;
+  color:var(--text-strong, var(--ink));
+}
+
+/* ---- 3. RATE POPOVER ------------------------------------------------ */
+.v29-pop{
+  position:fixed; z-index:1750; display:none;
+  width:320px; padding:12px; border-radius:12px;
+  background:var(--panel,#fff); border:1px solid var(--line,#dbe3ed);
+  box-shadow:0 18px 44px rgba(0,0,0,.4);
+  color:var(--ink, var(--text));
+}
+.v29-pop.on{ display:block; }
+.v29-pop-hd{
+  font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--muted); margin-bottom:7px;
+}
+.v29-pop-row{ display:flex; align-items:center; gap:6px; }
+.v29-pop-row input{ flex:1 1 auto; min-width:0; text-align:right; font-variant-numeric:tabular-nums; }
+.v29-pct{ font-size:12px; color:var(--muted); }
+.v29-pop-sub{ font-size:10.5px; color:var(--muted); margin:7px 0 9px; line-height:1.45; }
+.v29-pop-wide{ width:100%; justify-content:center; margin-top:7px; }
+.v29-pop-list{ display:flex; flex-direction:column; gap:4px; margin-top:9px; }
+.v29-pick{
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+  padding:6px 9px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--line,#dbe3ed); background:var(--panel-2,transparent); color:inherit;
+  font-size:11.5px;
+}
+.v29-pick:hover{ border-color:var(--accent,#2D7DD2); }
+.v29-pick b{ font-variant-numeric:tabular-nums; }
+.v29-pop-note{
+  font-size:10px; color:var(--muted); line-height:1.5; margin-top:9px;
+  padding-left:8px; border-left:2px solid var(--amber-line,#b07d15);
+}

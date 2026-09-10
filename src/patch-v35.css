@@ -1,0 +1,170 @@
+/* =====================================================================
+   v35 — one button, one panel
+   ===================================================================== */
+
+/* The originals are stowed, not deleted: they keep their ids, their
+   handlers and every delegation pointed at them. Taking them off screen
+   is what stops four layers' reordering from being visible. */
+#suite-root .v35-stowed{
+  position:absolute !important;
+  width:1px !important; height:1px !important;
+  padding:0 !important; margin:-1px !important;
+  overflow:hidden !important; clip:rect(0 0 0 0) !important;
+  clip-path:inset(50%) !important; white-space:nowrap !important;
+  border:0 !important;
+}
+
+/* ---- the one button ------------------------------------------------ */
+#suite-root .v34-right{ position:relative; }
+#suite-root .v35-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  height:36px; padding:0 16px;
+  border-radius:9px; cursor:pointer;
+  border:1px solid color-mix(in srgb,var(--v24-accent,#2D7DD2) 55%,var(--v24-border,#31445f));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--v24-accent,#2D7DD2) 22%,var(--v24-card,#132034)),color-mix(in srgb,var(--v24-accent,#2D7DD2) 11%,var(--v24-card,#132034)));
+  color:color-mix(in srgb,var(--v24-accent,#72d8b7) 72%,#fff);
+  font-size:12.5px; font-weight:700; white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 7px 18px rgba(0,0,0,.18);
+  transition:background .14s ease,border-color .14s ease,color .14s ease,transform .14s ease;
+}
+#suite-root .v35-btn:hover{ transform:translateY(-1px);border-color:var(--v24-accent,#2D7DD2);color:#fff; }
+#suite-root .v35-btn[aria-expanded="true"]{background:var(--v24-accent,#2D7DD2);border-color:var(--v24-accent,#2D7DD2);color:#071522;box-shadow:none;}
+.v35-dots{
+  width:14px; height:4px; flex:none; position:relative;
+}
+.v35-dots::before, .v35-dots::after, .v35-dots span{ content:''; }
+.v35-dots::before{
+  content:''; position:absolute; left:0; top:0; width:4px; height:4px;
+  border-radius:50%; background:currentColor;
+  box-shadow:5px 0 0 currentColor, 10px 0 0 currentColor;
+}
+
+/* ---- the panel ----------------------------------------------------- */
+.v35-panel{
+  display:none;
+  position:fixed; right:12px; top:80px;
+  z-index:2800;
+  width:min(520px, calc(100vw - 24px));
+  max-height:min(76vh, 720px);
+  overflow:hidden; overscroll-behavior:contain;
+  padding:0;
+  border-radius:14px;
+  background:color-mix(in srgb,var(--v24-card,#111d2d) 95%,#000);
+  border:1px solid var(--v24-border,#2b405c);
+  box-shadow:0 28px 76px rgba(0,0,0,.54),inset 0 1px 0 rgba(255,255,255,.04);
+  color:var(--v24-text,#e8f0fa);
+}
+.v35-panel.on{ display:block; }
+.v35-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 14px;border-bottom:1px solid var(--v24-border,#2b405c);background:color-mix(in srgb,var(--v24-header,#0b1422) 96%,transparent)}
+.v35-head>div{display:grid;gap:2px}.v35-head b{font-size:13px}.v35-head small{font-size:9px;color:var(--v24-muted,#94a8c1)}.v35-head button{min-width:34px;height:29px;border:1px solid var(--v24-border,#2b405c);border-radius:7px;background:transparent;color:var(--v24-muted,#94a8c1);font-size:9px;font-weight:800;cursor:pointer}.v35-head button:hover{color:#fff;border-color:var(--v24-accent,#2D7DD2)}
+.v35-sessionbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px;padding:9px 12px;border-bottom:1px solid var(--v24-border,#2b405c);background:color-mix(in srgb,var(--v24-header,#0b1422) 76%,var(--v24-card,#111d2d))}.v35-sessionbar label{display:grid;gap:4px;min-width:0}.v35-sessionbar label>span{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--v24-muted,#94a8c1)}.v35-sessionbar select{width:100%;min-width:0;height:34px;padding:0 30px 0 10px;border-radius:7px;border:1px solid var(--v24-border,#2b405c);background:var(--field-bg,var(--v24-page,#07111e));color:var(--field-text,var(--v24-text,#e8f0fa));font:600 11px inherit}.v35-sessionbar button{height:34px;padding:0 13px;border-radius:7px;border:1px solid color-mix(in srgb,var(--v24-accent,#2D7DD2) 50%,var(--v24-border,#2b405c));background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 13%,var(--v24-card,#111d2d));color:var(--v24-text,#e8f0fa);font-size:10px;font-weight:800;cursor:pointer}.v35-sessionbar button:disabled{opacity:.45;cursor:not-allowed}
+.v35-scroll{max-height:calc(min(76vh,720px) - 114px);overflow:auto;padding:7px 9px 10px;scrollbar-width:thin}
+.v35-grp{
+  font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--v24-muted,#8a93a8);
+  padding:9px 4px 5px;
+  border-top:1px solid color-mix(in srgb, var(--v24-border,#dbe3ed) 70%, transparent);
+  margin-top:4px;
+}
+.v35-grp:first-child{ border-top:0; margin-top:0; padding-top:2px; }
+.v35-items{
+  display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:5px;
+}
+#suite-root .v35-item,.v35-panel .v35-item{
+  text-align:left; cursor:pointer;
+  padding:7px 10px; border-radius:8px;
+  border:1px solid var(--v24-border,#2b405c) !important;
+  background:color-mix(in srgb,var(--v24-card,#111d2d) 82%,var(--v24-page,#07111e)) !important;
+  color:var(--v24-text,#e8f0fa) !important;
+  font-size:12px; font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  display:flex !important;align-items:center !important;justify-content:space-between !important;gap:10px !important;
+  min-height:34px !important;box-shadow:none !important;
+}
+.v35-item span{min-width:0;overflow:hidden;text-overflow:ellipsis}.v35-item i{font-size:13px;font-style:normal;color:var(--v24-accent,#2D7DD2);opacity:.76}.v35-item:hover{ border-color:var(--v24-accent,#2D7DD2);background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 10%,var(--v24-card,#111d2d)); }
+#suite-root .v35-item:hover,.v35-panel .v35-item:hover{border-color:var(--v24-accent,#2D7DD2) !important;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 10%,var(--v24-card,#111d2d)) !important}
+#suite-root .v35-item.primary,.v35-panel .v35-item.primary{
+  background:color-mix(in srgb, var(--v24-accent,#2D7DD2) 14%, var(--v24-card,#111d2d)) !important;
+  border-color:color-mix(in srgb, var(--v24-accent,#2D7DD2) 46%, var(--v24-border,#2b405c)) !important;
+  font-weight:700;
+}
+
+/* Match the Income Calculator's dense header rhythm while keeping the
+   Loan Suite's scenario and date controls readable. */
+#suite-root .v25-header-main{padding-block:9px !important;column-gap:10px !important}
+#suite-root .v34-bar{min-height:48px !important;padding-block:6px !important;background:color-mix(in srgb,var(--v24-header,#0b1422) 94%,#000) !important}
+#suite-root .v34-bar #v251HeaderStats{gap:6px !important}
+#suite-root .v34-bar .v33-chip{height:34px !important;padding-inline:10px !important;border-radius:999px !important}
+#suite-root .v35-btn{height:34px;border-radius:8px;padding-inline:14px}
+#suite-root .v23-primary-nav{padding-block:7px !important}
+#suite-root .v23-context-tabs{padding-block:6px !important;min-height:44px !important}
+#suite-root #v23SuitePrimaryNav>.v28-direct{display:none !important}
+
+/* Max Mortgage lives under Renovation; Escrow lives under Closing. They
+   remain in the All pages directory and Full form. */
+#suite-root .tabs .tab.v35-nested-source{display:none !important}
+.v35-linked-subtabs{display:flex;align-items:center;gap:4px;width:max-content;max-width:100%;margin:0 0 10px;padding:4px;border:1px solid var(--v24-border,#2b405c);border-radius:10px;background:color-mix(in srgb,var(--v24-card,#111d2d) 88%,var(--v24-page,#07111e));overflow:auto}.v35-linked-subtabs button{height:32px;padding:0 13px;border:0;border-radius:7px;background:transparent;color:var(--v24-muted,#94a8c1);font-size:10px;font-weight:800;white-space:nowrap;cursor:pointer}.v35-linked-subtabs button:hover{color:var(--v24-text,#e8f0fa);background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 9%,transparent)}.v35-linked-subtabs button.active{color:#fff;background:color-mix(in srgb,var(--v24-accent,#2D7DD2) 62%,var(--v24-card,#111d2d));box-shadow:0 3px 10px rgba(0,0,0,.18)}
+
+/* Editable Quote rail. */
+.v35-quote-controls{margin:0 0 12px;padding:13px;border:1px solid color-mix(in srgb,var(--v24-accent,#2D7DD2) 28%,var(--v24-border,#2b405c));border-radius:12px;background:linear-gradient(145deg,color-mix(in srgb,var(--v24-accent,#2D7DD2) 7%,var(--v24-card,#111d2d)),var(--v24-card,#111d2d))}.v35-quote-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.v35-quote-title>div{display:grid;gap:2px}.v35-quote-title b{font-size:12px}.v35-quote-title small,.v35-quote-controls>p{font-size:9px;color:var(--v24-muted,#94a8c1)}.v35-quote-title button{height:30px;padding:0 11px;border:1px solid var(--v24-border,#2b405c);border-radius:7px;background:transparent;color:var(--v24-accent,#72d8b7);font-size:9px;font-weight:800;cursor:pointer}.v35-quote-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.v35-quote-grid label{display:grid;gap:4px;font-size:9px;font-weight:700;color:var(--v24-muted,#94a8c1)}.v35-quote-grid input{width:100%;min-width:0;height:36px;padding:0 10px;border:1px solid var(--field-border,var(--v24-border,#2b405c));border-radius:8px;background:var(--field-bg,#f3f5f2);color:var(--field-text,#102436);font:700 12px/1.1 inherit;outline:none}.v35-quote-grid input:focus{border-color:var(--v24-accent,#2D7DD2);box-shadow:0 0 0 3px color-mix(in srgb,var(--v24-accent,#2D7DD2) 17%,transparent)}.v35-quote-controls>p{margin:8px 0 0;line-height:1.45}
+
+/* Added live-planning detail is intentionally compact so the summary
+   remains nestled rather than turning into another full page. */
+.v35-live-details{display:grid;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--v24-border,#2b405c)}.v35-live-details h3,.v35-live-details h4{margin:0;color:var(--v24-muted,#94a8c1);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.v35-live-details h4{margin-top:7px}.v35-live-row,.v35-live-warnings button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:9px;padding:7px 8px;border:1px solid transparent;border-radius:7px;background:color-mix(in srgb,var(--v24-card,#111d2d) 80%,var(--v24-page,#07111e));color:var(--v24-text,#e8f0fa);font:600 10px inherit;text-align:left;cursor:pointer}.v35-live-row:hover,.v35-live-warnings button:hover{border-color:var(--v24-accent,#2D7DD2)}.v35-live-row span{color:var(--v24-muted,#94a8c1)}.v35-live-row b{font-size:10px;text-align:right}.v35-live-block{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:7px;background:color-mix(in srgb,var(--v24-page,#07111e) 72%,transparent);font-size:10px}.v35-live-block b{padding:2px 7px;border-radius:999px}.v35-live-block b.bad{color:#ffc36b;background:rgba(178,92,0,.25)}.v35-live-block b.pass{color:#67e8b3;background:rgba(0,130,82,.24)}.v35-live-warnings{display:grid;gap:4px}.v35-live-warnings button{display:grid;justify-content:stretch}.v35-live-warnings small{margin-top:2px;color:var(--v24-muted,#94a8c1);font-size:8.5px;line-height:1.35}.v35-income-needed{display:grid;gap:4px}
+
+.v35-borrower-range{border-color:color-mix(in srgb,var(--v24-accent,#2D7DD2) 28%,var(--v24-border,#2b405c)) !important}.v35-borrower-range>.body>p{margin:0 0 9px;color:var(--v24-muted,#94a8c1);font-size:10px}.v35-borrower-range>.body>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.v35-borrower-range button{display:grid;gap:5px;padding:10px;border:1px solid var(--v24-border,#2b405c);border-radius:9px;background:color-mix(in srgb,var(--v24-card,#111d2d) 82%,var(--v24-page,#07111e));color:var(--v24-text,#e8f0fa);text-align:left;cursor:pointer}.v35-borrower-range button:hover{border-color:var(--v24-accent,#2D7DD2)}.v35-borrower-range button span{font-size:9px;color:var(--v24-muted,#94a8c1)}.v35-borrower-range button b{font-size:12px}[data-v35-linked]{cursor:pointer}[data-v35-linked]:hover{outline:1px solid color-mix(in srgb,var(--v24-accent,#2D7DD2) 44%,transparent);outline-offset:2px}
+
+/* ---- the readings bar now holds only readings and one button ------- */
+#suite-root .v34-bar{ gap:12px; }
+#suite-root .v34-right{ gap:8px; flex:0 0 auto; }
+
+/* the masthead loses its action cluster entirely, so it stops wrapping */
+#suite-root .v25-header-actions{
+  gap:0 !important;
+  min-height:0 !important;
+  padding:0 !important;
+}
+
+/* The summary is a real in-frame column. These selectors deliberately
+   outrank the older fixed-drawer rule from 25.1. */
+#suite-root.v24-summary-open .cols-main,
+#suite-root.v251-full-active .cols-main,
+#suite-root .cols-main{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(328px,376px) !important;
+  gap:14px !important;
+  align-items:start !important;
+}
+#suite-root.v24-summary-open .cols-main>.rail.v31-rail,
+#suite-root.v251-full-active .cols-main>.rail.v31-rail,
+#suite-root .cols-main>.rail.v31-rail{
+  display:block !important;
+  position:sticky !important;
+  grid-column:2 !important;
+  top:calc(var(--v34-chrome,130px) + 12px) !important;
+  right:auto !important;bottom:auto !important;
+  width:auto !important;max-width:none !important;
+  max-height:calc(100vh - var(--v34-chrome,130px) - 28px) !important;
+  margin:0 !important;padding:10px !important;
+  overflow:hidden auto !important;
+  z-index:24 !important;
+  border-radius:14px !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.18) !important;
+}
+#suite-root .v251-summary-close{display:none !important}
+#suite-root .rail.v35-summary-pulse{animation:v35-summary-pulse .68s ease}
+@keyframes v35-summary-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--v24-accent,#2D7DD2) 50%,transparent)}45%{box-shadow:0 0 0 4px color-mix(in srgb,var(--v24-accent,#2D7DD2) 35%,transparent)}100%{box-shadow:0 12px 30px rgba(0,0,0,.18)}}
+
+@media (min-width:2400px){#suite-root.v24-summary-open .cols-main,#suite-root.v251-full-active .cols-main,#suite-root .cols-main{grid-template-columns:minmax(0,1fr) 400px !important}}
+@media (max-width:1180px){#suite-root.v24-summary-open .cols-main,#suite-root.v251-full-active .cols-main,#suite-root .cols-main{grid-template-columns:minmax(0,1fr) !important}#suite-root.v24-summary-open .cols-main>.rail.v31-rail,#suite-root.v251-full-active .cols-main>.rail.v31-rail,#suite-root .cols-main>.rail.v31-rail{position:static !important;grid-column:1 !important;max-height:none !important}}
+
+@media (max-width:640px){
+  .v35-panel{
+    position:fixed; right:10px; left:10px; top:auto; bottom:10px;
+    width:auto; max-height:64vh;
+  }
+  .v35-items{ grid-template-columns:1fr; }
+  #suite-root .v35-btn{ height:40px; }
+}
+@media(max-width:980px){.v35-quote-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v35-borrower-range>.body>div{grid-template-columns:1fr}}
+@media(max-width:520px){.v35-quote-grid{grid-template-columns:1fr}.v35-sessionbar{grid-template-columns:1fr}.v35-sessionbar button{width:100%}}

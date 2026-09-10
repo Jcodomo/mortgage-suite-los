@@ -1,0 +1,191 @@
+/* =====================================================================
+   v28 — header layout, lighter dark, pinned rail, tighter menus
+   ===================================================================== */
+
+/* ---- 1. DARK, LIGHTENED -------------------------------------------
+   The blue-shifted dark from v27 landed too low. Every surface is
+   raised: the page by roughly a third of the way toward the card, and
+   the cards further still, so panels separate from the background
+   instead of everything sinking into one dark field. OLED is untouched —
+   it is meant to be black.                                            */
+html[data-v25-surface="dark"] #suite-root,
+html[data-v25-surface="dark"] #calc-root{
+  --bg:   color-mix(in srgb, var(--v24-page, #111A2B) 58%, #1B2A44 42%);
+  --bg-2: color-mix(in srgb, var(--v24-page, #111A2B) 54%, #1E3050 46%);
+  --panel:   color-mix(in srgb, var(--v24-card, #182338) 52%, #24365A 48%);
+  --panel-2: color-mix(in srgb, var(--v24-card, #182338) 46%, #2A3E64 54%);
+  --surface:   color-mix(in srgb, var(--v24-page, #111A2B) 58%, #1B2A44 42%);
+  --surface-2: color-mix(in srgb, var(--v24-card, #182338) 52%, #24365A 48%);
+  --surface-3: color-mix(in srgb, var(--v24-card, #182338) 42%, #30456E 58%);
+  --line:   color-mix(in srgb, var(--v24-border, #24314A) 44%, #3B527E 56%);
+  --line-2: color-mix(in srgb, var(--v24-border, #24314A) 54%, #35496F 46%);
+  --muted:  color-mix(in srgb, var(--v24-muted, #8FA2BF) 62%, #B4C4DE 38%);
+}
+html[data-v25-surface="dark"] body{
+  background:color-mix(in srgb, var(--v24-page, #111A2B) 56%, #17253C 44%) !important;
+}
+html[data-v25-surface="dark"] #suite-root .card{
+  border-color:var(--line) !important;
+  box-shadow:0 1px 0 color-mix(in srgb,#fff 6%,transparent) inset, 0 10px 26px rgba(4,10,22,.34) !important;
+}
+
+/* ---- 2. LIVE SUMMARY: right rail, always ---------------------------
+   Pinned by v27; this makes the position unconditional so no layout
+   mode can float it elsewhere or collapse it.                         */
+#suite-root .cols-main{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 332px !important;
+  gap:16px !important;
+  align-items:start !important;
+}
+#suite-root .rail{
+  display:block !important;
+  grid-column:2 !important;
+  position:sticky !important;
+  top:150px !important;
+  max-height:calc(100vh - 168px) !important;
+  overflow:auto !important;
+  width:auto !important;
+}
+@media (max-width:1180px){
+  #suite-root .cols-main{ grid-template-columns:minmax(0,1fr) !important; }
+  #suite-root .rail{ grid-column:1 !important; position:static !important; max-height:none !important; }
+}
+
+/* ---- 3. HEADER ACTIONS -------------------------------------------- */
+#suite-root .v25-header-actions{ flex-wrap:wrap; justify-content:flex-end; gap:6px !important; }
+#suite-root .v28-printgen{
+  border-color:color-mix(in srgb, var(--v24-accent,#2D7DD2) 58%, transparent) !important;
+  color:var(--v24-accent,#2D7DD2) !important;
+}
+/* the two menus sit last and read as secondary */
+#suite-root #v23SuiteActions > summary,
+#suite-root #v24LoanTools > summary{ opacity:.9; }
+
+/* ---- 4. SMALLER MENU POPUPS ---------------------------------------
+   They opened near full width with very tall rows. Two tight columns,
+   anchored to the right edge under their own button.                  */
+#suite-root .v23-action-menu > .v23-actions-panel,
+#suite-root .v24-tools-panel{
+  right:0 !important; left:auto !important;
+  width:min(480px, calc(100vw - 24px)) !important;
+  max-height:min(60vh, 440px) !important;
+  padding:8px !important;
+  overflow-y:auto !important;
+}
+#suite-root .v23-actions-grid{
+  grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+  gap:5px !important;
+}
+#suite-root .v23-actions-grid > *{
+  min-height:0 !important;
+  padding:7px 9px !important;
+  font-size:11.5px !important;
+  border-radius:8px !important;
+  text-align:left !important;
+  justify-content:flex-start !important;
+}
+#suite-root .v23-actions-grid svg,
+#suite-root .v23-actions-grid .v23-nav-icon{ width:13px !important; height:13px !important; }
+
+/* ---- 5. HEADER STATS + the rate ----------------------------------- */
+#suite-root .v251-header-stats{ gap:6px !important; }
+#suite-root .v28-rate-stat{
+  display:flex; flex-direction:column; gap:1px; align-items:flex-start;
+  padding:5px 11px; border-radius:9px; cursor:pointer;
+  border:1px solid color-mix(in srgb, var(--v24-accent,#2D7DD2) 46%, transparent);
+  background:color-mix(in srgb, var(--v24-accent,#2D7DD2) 12%, transparent);
+  color:inherit;
+}
+#suite-root .v28-rate-stat:hover{
+  background:color-mix(in srgb, var(--v24-accent,#2D7DD2) 22%, transparent);
+}
+#suite-root .v28-rate-stat > span{
+  font-size:9px; text-transform:uppercase; letter-spacing:.07em; opacity:.72; font-weight:700;
+}
+#suite-root .v28-rate-stat > b{ font-size:13px; font-variant-numeric:tabular-nums; }
+
+/* ---- 6. SCENARIO, AS OF, CLOSING ----------------------------------
+   They were three bare inputs of three different widths. Given a shared
+   framed treatment with the label inside the frame, so the row reads as
+   one control group rather than three loose boxes.                    */
+#suite-root .v251-datefield,
+#suite-root .v24-scenario-bar{
+  background:color-mix(in srgb, var(--v24-header-text,#dbe6f7) 9%, transparent);
+  border:1px solid color-mix(in srgb, var(--v24-header-text,#dbe6f7) 20%, transparent);
+  border-radius:10px;
+  padding:3px 4px 3px 9px;
+  display:flex; align-items:center; gap:6px;
+}
+#suite-root .v251-datefield > label,
+#suite-root .v251-datefield > .tlabel{
+  font-size:9px !important; text-transform:uppercase; letter-spacing:.07em;
+  font-weight:700; opacity:.7; white-space:nowrap;
+}
+#suite-root .v251-datefield input,
+#suite-root .v24-scenario-bar > input,
+#suite-root .v24-scenario-bar > select{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  height:28px !important;
+  color:inherit !important;
+}
+#suite-root .v24-scenario-bar > input:focus,
+#suite-root .v251-datefield input:focus{
+  outline:2px solid color-mix(in srgb, var(--v24-accent,#2D7DD2) 55%, transparent);
+  outline-offset:1px; border-radius:6px;
+}
+#suite-root .v24-scenario-bar > select{
+  border-left:1px solid color-mix(in srgb, var(--v24-header-text,#dbe6f7) 18%, transparent) !important;
+  border-radius:0 !important; padding-left:8px !important;
+}
+
+/* ---- 7. APPEARANCE CLUSTER ---------------------------------------- */
+#shellbar .v28-appearance{
+  display:inline-flex !important; align-items:center; gap:2px;
+  padding:2px 3px !important;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:9px;
+}
+#shellbar .v28-appearance .v28-surface-cycle{ opacity:.75; }
+#shellbar .v28-appearance .v28-surface-cycle:hover{ opacity:1; }
+
+/* ---- 8. PRINT / GENERATE panel ------------------------------------ */
+.v28-modal{
+  position:fixed; inset:0; z-index:1700; display:none;
+  background:rgba(4,10,22,.62); padding:40px 16px; overflow:auto;
+}
+.v28-modal.on{ display:block; }
+.v28-modal-card{
+  max-width:640px; margin:0 auto; border-radius:14px; overflow:hidden;
+  background:var(--panel,#fff); border:1px solid var(--line,#dbe3ed);
+  box-shadow:0 24px 60px rgba(0,0,0,.45);
+}
+.v28-modal-hd{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 14px; border-bottom:1px solid var(--line,#dbe3ed); font-size:13px;
+}
+.v28-x{
+  border:1px solid var(--line,#dbe3ed); background:transparent; color:inherit;
+  border-radius:6px; font-size:10px; padding:3px 8px; cursor:pointer;
+}
+.v28-gen-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:12px 14px; }
+.v28-gen{
+  display:flex; flex-direction:column; gap:2px; text-align:left; cursor:pointer;
+  padding:10px 11px; border-radius:10px;
+  border:1px solid var(--line,#dbe3ed); background:var(--panel-2,transparent); color:inherit;
+}
+.v28-gen:hover:not(.off){ border-color:var(--accent,#2D7DD2); }
+.v28-gen.off{ opacity:.45; cursor:not-allowed; }
+.v28-gen-t{ font-size:12px; font-weight:700; }
+.v28-gen-s{ font-size:10.5px; color:var(--muted,#8a93a8); line-height:1.45; }
+.v28-gen-w{
+  font-size:9px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--accent,#2D7DD2); font-weight:700; margin-top:3px;
+}
+.v28-modal-ft{
+  padding:10px 14px; border-top:1px solid var(--line,#dbe3ed);
+  font-size:10.5px; color:var(--muted,#8a93a8); line-height:1.5;
+}
+@media (max-width:620px){ .v28-gen-grid{ grid-template-columns:1fr; } }

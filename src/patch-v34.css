@@ -1,0 +1,90 @@
+/* =====================================================================
+   v34 — the wide readings row, and offsets that measure themselves
+   ===================================================================== */
+
+/* ---- the new band -------------------------------------------------- */
+#suite-root .v34-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  width:100%;
+  box-sizing:border-box;
+  min-height:52px;
+  padding:7px max(22px, calc((100vw - 2280px)/2));
+  background:color-mix(in srgb, var(--v24-header,#0F2A4A) 88%, #000 12%);
+  border-bottom:1px solid color-mix(in srgb, var(--v24-header-text,#dbe6f7) 14%, transparent);
+  position:sticky;
+  top:0;
+  z-index:57;
+}
+#suite-root .v34-left,
+#suite-root .v34-right{
+  display:flex; align-items:center; gap:8px; min-width:0;
+}
+#suite-root .v34-left{ flex:1 1 auto; overflow-x:auto; scrollbar-width:none; }
+#suite-root .v34-left::-webkit-scrollbar{ display:none; }
+#suite-root .v34-right{ flex:0 0 auto; }
+#suite-root .v34-bar #v251HeaderStats{ display:flex; gap:8px; min-width:0; }
+
+/* the masthead keeps only what belongs there and now fits on one line */
+#suite-root .v25-header-actions{
+  flex-wrap:nowrap !important;
+  gap:8px !important;
+  overflow:visible !important;
+  mask-image:none !important;
+  -webkit-mask-image:none !important;
+}
+
+/* ---- measured offsets ---------------------------------------------
+   --v34-chrome is written by the layer after measuring the bands that
+   are actually on screen. Hard-coded numbers were wrong every time a
+   band changed height; this cannot be.                                */
+.v23-context-tabs{
+  top:var(--v34-chrome, 130px) !important;
+}
+#suite-root .rail.v31-rail{
+  top:calc(var(--v34-chrome, 130px) + 44px) !important;
+  max-height:calc(100vh - var(--v34-chrome, 130px) - 60px) !important;
+}
+
+/* ---- everything on one line, at every size ------------------------- */
+#suite-root .v34-bar .v33-chip{
+  height:36px !important;
+  padding:0 12px !important;
+}
+#suite-root .v34-bar .v32-btn{
+  height:36px !important;
+  line-height:34px !important;
+}
+
+/* 4K / ultrawide: roomier, still one line */
+@media (min-width:2200px){
+  #suite-root .v34-bar{ min-height:58px; gap:18px; }
+  #suite-root .v34-bar .v33-chip{ height:40px !important; padding:0 15px !important; }
+  #suite-root .v34-bar .v33-chip > b{ font-size:14px !important; }
+  #suite-root .v34-bar .v32-btn{ height:40px !important; line-height:38px !important; padding:0 17px !important; }
+}
+/* laptop */
+@media (max-width:1400px){
+  #suite-root .v34-bar{ gap:10px; padding-left:16px; padding-right:16px; }
+  #suite-root .v34-bar .v33-chip{ padding:0 10px !important; }
+}
+/* small: the readings scroll, the actions stay put and stay hittable */
+@media (max-width:900px){
+  #suite-root .v34-bar{ min-height:48px; gap:8px; padding-left:12px; padding-right:12px; }
+  #suite-root .v34-bar .v33-chip > span{ display:none !important; }
+  #suite-root .v34-bar .v33-chip{ height:34px !important; padding:0 9px !important; }
+  #suite-root .v34-bar .v32-btn{ height:34px !important; line-height:32px !important; padding:0 10px !important; }
+}
+@media (max-width:640px){
+  #suite-root .v34-bar{ flex-wrap:wrap; row-gap:6px; padding-bottom:8px; }
+  #suite-root .v34-left{ order:2; width:100%; }
+  #suite-root .v34-right{ order:1; width:100%; justify-content:flex-end; }
+  #suite-root .v34-bar .v32-btn{ height:40px !important; line-height:38px !important; }
+  .v23-context-tabs{ position:static !important; top:auto !important; }
+  #suite-root .v34-bar{ position:static !important; }
+}
+
+/* ---- the duplicate the nav kept showing ---------------------------- */
+#suite-root .tabs .tab.v27-hidden-tab{ display:none !important; }
