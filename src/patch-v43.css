@@ -1,0 +1,45 @@
+/* =====================================================================
+   Release 43 — card menus in the File-actions design, restored tabs
+   ===================================================================== */
+
+/* the restored copies are ordinary tabs again */
+#suite-root .tabs .tab.v37-promoted-copy{ display:revert !important; }
+#suite-root .tabs .tab.v27-hidden-tab{ display:revert !important; }
+.v40-hold{ display:none !important; }
+
+/* ---- the menu: a grid of cards, one size down --------------------- */
+#suite-root .v43-menu{
+  all:unset; box-sizing:border-box; position:absolute; top:calc(100% + 6px); right:0; z-index:1800;
+  display:none; width:min(560px, calc(100vw - 24px)); max-height:min(72vh, 640px); overflow-y:auto; overscroll-behavior:contain;
+  padding:8px; border-radius:12px;
+  background:var(--panel,#fff); border:1px solid var(--line,#d0d7de);
+  box-shadow:0 20px 50px rgba(0,0,0,.34); color:var(--ink, var(--text));
+  font-family:var(--v24-font-ui, Inter, system-ui, sans-serif);
+  animation:v43-in .12s ease; transform-origin:top right;
+}
+#suite-root .v43-menu.on{ display:block; }
+#suite-root .v43-menu[hidden]{ display:none !important; }
+#suite-root .v43-sec{
+  display:block; font-size:8.5px; font-weight:800; text-transform:uppercase; letter-spacing:.1em;
+  color:var(--muted); padding:8px 6px 5px;
+}
+#suite-root .v43-sec + .v43-grid + .v43-sec{ border-top:1px solid color-mix(in srgb, var(--line,#d0d7de) 70%, transparent); margin-top:4px; }
+#suite-root .v43-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:6px; }
+#suite-root .v43-card{
+  all:unset; box-sizing:border-box; cursor:pointer;
+  display:flex; align-items:center; gap:9px; min-height:38px; padding:7px 10px;
+  border-radius:9px; border:1px solid var(--line,#d0d7de);
+  background:color-mix(in srgb, var(--panel-2, var(--panel,#fff)) 70%, var(--panel,#fff));
+  font-size:11.5px; font-weight:600; color:inherit; white-space:nowrap; overflow:hidden;
+  transition:border-color .12s ease, background-color .12s ease;
+}
+#suite-root .v43-card:hover{ border-color:var(--accent,#0969da); background:color-mix(in srgb, var(--accent,#0969da) 8%, var(--panel,#fff)); }
+#suite-root .v43-card svg{ all:unset; display:inline-block; width:14px; height:14px; flex:0 0 14px; fill:var(--accent,#0969da); }
+#suite-root .v43-card span{ all:unset; display:inline; overflow:hidden; text-overflow:ellipsis; }
+@keyframes v43-in{ from{ opacity:0; transform:translateY(-3px) scale(.985);} to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ #suite-root .v43-menu{ animation:none; } }
+@media (max-width:620px){ #suite-root .v43-grid{ grid-template-columns:1fr; } }
+
+/* ---- the synthetic tabs match the row ------------------------------ */
+#suite-root .tabs .v43-tab[data-v23-visible="1"]{ display:flex !important; }
+#suite-root .tabs .v43-tab[data-v23-visible="0"]{ display:none !important; }

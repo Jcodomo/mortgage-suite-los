@@ -2,7 +2,7 @@
 
 Open `index.html` for the GitHub Pages landing page. `loan-suite.html` starts the mortgage suite directly on Quote, and `income-calculator.html` starts the income calculator directly.
 
-Release 37 fixes the sticky-header stack in both workspaces. Identity, scenario, KPI, and action bands now scroll away normally; the primary and secondary navigation remain together beneath the shared shell without clipping fields or totals. A subtle progress line, reliable anchor spacing, a contained Live Summary scrollbar, and removal of promoted duplicate tabs improve navigation without adding another menu. Release 36's compact 1320px layout and reviewed asset-statement workflow remain intact, as do all 14 Loan Suite pages, freeform date/number handling, calculation engines, autosave, scenarios, and document generators.
+Release 44 uses the clean Release 21 Loan Suite layout as its visual foundation while retaining the complete Release 43 feature inventory. The Quote worksheet combines the quick-edit and setup rails, all 17 focused workspaces remain reachable, Full form keeps the core worksheets editable in one continuous view, and the Live comparison, document generators, OCR, credit, taxes/proration, rates, scenarios, and underwriting tools remain available. Number and date fields accept freeform entry and normalize without changing the calculation engines. The Mortgage Income Calculator keeps its Release 37 layout and behavior, with Agency starting at Auto for a new file.
 
 The income calculator and the renovation suite in one file, with a loan-origination
 style shell over the top: named left navigation, subtabs, five synchronized themes, continuous

@@ -1,0 +1,90 @@
+/* =====================================================================
+   Release 41 — the calculator's dimensions, two rows, persistent icons,
+   six colourways, readable type
+   ===================================================================== */
+
+/* ---- 1. THE SUITE AT THE CALCULATOR'S WIDTH ------------------------
+   The calculator's canvas is 1560px; release 35 had pinned the suite to
+   1320px, which is the "too narrow" body. Matched exactly, with the same
+   side gutters.                                                        */
+#suite-root .app, #suite-root .cols-main, #suite-root .wrap, #suite-root .chrome-inner{
+  max-width:1560px !important; width:100% !important;
+  margin-left:auto !important; margin-right:auto !important;
+  padding-left:clamp(16px, 3vw, 40px) !important; padding-right:clamp(16px, 3vw, 40px) !important;
+  box-sizing:border-box;
+}
+#suite-root .cols-main{ grid-template-columns:minmax(0,1fr) 360px !important; gap:22px !important; }
+@media (min-width:1700px){ #suite-root .cols-main{ grid-template-columns:minmax(0,1fr) 400px !important; } }
+
+/* ---- 2. TWO ROWS, NOTHING UNDER THEM -------------------------------- */
+.los-strip{ display:none !important; }
+#suite-root .v23-primary-nav, .v23-context-tabs{ padding-left:clamp(16px,3vw,40px) !important; padding-right:clamp(16px,3vw,40px) !important; }
+
+/* ---- 3. ICONS THAT STAY --------------------------------------------- */
+/* release 23 draws its icons with ::before/::after on the span; those sat
+   on top of the redrawn SVGs. Off, so only the SVG shows. */
+#suite-root .v23-nav-icon.v40-nav-ic::before, #suite-root .v23-nav-icon.v40-nav-ic::after{ display:none !important; content:none !important; }
+#suite-root .v23-nav-icon.v40-nav-ic{ width:16px !important; height:16px !important; display:inline-flex !important; align-items:center; }
+/* the header bar states its own size so no band rule can shrink it */
+#suite-root .v41-bar{ flex:0 0 auto !important; margin-left:auto !important; display:flex !important; align-items:center !important; gap:8px !important; }
+#suite-root .v41-bar .v40-icons{ display:flex !important; }
+#suite-root .v41-bar .v40-ic{ width:32px !important; min-width:32px !important; height:30px !important; flex:0 0 32px !important; display:inline-flex !important; }
+#suite-root .v41-bar .v40-ic svg{ width:16px !important; height:16px !important; display:block !important; }
+#suite-root .v41-bar .v40-lb{ height:34px !important; display:inline-flex !important; }
+#suite-root .v41-bar .v40-lb span{ display:inline !important; }
+/* nothing in the header may hide its label or icon at any band */
+#suite-root .v33-xs .v40-ic, #suite-root .v33-sm .v40-ic{ width:32px !important; }
+#suite-root .v33-xs .v40-lb > span, #suite-root .v33-sm .v40-lb > span{ display:inline !important; }
+#suite-root .v33-xs .v23-nav-icon, #suite-root .v33-sm .v23-nav-icon{ display:inline-flex !important; }
+[hidden]{ display:none !important; }
+
+/* ---- 4. RETURN TO QUOTE, in the theme ------------------------------- */
+#suite-root .v36-suite-footer{
+  max-width:1560px; margin:18px auto 30px; padding:12px clamp(16px,3vw,40px);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  border-top:1px solid var(--line); color:var(--muted); font-size:11.5px;
+}
+#suite-root .v36-suite-footer button{
+  height:34px; padding:0 14px; border-radius:8px; cursor:pointer;
+  border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background:color-mix(in srgb, var(--accent) 12%, transparent); color:var(--accent);
+  font:600 12.5px/32px var(--v24-font-ui, inherit);
+}
+#suite-root .v36-suite-footer button:hover{ background:color-mix(in srgb, var(--accent) 20%, transparent); }
+
+/* ---- 5. SIX MORE COLOURWAYS ----------------------------------------
+   Two neutral surfaces asked for, and four from well-known palettes.
+   Every text token here clears 7:1 on its page colour.                */
+html[data-v24-theme="lightgray"]{ --v24-header:#1f2328; --v24-header-text:#f4f6f8; --v24-page:#e9ecef; --v24-card:#f8f9fa; --v24-text:#1f2328; --v24-muted:#495057; --v24-border:#ced4da; --v24-accent:#1c64d9; }
+html[data-v24-theme="cloudgrey"]{ --v24-header:#2b3440; --v24-header-text:#eef2f6; --v24-page:#dfe4ea; --v24-card:#eef1f5; --v24-text:#1e2530; --v24-muted:#4b5563; --v24-border:#c3cbd5; --v24-accent:#2563eb; }
+/* Nord — arcticicestudio */
+html[data-v24-theme="nord"]{ --v24-header:#2e3440; --v24-header-text:#eceff4; --v24-page:#2e3440; --v24-card:#3b4252; --v24-text:#eceff4; --v24-muted:#d8dee9; --v24-border:#4c566a; --v24-accent:#88c0d0; }
+/* Dracula — draculatheme.com */
+html[data-v24-theme="dracula"]{ --v24-header:#21222c; --v24-header-text:#f8f8f2; --v24-page:#282a36; --v24-card:#343746; --v24-text:#f8f8f2; --v24-muted:#bfc2d4; --v24-border:#44475a; --v24-accent:#bd93f9; }
+/* Solarized light — Ethan Schoonover */
+html[data-v24-theme="solarized"]{ --v24-header:#073642; --v24-header-text:#eee8d5; --v24-page:#fdf6e3; --v24-card:#eee8d5; --v24-text:#073642; --v24-muted:#586e75; --v24-border:#d3cbb7; --v24-accent:#268bd2; }
+/* Linear — linear.app */
+html[data-v24-theme="linear"]{ --v24-header:#0f1116; --v24-header-text:#f7f8f8; --v24-page:#0f1116; --v24-card:#1a1d24; --v24-text:#f7f8f8; --v24-muted:#b4b8c5; --v24-border:#2a2e39; --v24-accent:#7170ff; }
+html[data-v24-theme="nord"] #suite-root, html[data-v24-theme="dracula"] #suite-root, html[data-v24-theme="linear"] #suite-root,
+html[data-v24-theme="nord"] #calc-root, html[data-v24-theme="dracula"] #calc-root, html[data-v24-theme="linear"] #calc-root{
+  --pass-ink:#a3be8c; --warn-ink:#ff6e6e; --amber-ink:#ebcb8b;
+}
+html[data-v24-theme="solarized"] #suite-root, html[data-v24-theme="solarized"] #calc-root{ --pass-ink:#859900; --warn-ink:#dc322f; --amber-ink:#b58900; }
+
+/* ---- 6. READABLE TYPE ----------------------------------------------
+   Sizes up one step across the chrome and the rail; muted text raised
+   to a contrast that reads on every surface.                           */
+#suite-root{ font-size:13.5px; }
+#suite-root .rail .card .out .l, #suite-root .rail .v40-out .l{ font-size:12.5px !important; }
+#suite-root .rail .card .out .v, #suite-root .rail .v40-out .v{ font-size:13px !important; }
+#suite-root .rail .sec-head{ font-size:10px !important; }
+#suite-root .rail .v40-out .l small{ font-size:10.5px !important; }
+#suite-root .v23-primary-nav button{ font-size:13px !important; }
+.v23-context-tabs .tab, #suite-root .tabs .tab{ font-size:11.5px !important; }
+#suite-root .field label, #suite-root label > span{ font-size:11.5px !important; }
+#suite-root input, #suite-root select, #suite-root textarea{ font-size:13.5px !important; }
+#suite-root .muted, #suite-root .sub, #suite-root small{ color:color-mix(in srgb, var(--v24-muted, #57606a) 78%, var(--v24-text, #24292f)) !important; }
+
+/* Ledger's muted text measured 3.92:1 on its page — under AA. Pulled to
+   #56677A (5.16:1), same hue, one step darker. */
+html[data-v24-theme="ledger"]{ --v24-muted:#56677A; }

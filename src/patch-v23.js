@@ -7,8 +7,8 @@ var V=window.V23={version:'23.0'};
 var SUITE_GROUPS=[
   {key:'file',label:'File',icon:'file',tabs:['SETUP','PROPERTY','QUOTE']},
   {key:'loan',label:'Loan',icon:'home',tabs:['RENOVATION','MAX MORTGAGE','MORTGAGE RATES']},
-  {key:'costs',label:'Costs',icon:'coins',tabs:['CLOSING','ESCROW']},
-  {key:'underwriting',label:'Underwriting',icon:'check',tabs:['QUALIFY','RENTAL','ADVANCED']},
+  {key:'costs',label:'Costs',icon:'coins',tabs:['CLOSING','ESCROW','TAXES & PRORATION']},
+  {key:'underwriting',label:'Underwriting',icon:'check',tabs:['QUALIFY','RENTAL','CREDIT','ADVANCED','CONTRACT & LE']},
   {key:'results',label:'Results',icon:'chart',tabs:['SCENARIOS','SUMMARY','DOCUMENTS & OCR']}
 ];
 var CALC_GROUPS=[

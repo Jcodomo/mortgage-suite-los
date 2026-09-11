@@ -26,6 +26,7 @@ var V34 = window.V34 = { version:'34.0' };
    =================================================================== */
 var PROMOTED = ['DOCUMENTS & OCR','MORTGAGE RATES','PROPERTY','ADVANCED'];
 function hideGroupCopies(){
+  if (window.V43) return true;   /* release 43: these pages live in their groups again */
   var tabs = document.querySelector('#suite-root .tabs'); if (!tabs) return false;
   $$('.tab', tabs).forEach(function(t){
     if (t.classList.contains('v25-full-nav') || t.dataset.group) return;   /* the nav's own */

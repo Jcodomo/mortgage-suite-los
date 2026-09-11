@@ -123,6 +123,7 @@ function watchEngineTabs(){
    twelve-month projection under it.
    =================================================================== */
 function mountTaxesInEscrow(){
+  if (window.V39) return;   /* release 39: Taxes is its own page, not appended under Escrow */
   var st = suite(); if (!st || !window.TAXPRO) return;
   if (V8.active) return;
   if (st.snapshot.mode !== 'escrow') return;

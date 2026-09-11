@@ -172,10 +172,10 @@ html[data-v24-theme] #suite-root textarea:focus{
 .v26-dupe{ display:none !important; }
 /* a nested menu-wrap inside the grid was rendering its whole contents
    inline, which is where the second copy of every entry came from */
-.v23-actions-grid .menu-wrap .menu{
+#suite-root .v23-actions-grid .menu-wrap .menu{
   position:static !important; display:none !important;
 }
-.v23-actions-grid .menu-wrap.v26-open .menu{
+#suite-root .v23-actions-grid .menu-wrap.v26-open .menu{
   display:block !important; box-shadow:none !important; border:0 !important;
   padding-left:10px !important;
 }

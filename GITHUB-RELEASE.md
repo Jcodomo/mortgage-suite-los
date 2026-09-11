@@ -1,4 +1,4 @@
-# Mortgage Suite LOS v37
+# Mortgage Suite LOS v44
 
 A self-contained mortgage income, renovation, property, qualification, closing-cost, scenario, OCR, and document-workbench application.
 
@@ -17,8 +17,8 @@ npm run build
 
 ## Release verification
 
-- All 27 repository test files pass through `npm test`, including calculation, freeform date/number, navigation, print, and Release 37 sticky-header checks.
+- All 34 repository test files pass through the release verification, including income, FHA 203(k), HomeStyle, conventional, PMI/MIP, escrow, closing-cost, amortization, freeform date/number, navigation, print, and Release 44 integration checks.
 - GitHub Actions rebuilds the HTML and confirms the release artifact is non-empty.
 - The distributed HTML contains all styles, application code, calculators, and printable templates in one file.
 
-Reference PDFs used to tune the New York estimates are intentionally excluded from the repository. The implemented reference figures and formulas are documented in `CHANGELOG-v18.md`.
+Reference PDFs used to tune the New York estimates are intentionally excluded from the repository. The implemented reference figures and formulas are documented in `CHANGELOG-v18.md`; the final v21-based interface merge is documented in `CHANGELOG-v44.md`.

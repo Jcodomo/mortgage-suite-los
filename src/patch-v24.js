@@ -4,7 +4,7 @@
 var $=function(id){return document.getElementById(id);};
 var $$=function(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));};
 var V=window.V24={version:'24.0'};
-var THEMES=['ledger','slate','bank','graphite','terminal'];
+var THEMES=['ledger','slate','bank','graphite','terminal','github','github-dark','lightgray','cloudgrey','nord','dracula','solarized','linear'];/* github pair added in release 39 */
 var THEME_LABEL={ledger:'Navy ledger',slate:'Slate and teal',bank:'Bank paper',graphite:'Graphite mono',terminal:'Midnight terminal',federal:'Federal blue',clay:'Clay and sand',violet:'Violet fintech',evergreen:'Evergreen ledger',steel:'Steel and amber'};
 var INPUTS=['paper','mist','mint','sand','ink'];
 var INPUT_LABEL={paper:'Paper',mist:'Mist',mint:'Mint',sand:'Sand',ink:'Ink'};
@@ -22,7 +22,7 @@ function pathGet(obj,path){return String(path).split('.').reduce(function(a,k){r
 function applyTheme(name,quiet){
   if(THEMES.indexOf(name)<0)name='terminal';
   if(document.documentElement.dataset.v24Theme!==name)document.documentElement.dataset.v24Theme=name;if(safeGet('los.v24.theme','')!==name)safeSet('los.v24.theme',name);
-  var base=name==='terminal'?'dark':'light';
+  var base=/^(terminal|github-dark|nord|dracula|linear)$/.test(name)?'dark':'light';
   if(window.LOS&&LOS.setSkin){if(LOS.skin()!==base||document.documentElement.dataset.theme!==base)LOS.setSkin(base);}else if(document.documentElement.dataset.theme!==base)document.documentElement.dataset.theme=base;
   var s=st();if(s&&s.snapshot.theme!==base){s.snapshot.theme=base;if(!quiet)s.emit();}
   paintAppearance();return name;

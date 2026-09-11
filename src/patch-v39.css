@@ -1,0 +1,204 @@
+/* =====================================================================
+   Release 39 — the reference look: one button system, GitHub colourway,
+   compact rail, appearance panel, address search
+   ===================================================================== */
+
+/* ---- 1. GITHUB COLOURWAYS -------------------------------------------
+   GitHub's own primer palette. Light: #ffffff canvas, #f6f8fa subtle,
+   #d0d7de border, #24292f text, #0969da accent. Dark: #0d1117 canvas,
+   #161b22 subtle, #30363d border, #c9d1d9 text, #58a6ff accent, #3fb950
+   success, #d29922 attention, #f85149 danger.                          */
+html[data-v24-theme="github"]{
+  --v24-header:#24292f; --v24-header-text:#f6f8fa; --v24-page:#ffffff; --v24-card:#f6f8fa;
+  --v24-text:#24292f; --v24-muted:#57606a; --v24-border:#d0d7de; --v24-accent:#0969da;
+  --v24-font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;
+  --v24-font-num:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+html[data-v24-theme="github-dark"]{
+  --v24-header:#010409; --v24-header-text:#e6edf3; --v24-page:#0d1117; --v24-card:#161b22;
+  --v24-text:#c9d1d9; --v24-muted:#8b949e; --v24-border:#30363d; --v24-accent:#58a6ff;
+  --v24-font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;
+  --v24-font-num:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+html[data-v24-theme^="github"] #suite-root,
+html[data-v24-theme^="github"] #calc-root{
+  --pass-ink:#1a7f37; --pass-bg:color-mix(in srgb,#2da44e 12%,var(--v24-card)); --pass-line:color-mix(in srgb,#2da44e 40%,var(--v24-border));
+  --warn-ink:#cf222e; --warn-bg:color-mix(in srgb,#cf222e 10%,var(--v24-card)); --warn-line:color-mix(in srgb,#cf222e 40%,var(--v24-border));
+  --amber-ink:#9a6700; --amber-bg:color-mix(in srgb,#bf8700 12%,var(--v24-card)); --amber-line:color-mix(in srgb,#bf8700 40%,var(--v24-border));
+}
+html[data-v24-theme="github-dark"] #suite-root,
+html[data-v24-theme="github-dark"] #calc-root{
+  --pass-ink:#3fb950; --warn-ink:#f85149; --amber-ink:#d29922;
+}
+
+/* ---- 2. ONE BUTTON SYSTEM ------------------------------------------
+   The reference's controls: 34px, 8px radius, 1px border, medium weight,
+   subtle surface, a single accent for the one that leads. Applied to
+   everything in the header band, the scenario row, the tab strip, and
+   the rail's clickable rows.                                            */
+#suite-root .v39-btn,
+#suite-root .v32-btn,
+#suite-root .v32-ctl,
+#suite-root .v33-chip,
+#suite-root .v35-btn,
+#suite-root .v23-action-menu > summary,
+#suite-root .toolbar .btn,
+#suite-root .topbar .btn{
+  height:34px !important; min-height:34px !important;
+  padding:0 13px !important;
+  border-radius:8px !important;
+  border:1px solid color-mix(in srgb, var(--v24-border,#d0d7de) 80%, var(--v24-header-text,#fff) 20%) !important;
+  background:color-mix(in srgb, var(--v24-header-text,#f6f8fa) 7%, transparent) !important;
+  color:var(--v24-header-text,#f6f8fa) !important;
+  font:600 12.5px/32px var(--v24-font-ui, inherit) !important;
+  letter-spacing:0 !important; text-transform:none !important;
+  display:inline-flex !important; align-items:center !important; gap:7px !important;
+  white-space:nowrap !important; box-shadow:none !important; cursor:pointer;
+  transition:background-color .12s ease, border-color .12s ease;
+}
+#suite-root .v39-btn:hover, #suite-root .v32-btn:hover, #suite-root .v32-ctl:hover,
+#suite-root .v33-chip:hover, #suite-root .v23-action-menu > summary:hover,
+#suite-root .toolbar .btn:hover, #suite-root .topbar .btn:hover{
+  background:color-mix(in srgb, var(--v24-header-text,#f6f8fa) 14%, transparent) !important;
+  border-color:color-mix(in srgb, var(--v24-header-text,#f6f8fa) 40%, transparent) !important;
+}
+#suite-root .v39-btn.primary, #suite-root .v32-primary{
+  background:var(--v24-accent,#0969da) !important; border-color:transparent !important; color:#fff !important;
+}
+#suite-root .v39-btn.primary:hover, #suite-root .v32-primary:hover{ filter:brightness(1.07); }
+#suite-root .v39-btn svg{ width:14px; height:14px; flex:none; opacity:.9; }
+#suite-root .v39-btn[aria-expanded="true"]{
+  background:color-mix(in srgb, var(--v24-accent,#0969da) 22%, transparent) !important;
+  border-color:color-mix(in srgb, var(--v24-accent,#0969da) 55%, transparent) !important;
+}
+/* stat chips keep their two-line shape within the same frame */
+#suite-root .v33-chip{ flex-direction:column !important; align-items:flex-start !important; gap:0 !important; line-height:1.15 !important; }
+/* tabs: the reference's pill strip */
+#suite-root .tabs .tab, .v23-context-tabs .tab, #suite-root .v25-full-nav{
+  height:30px !important; padding:0 13px !important; border-radius:999px !important;
+  font:700 11px/28px var(--v24-font-ui, inherit) !important; letter-spacing:.04em !important; text-transform:uppercase !important;
+  border:1px solid color-mix(in srgb, var(--v24-border,#d0d7de) 85%, transparent) !important;
+  background:color-mix(in srgb, var(--v24-card,#f6f8fa) 60%, transparent) !important;
+  color:var(--v24-muted,#57606a) !important; box-shadow:none !important;
+}
+#suite-root .tabs .tab.active, .v23-context-tabs .tab.active, #suite-root .v25-full-nav.active{
+  background:var(--v24-header,#24292f) !important; color:var(--v24-header-text,#f6f8fa) !important; border-color:transparent !important;
+}
+
+/* ---- 3. THE HEADER BAR --------------------------------------------- */
+#suite-root .v39-bar{ display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+#suite-root .v39-wrap{ position:relative; }
+.v39-stowed{
+  position:absolute !important; width:1px !important; height:1px !important; margin:-1px !important;
+  padding:0 !important; overflow:hidden !important; clip:rect(0 0 0 0) !important; clip-path:inset(50%) !important;
+  border:0 !important; white-space:nowrap !important;
+}
+.v39-panel{
+  display:none; position:absolute; right:0; top:calc(100% + 6px); z-index:1800;
+  min-width:220px; max-width:min(360px, calc(100vw - 24px)); padding:6px;
+  border-radius:10px; background:var(--panel,#fff); border:1px solid var(--line,#d0d7de);
+  box-shadow:0 16px 40px rgba(0,0,0,.28); color:var(--ink, var(--text));
+  animation:v39-in .12s ease; transform-origin:top right;
+}
+.v39-panel.on{ display:block; }
+.v39-panel-hd{ font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.09em; color:var(--muted); padding:6px 8px 4px; }
+.v39-panel-items{ display:flex; flex-direction:column; gap:2px; }
+.v39-item{
+  text-align:left; padding:7px 10px; border-radius:7px; border:1px solid transparent;
+  background:transparent; color:inherit; font-size:12.5px; font-weight:500; cursor:pointer;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.v39-item:hover{ background:color-mix(in srgb, var(--accent,#0969da) 10%, transparent); border-color:color-mix(in srgb, var(--accent,#0969da) 30%, transparent); }
+.v39-empty{ padding:10px; font-size:12px; color:var(--muted); }
+@keyframes v39-in{ from{ opacity:0; transform:translateY(-3px) scale(.985);} to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ .v39-panel{ animation:none; } }
+
+/* ---- 4. APPEARANCE PANEL ------------------------------------------- */
+#v23Appearance{ position:relative; }
+.v39-look{ right:0; min-width:300px; max-width:340px; padding:10px 12px 12px; }
+.v39-look-hd{ font-size:12.5px; font-weight:800; margin-bottom:2px; }
+.v39-look-sec{ font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.09em; color:var(--muted); margin:10px 0 5px; }
+.v39-look-row{ display:flex; gap:5px; flex-wrap:wrap; }
+.v39-chip{
+  padding:5px 11px; border-radius:999px; font-size:11.5px; font-weight:600; cursor:pointer;
+  border:1px solid var(--line,#d0d7de); background:transparent; color:inherit;
+}
+.v39-chip.on{ background:var(--accent,#0969da); border-color:transparent; color:#fff; }
+.v39-look-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; }
+.v39-swatch{
+  display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px 4px 5px;
+  border-radius:8px; border:1px solid var(--line,#d0d7de); background:transparent; color:inherit; cursor:pointer;
+}
+.v39-swatch i{ display:block; width:100%; height:7px; border-radius:3px; }
+.v39-swatch i + i{ margin-top:-2px; }
+.v39-swatch span{ font-size:9.5px; font-weight:600; color:var(--muted); white-space:nowrap; }
+.v39-swatch.on{ border-color:var(--accent,#0969da); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent,#0969da) 30%, transparent); }
+.v39-swatch.on span{ color:var(--accent,#0969da); }
+
+/* ---- 5. THE RAIL, TO THE REFERENCE --------------------------------- */
+#suite-root .rail .card.v39-rail{ padding:0 !important; }
+#suite-root .rail .card.v39-rail > h3{
+  display:flex !important; align-items:center !important; justify-content:space-between !important;
+  padding:10px 12px !important; margin:0 !important; font-size:10.5px !important; letter-spacing:.08em !important;
+  border-bottom:1px solid var(--line-2, var(--line)) !important;
+}
+/* the header badge was washed out on light surfaces and rewritten every
+   render tick; a fixed treatment and no transition stops both */
+#suite-root .rail .card.v39-rail > h3 .badge{
+  display:inline-block !important; opacity:1 !important; transition:none !important;
+  padding:3px 9px !important; border-radius:999px !important;
+  font-size:9px !important; letter-spacing:.07em !important; font-weight:800 !important;
+  background:color-mix(in srgb, var(--accent,#0969da) 16%, transparent) !important;
+  color:var(--accent,#0969da) !important;
+  border:1px solid color-mix(in srgb, var(--accent,#0969da) 42%, transparent) !important;
+}
+#suite-root .rail .card.v39-rail > h3 .badge.on{ background:color-mix(in srgb,#2da44e 16%,transparent) !important; color:var(--pass-ink,#1a7f37) !important; border-color:color-mix(in srgb,#2da44e 42%,transparent) !important; }
+#suite-root .rail .card.v39-rail > .body{ padding:6px 12px 10px !important; }
+#suite-root .rail .card.v39-rail .sec-head{ font-size:9px !important; letter-spacing:.09em !important; margin:11px 0 3px !important; padding-bottom:3px !important; }
+#suite-root .rail .card.v39-rail .out{ padding:3px 0 !important; }
+#suite-root .rail .card.v39-rail .out .l{ font-size:11.5px !important; }
+#suite-root .rail .card.v39-rail .out .v{ font-size:12px !important; font-variant-numeric:tabular-nums; }
+/* every row is a target and looks like one on hover */
+#suite-root .rail .card.v39-rail .out,
+#suite-root .rail .card.v39-rail [data-out],
+#suite-root .rail .card.v39-rail .v35-live-row{
+  cursor:pointer; border-radius:6px; margin:0 -6px; padding-left:6px !important; padding-right:6px !important;
+  transition:background-color .12s ease;
+}
+#suite-root .rail .card.v39-rail .out:hover,
+#suite-root .rail .card.v39-rail [data-out]:hover,
+#suite-root .rail .card.v39-rail .v35-live-row:hover{
+  background:color-mix(in srgb, var(--accent,#0969da) 9%, transparent);
+}
+/* the disclosure */
+.v39-more{ margin-top:8px; border-top:1px solid var(--line-2, var(--line)); padding-top:6px; }
+.v39-more > summary{
+  list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:8px;
+  padding:6px 4px; border-radius:6px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--accent,#0969da);
+}
+.v39-more > summary::-webkit-details-marker{ display:none; }
+.v39-more > summary::before{ content:'\25B8'; font-size:10px; transition:transform .12s ease; }
+.v39-more[open] > summary::before{ transform:rotate(90deg); }
+.v39-more > summary small{ font-weight:500; text-transform:none; letter-spacing:0; color:var(--muted); font-size:10.5px; }
+.v39-more > summary:hover{ background:color-mix(in srgb, var(--accent,#0969da) 9%, transparent); }
+.v39-more #v35LiveDetails{ margin-top:4px; }
+.v39-more .v35-live-block, .v39-more .v35-live-row{ font-size:11.5px !important; }
+
+/* ---- 6. ADDRESS SUGGESTIONS ---------------------------------------- */
+.v39-addr{
+  position:absolute; z-index:1900; max-width:380px; padding:4px;
+  border-radius:10px; background:var(--panel,#fff); border:1px solid var(--line,#d0d7de);
+  box-shadow:0 16px 40px rgba(0,0,0,.28); color:var(--ink, var(--text));
+}
+.v39-addr button{
+  display:flex; flex-direction:column; gap:1px; width:100%; text-align:left; cursor:pointer;
+  padding:7px 10px; border-radius:7px; border:1px solid transparent; background:transparent; color:inherit;
+}
+.v39-addr button:hover{ background:color-mix(in srgb, var(--accent,#0969da) 10%, transparent); }
+.v39-addr b{ font-size:12.5px; }
+.v39-addr small{ font-size:10.5px; color:var(--muted); }
+.v39-addr-src{ font-size:9.5px; color:var(--muted); padding:5px 10px 3px; border-top:1px solid var(--line); margin-top:3px; }
+
+/* ---- 7. the surface toggle from earlier releases stays, but in-frame */
+#shellbar .v28-appearance, #v23Appearance{ display:inline-flex; align-items:center; gap:6px; }

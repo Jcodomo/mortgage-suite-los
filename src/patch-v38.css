@@ -1,0 +1,63 @@
+/* =====================================================================
+   Release 38 — rail rows, legible warnings, motion
+   ===================================================================== */
+
+/* the retired block, in case a cached render still carries it */
+#v29Extra{ display:none !important; }
+
+/* ---- extra rows inherit release 35's row treatment, plus a bar ----- */
+.v38-head{
+  font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.09em;
+  color:var(--muted); margin:12px 0 4px;
+}
+.v38-row > span > small{
+  display:block; font-size:9.5px; font-weight:500; color:var(--muted); margin-top:1px; line-height:1.35;
+}
+.v38-row > b{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
+.v38-bar{
+  display:block; width:120px; max-width:100%; height:5px; border-radius:999px;
+  background:color-mix(in srgb, var(--line) 70%, transparent); overflow:hidden; position:relative;
+}
+.v38-bar::after{
+  content:''; position:absolute; inset:0 auto 0 0; width:var(--w, 0%); border-radius:999px;
+  transition:width .35s cubic-bezier(.2,.7,.2,1);
+}
+.v38-bar.ok::after{ background:#1f9d55; }
+.v38-bar.tight::after{ background:#d99620; }
+.v38-bar.over::after{ background:#c0392b; }
+
+/* ---- the warning bodies were rendered at 8px and crammed ----------- */
+#suite-root .rail .v35-live-warnings > *,
+#suite-root .rail .v35-live-warning{
+  font-size:11px !important; line-height:1.5 !important;
+  padding:8px 10px !important; text-align:left !important;
+}
+#suite-root .rail .v35-live-warnings b,
+#suite-root .rail .v35-live-warning b{ display:block; margin-bottom:2px; font-size:11.5px; }
+
+/* ---- the summary's own header: the badge was unreadable ------------ */
+#suite-root .rail .card > h3 .badge,
+#suite-root .rail .card > h3 .pill{
+  background:color-mix(in srgb, var(--accent) 16%, transparent) !important;
+  color:var(--accent) !important; border:1px solid color-mix(in srgb, var(--accent) 40%, transparent) !important;
+  font-size:9px !important; letter-spacing:.06em; padding:3px 8px !important; opacity:1 !important;
+}
+
+/* ---- motion: brief, and off entirely when the OS asks -------------- */
+.v35-live-row, .v38-row, .v35-rail-editor, .v35-panel, .v29-pop, .v30-modal .v30-card, .v11-modal .rpt-picker{
+  transition:background-color .14s ease, border-color .14s ease, transform .14s ease, opacity .14s ease;
+}
+.v35-live-row:hover, .v38-row:hover{ transform:translateX(2px); }
+.v35-rail-editor{ animation:v38-in .16s cubic-bezier(.2,.7,.2,1); transform-origin:top right; }
+.v35-panel.on{ animation:v38-in .14s cubic-bezier(.2,.7,.2,1); transform-origin:top right; }
+.v29-pop.on{ animation:v38-in .14s cubic-bezier(.2,.7,.2,1); transform-origin:top left; }
+@keyframes v38-in{ from{ opacity:0; transform:translateY(-4px) scale(.985); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){
+  .v35-live-row, .v38-row, .v35-rail-editor, .v35-panel, .v29-pop, .v38-bar::after{ transition:none !important; animation:none !important; }
+  .v35-live-row:hover, .v38-row:hover{ transform:none; }
+}
+
+/* ---- keyboard focus that is visible on every theme ----------------- */
+.v35-live-row:focus-visible, .v38-row:focus-visible{
+  outline:2px solid var(--accent); outline-offset:2px; border-radius:8px;
+}

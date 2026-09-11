@@ -14,7 +14,8 @@ const checks=[
   ['release stamp',/losRelease='22'/.test(js)],
   ['metric cards use theme tokens',/var\(--panel\)/.test(css)&&/var\(--calc-bg\)/.test(css)&&/var\(--accent\)/.test(css)],
   ['metric cards remain responsive',/@media\(max-width:520px\)/.test(css)],
-  ['landing identifies current release',/Release (?:22|23|24|25(?:\.1)?|35|36|37)/.test(landing)],
+  // reads package.json so this stops failing on every release bump
+  ['landing identifies current release',new RegExp('Release '+String(JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version).split('.')[0]).test(landing)],
   ['landing links loan entry page',/loan-suite\.html/.test(landing)],
   ['landing links income entry page',/income-calculator\.html/.test(landing)],
   ['loan entry routes to quote',/app=suite(?:&|&amp;)tab=quote/.test(loan)],
