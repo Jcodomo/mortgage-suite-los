@@ -16,6 +16,7 @@ Release 44 is the final v21-based Loan Suite merge. It preserves the calculation
 ## Appearance and layout
 
 - Centers the main work area up to 1560px and adapts cleanly from laptop to ultrawide screens without horizontal overflow.
+- Refines the Loan Suite masthead into the Income Calculator's full-width band style, with centered controls, a denser KPI/action row, aligned scenario fields, and evenly spaced dates.
 - Keeps Light, Dark, and OLED surfaces independent from the color palette and input-field tone.
 - Retains all palette choices and Paper, Mist, Mint, Sand, and Ink input tones.
 - Uses the Midnight/terminal palette treatment for the dark Loan Suite while preserving light mode and accessible menu contrast.

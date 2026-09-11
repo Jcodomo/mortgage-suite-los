@@ -32,6 +32,9 @@ has(/enforceEntryShell/,js,'direct Loan Suite and Income Calculator links win ov
 has(/#suite-root\.v44-final/,css,'release styling is scoped to the Loan Suite');
 assert(!css.includes('#calc-root.v44-final'),'release styling does not rewrite the Income Calculator');
 has(/#v28nav-documents\.v42-off/,css,'Documents remains a visible first-class destination');
+has(/Final header refinement/,css,'Loan Suite header receives the Income Calculator full-width band treatment');
+has(/#suite-root\.v44-final \.topbar\.v25-topbar,[\s\S]*max-width:none !important/,css,'Loan Suite masthead is full width instead of a floating card');
+has(/#suite-root\.v44-final #v25HeaderMain[\s\S]*max-width:1560px !important/,css,'Loan Suite header content stays centered like the Income Calculator');
 has(/grid-template-columns:repeat\(4,minmax\(150px,1fr\)\)/,css,'calculation tiles use a four-card desktop row');
 has(/Version 21-inspired final Loan Suite shell/,html,'built artifact contains the final Loan Suite layer');
 

@@ -6014,6 +6014,92 @@ html[data-v25-surface="oled"] #suite-root.v44-final{
 }
 @media (prefers-reduced-motion:reduce){#suite-root.v44-final *,#suite-root.v44-final *::before,#suite-root.v44-final *::after{scroll-behavior:auto !important;animation:none !important;transition:none !important}}
 
+/* ---------------------------------------------------------------------
+   Final header refinement
+
+   Match the Income Calculator's full-width bands and centered inner rail.
+   The controls and handlers are unchanged; this only removes the floating
+   card appearance and tightens the visual rhythm.
+   --------------------------------------------------------------------- */
+#suite-root.v44-final .topbar.v25-topbar,
+#suite-root.v44-final #v34Bar{
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  clip-path:inset(0 -100vmax) !important;
+}
+#suite-root.v44-final .topbar.v25-topbar{
+  border-bottom:1px solid color-mix(in srgb,var(--v44-header-text) 12%,transparent) !important;
+  box-shadow:0 0 0 100vmax var(--v44-header) !important;
+}
+#suite-root.v44-final #v25HeaderMain{
+  width:100% !important;
+  max-width:1560px !important;
+  min-height:54px !important;
+  margin:0 auto !important;
+  padding:7px clamp(18px,2.4vw,38px) !important;
+  gap:8px !important;
+}
+#suite-root.v44-final #v251SuiteBrand .mark{
+  width:27px !important;height:27px !important;border-radius:8px !important;
+}
+#suite-root.v44-final #v251SuiteBrand h1{font-size:14px !important}
+#suite-root.v44-final #v251SuiteBrand .prog{
+  height:22px !important;padding:0 9px !important;font-size:9.5px !important;
+}
+#suite-root.v44-final #v24ScenarioBar{
+  min-height:38px !important;padding:3px !important;border-radius:8px !important;
+  background:color-mix(in srgb,#000 16%,transparent) !important;
+}
+#suite-root.v44-final #v25ScenarioMark{
+  width:28px !important;height:28px !important;min-width:28px !important;border-radius:7px !important;
+  position:static !important;left:auto !important;
+  grid-column:1 !important;grid-row:1 !important;
+}
+#suite-root.v44-final #v24ScenarioBar select{grid-column:2 !important;grid-row:1 !important}
+#suite-root.v44-final #v24ScenarioBar input{grid-column:3 !important;grid-row:1 !important}
+#suite-root.v44-final #v24ScenarioBar select,
+#suite-root.v44-final #v24ScenarioBar input{
+  height:30px !important;border-radius:6px !important;font-size:11px !important;line-height:28px !important;
+}
+#suite-root.v44-final .v251-datefield{
+  min-width:154px !important;height:38px !important;padding:3px 5px 3px 9px !important;border-radius:8px !important;
+}
+#suite-root.v44-final .v251-datefield input{
+  height:30px !important;border-radius:6px !important;font-size:11px !important;line-height:28px !important;
+}
+#suite-root.v44-final #v34Bar{
+  min-height:48px !important;
+  padding:6px max(18px,calc((100vw - 1560px)/2 + 38px)) !important;
+  background:color-mix(in srgb,var(--v44-header) 94%,#000) !important;
+  border-top:0 !important;
+  border-bottom:1px solid color-mix(in srgb,var(--v44-header-text) 10%,transparent) !important;
+  box-shadow:0 0 0 100vmax color-mix(in srgb,var(--v44-header) 94%,#000) !important;
+}
+#suite-root.v44-final #v251HeaderStats .v33-chip{
+  min-width:96px !important;height:34px !important;padding:4px 10px !important;border-radius:999px !important;
+}
+#suite-root.v44-final #v44Header{gap:4px !important}
+#suite-root.v44-final .v44-action{
+  height:32px !important;min-height:32px !important;padding:0 10px !important;gap:6px !important;
+  border-radius:7px !important;font-size:10.5px !important;line-height:30px !important;
+  background:color-mix(in srgb,var(--v44-header-text) 5%,transparent) !important;
+}
+#suite-root.v44-final .v44-action:hover,
+#suite-root.v44-final .v44-action[aria-expanded="true"]{
+  background:color-mix(in srgb,var(--v44-accent) 18%,transparent) !important;
+}
+#suite-root.v44-final .v44-action.primary{background:var(--v44-accent) !important;color:#fff !important}
+#suite-root.v44-final .v23-primary-nav,
+#suite-root.v44-final .v23-context-tabs{border-radius:0 !important}
+@media (max-width:1180px){
+  #suite-root.v44-final #v34Bar{padding-left:16px !important;padding-right:16px !important}
+}
+@media (max-width:680px){
+  #suite-root.v44-final #v24ScenarioBar input{grid-column:1/-1 !important;grid-row:2 !important}
+}
+
 </style>
 <!-- ===== LOS PATCH LAYER — END ===== -->
 </head>
