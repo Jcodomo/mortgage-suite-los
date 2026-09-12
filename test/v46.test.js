@@ -4,6 +4,8 @@ const eq=(l,g,w)=>{const ok=JSON.stringify(g)===JSON.stringify(w);ok?pass++:fail
   console.log(`${ok?'PASS':'FAIL'}  ${l}  got=${JSON.stringify(g)} want=${JSON.stringify(w)}`);};
 const fs=require('fs'), vm=require('vm');
 const src=fs.readFileSync(__dirname+'/../src/patch-v46.js','utf8');
+eq('workspace switch bridge is exposed and binds both selectors', /function ensureWorkspaceSwitch\(\)/.test(src) && /window\.SHELL=shell/.test(src) && /calcBtn\.onclick/.test(src) && /suiteBtn\.onclick/.test(src), true);
+eq('workspace switching updates the entry route', /searchParams\.set\('app',next==='suite'\?'suite':'income'\)/.test(src) && /history\.replaceState/.test(src), true);
 const seg=src.slice(src.indexOf('var RULES ='), src.indexOf('V46.pick ='));
 const ctx={}; vm.createContext(ctx); vm.runInContext(seg.replace('var RULES','this.RULES').replace('var PROMPTS','this.PROMPTS'), ctx);
 const P=ctx.PROMPTS;

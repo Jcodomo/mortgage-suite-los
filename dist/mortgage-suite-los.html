@@ -36525,6 +36525,57 @@ function say(t,b,k,ms){ if (window.LOS && LOS.say) LOS.say(t,b,k,ms); }
 function store(){ try { return window.mortgageSuite.store; } catch(e){ return null; } }
 var V46 = window.V46 = { version:'46.0' };
 
+/* Keep the two workspace selectors reachable and keep their URL route in
+   sync. Some older builds leave the original lexical controller unavailable
+   to later patch layers; the DOM-backed bridge preserves the same switch. */
+function ensureWorkspaceSwitch(){
+  var calc=$('calc-root'), suite=$('suite-root'), calcBtn=$('mode-calc'), suiteBtn=$('mode-suite');
+  if (!calc || !suite || !calcBtn || !suiteBtn) return false;
+  var shell=window.SHELL;
+  if (!shell || typeof shell.go!=='function'){
+    shell={};
+    shell.go=function(next){
+      next=next==='suite'?'suite':'calc';
+      calc.classList.toggle('on',next==='calc');
+      suite.classList.toggle('on',next==='suite');
+      calcBtn.classList.toggle('on',next==='calc');
+      suiteBtn.classList.toggle('on',next==='suite');
+      document.body.dataset.shellMode=next;
+      if (next==='suite'){
+        var s=store();
+        if (s && s.snapshot && typeof s.setMode==='function') try { s.setMode(s.snapshot.mode); } catch(e){}
+      }
+      try {
+        var url=new URL(location.href);
+        url.searchParams.set('app',next==='suite'?'suite':'income');
+        history.replaceState(history.state,'',url.href);
+      } catch(e){}
+      try { window.scrollTo({top:0,behavior:'smooth'}); } catch(e){}
+    };
+    shell.toSuite=function(){ shell.go('suite'); };
+    shell.toCalc=function(){ shell.go('calc'); };
+    shell.say=function(){};
+    Object.defineProperty(shell,'mode',{get:function(){ return suite.classList.contains('on')?'suite':'calc'; }});
+    shell.__v46Bridge=true;
+    window.SHELL=shell;
+  } else if (!shell.__v46RouteSync){
+    var originalGo=shell.go.bind(shell);
+    shell.go=function(next){
+      var result=originalGo(next);
+      try {
+        var url=new URL(location.href);
+        url.searchParams.set('app',next==='suite'?'suite':'income');
+        history.replaceState(history.state,'',url.href);
+      } catch(e){}
+      return result;
+    };
+    shell.__v46RouteSync=true;
+  }
+  if (!calcBtn.__v46Switch){ calcBtn.__v46Switch=true; calcBtn.onclick=function(){ window.SHELL.go('calc'); }; }
+  if (!suiteBtn.__v46Switch){ suiteBtn.__v46Switch=true; suiteBtn.onclick=function(){ window.SHELL.go('suite'); }; }
+  return true;
+}
+
 /* =================================================================== 1
    METRIC CARDS — first thing in the control centre, and more of them
 
@@ -36618,7 +36669,8 @@ function aiPanel(){
 }
 V46.prompts = PROMPTS;
 
-function tick(){ try { metricCards(); } catch(e){} try { aiPanel(); } catch(e){} }
+function tick(){ try { ensureWorkspaceSwitch(); } catch(e){} try { metricCards(); } catch(e){} try { aiPanel(); } catch(e){} }
+if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',tick); else tick();
 if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1200); else setInterval(tick, 900);
 setTimeout(tick, 240);
 })();
