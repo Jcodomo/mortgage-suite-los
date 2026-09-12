@@ -119,6 +119,23 @@ function bindSyntheticRoutes(){
   });
 }
 
+/* One route map owns every visible context tab. That keeps the compact tab
+   rows from becoming duplicate shortcuts to whichever legacy panel happened
+   to be active, while preserving the original grouped workspaces. */
+function bindUniqueTabRoutes(){
+  $$('#suite-root .tabs .tab').forEach(function(tab){
+    var label=key(tab.dataset.v23Key||tab.textContent);
+    if (!PAGE_GROUP[label] || tab.__v44UniqueRoute) return;
+    tab.__v44UniqueRoute=true;
+    tab.addEventListener('click',function(e){
+      if (tab.__v44Routing) return;
+      e.preventDefault();e.stopImmediatePropagation();
+      tab.__v44Routing=true;
+      try { V.goPage(label); } finally { setTimeout(function(){ tab.__v44Routing=false; },60); }
+    },true);
+  });
+}
+
 /* -------------------------- compact action menu ------------------------- */
 var MENUS={
   file:{title:'File actions',subtitle:'Save, restore, import and export',sections:[
@@ -224,12 +241,21 @@ function appearanceHtml(){
   function row(items,kind,current){ return '<div class="v44-appearance-row">'+items.map(function(x){ return '<button type="button" class="v44-appearance-chip'+(x[0]===current?' on':'')+'" data-'+kind+'="'+esc(x[0])+'">'+esc(x[1])+'</button>'; }).join('')+'</div>'; }
   return '<div class="v44-menu-title"><span>Appearance</span><small>Loan Suite and Income Calculator</small></div><div class="v44-appearance-label">Surface</div>'+row(APPEARANCE.surfaces,'surface',surface)+'<div class="v44-appearance-label">Theme</div><div class="v44-appearance-grid">'+APPEARANCE.themes.map(function(x){ return '<button type="button" class="v44-theme-chip'+(x[0]===theme?' on':'')+'" data-theme="'+esc(x[0])+'"><i></i><span>'+esc(x[1])+'</span></button>'; }).join('')+'</div><div class="v44-appearance-label">Input fields</div>'+row(APPEARANCE.tones,'tone',tone);
 }
+function positionMenu(){
+  var menu=$('v44Menu'), header=$('v44Header');
+  if (!menu || !header) return;
+  var rect=header.getBoundingClientRect();
+  var top=Math.max(96,Math.round(rect.bottom+10));
+  menu.style.top=top+'px';
+  menu.style.maxHeight='calc(100vh - '+(top+18)+'px)';
+}
 V.openMenu=function(kind){
   var menu=$('v44Menu'), spec=MENUS[kind]; if (!menu || !spec) return;
   if (V.menuOpen===kind && !menu.hidden){ V.closeMenu(); return; }
   V.menuOpen=kind;
   menu.innerHTML='<div class="v44-menu-title"><span>'+esc(spec.title)+'</span><small>'+esc(spec.subtitle)+'</small></div>'+menuItems(spec)+(kind==='file'?sessionHtml():'');
   menu.hidden=false;
+  positionMenu();
   $$('#v44Header [aria-expanded]').forEach(function(b){ b.setAttribute('aria-expanded',b.dataset.menu===kind?'true':'false'); });
 };
 V.closeMenu=function(){
@@ -242,6 +268,7 @@ V.openAppearance=function(){
   V.menuOpen='appearance';
   menu.innerHTML=appearanceHtml();
   menu.hidden=false;
+  positionMenu();
   $$('#v44Header [aria-expanded]').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
 };
 function runMenuItem(button){
@@ -549,6 +576,7 @@ function tick(){
   try { buildHeader(); } catch(e){ if (console && console.warn) console.warn('v44 header',e); }
   try { bindDocumentsTab(); } catch(e){}
   try { bindSyntheticRoutes(); } catch(e){}
+  try { bindUniqueTabRoutes(); } catch(e){}
   try { freeformSuite(); } catch(e){}
   try { bindQuoteInputs(); } catch(e){}
   try { mergeScenarioWorksheet(); } catch(e){}

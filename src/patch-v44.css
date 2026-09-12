@@ -622,6 +622,49 @@ html[data-v25-surface="oled"] #suite-root.v44-final{
 #suite-root.v44-final .v44-action.primary{background:var(--v44-accent) !important;color:#fff !important}
 #suite-root.v44-final .v23-primary-nav,
 #suite-root.v44-final .v23-context-tabs{border-radius:0 !important}
+/* Final layout polish: keep every page, reduce redundant chrome. */
+#suite-root.v44-final .v23-primary-nav{
+  min-height:44px !important;
+  padding-top:5px !important;
+  padding-bottom:5px !important;
+  gap:4px !important;
+}
+#suite-root.v44-final .v23-primary-nav > button{
+  height:32px !important;
+  padding:0 11px !important;
+  border-radius:8px !important;
+  font-size:10.5px !important;
+  line-height:30px !important;
+}
+#suite-root.v44-final .v23-context-tabs{
+  min-height:38px !important;
+  padding-top:4px !important;
+  padding-bottom:4px !important;
+  gap:5px !important;
+}
+#suite-root.v44-final .v23-context-tabs .tab{
+  height:27px !important;
+  padding:0 10px !important;
+  border-radius:8px !important;
+  font-size:9.5px !important;
+  line-height:25px !important;
+}
+#suite-root.v44-final #v24ContextSummary{
+  margin-left:auto !important;
+  opacity:.78 !important;
+}
+#suite-root.v44-final .cols-main{
+  gap:14px !important;
+  padding-top:14px !important;
+}
+#suite-root.v44-final .card > h3{
+  min-height:40px !important;
+  padding-top:9px !important;
+  padding-bottom:9px !important;
+}
+#suite-root.v44-final .card > .body{
+  padding:12px !important;
+}
 @media (max-width:1180px){
   #suite-root.v44-final #v34Bar{padding-left:16px !important;padding-right:16px !important}
 }

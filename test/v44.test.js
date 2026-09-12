@@ -27,9 +27,13 @@ for(let version=38;version<=44;version++){
 has(/input\[type="number"\],input\[type="date"\]/,js,'numeric and date inputs are upgraded to freeform text');
 has(/function bindQuoteInputs\(\)/,js,'quick Quote inputs update the shared scenario store live');
 has(/\.v44-theme-chip\[data-theme\],\.v44-appearance-chip\[data-tone\],\.v44-appearance-chip\[data-surface\]/,js,'menu clicks only enter appearance mode from actual appearance chips');
+has(/function positionMenu\(\)/,js,'header menus are positioned below the visible button row');
+has(/rect\.bottom\+10/,js,'open menu cannot overlap the Loan Suite header buttons');
 has(/data-direct="documents"/,js,'header Documents control opens Documents and OCR directly');
 has(/panel\.scrollIntoView\(\{behavior:'smooth',block:'start'\}\)/,js,'Documents navigation scrolls its workspace into view');
 has(/function bindSharedLook\(\)/,js,'shared Look control opens the organized Appearance panel');
+has(/function bindUniqueTabRoutes\(\)/,js,'visible context tabs share the same unique page router as menus');
+has(/V\.goPage\(label\)/,js,'context tab clicks route by their page label');
 has(/PUNCH_FIELDS=\[/,js,'Quote and Setup share a complete freeform scenario punch-in surface');
 has(/inputPercent\(value\)/,js,'percentage inputs use stable display rounding');
 has(/Math\.round\(n\*1000000\)\/10000/,js,'FHA 3.5 percent is displayed without floating-point noise');
@@ -51,6 +55,8 @@ has(/#suite-root\.v44-final #v25HeaderMain[\s\S]*max-width:1560px !important/,cs
 has(/grid-template-columns:repeat\(4,minmax\(150px,1fr\)\)/,css,'calculation tiles use a four-card desktop row');
 has(/\.v44-punch-grid/,css,'scenario punch-in fields have a responsive grid');
 has(/\.v44-live-summary/,css,'live summary has the reference-style compact rail');
+has(/Final layout polish/,css,'final layout polish layer tightens redundant chrome');
+has(/#suite-root\.v44-final \.v23-context-tabs \.tab[\s\S]*height:27px !important/,css,'context tabs are compact but retained');
 has(/Version 21-inspired final Loan Suite shell/,html,'built artifact contains the final Loan Suite layer');
 
 console.log('v44 final merge checks passed');
