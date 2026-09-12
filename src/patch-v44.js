@@ -71,6 +71,10 @@ V.goPage=function(label){
     try { if (window.V9 && V9.renderDocs) V9.renderDocs(); } catch(e){}
     if (window.V35) V35.documentsActive=true;
     document.querySelector('#suite-root')?.classList.add('v35-documents-active');
+    setTimeout(function(){
+      var panel=$('panel-v9docs') || document.querySelector('#suite-root .panel.active[data-panel="v9docs"], #suite-root .panel.active');
+      if (panel && panel.scrollIntoView) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },90);
     return;
   }
   if (target==='CONTRACT & LE' || target==='TAXES & PRORATION' || target==='ADVANCED'){
@@ -233,14 +237,20 @@ V.closeMenu=function(){
   V.menuOpen='';
   $$('#v44Header [aria-expanded]').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
 };
+V.openAppearance=function(){
+  var menu=$('v44Menu'); if (!menu) return;
+  V.menuOpen='appearance';
+  menu.innerHTML=appearanceHtml();
+  menu.hidden=false;
+  $$('#v44Header [aria-expanded]').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
+};
 function runMenuItem(button){
   var kind=button.dataset.kind,value=button.dataset.value;
   V.closeMenu();
   if (kind==='page') return V.goPage(value);
   if (kind==='rail') return V.toggleRail();
   if (kind==='appearance'){
-    var menu=$('v44Menu'); if (menu){ V.menuOpen='appearance'; menu.innerHTML=appearanceHtml(); menu.hidden=false; }
-    return;
+    return V.openAppearance();
   }
   if (kind==='id') { var byId=$(value); return byId ? byId.click() : say('Tool not ready',value+' is still loading.','warn'); }
   if (kind==='save') { var save=$('v23QuickSave') || findControl(['Save a version','Save scenario']); return save ? save.click() : say('Save not ready','Please try again.','warn'); }
@@ -268,7 +278,7 @@ function buildHeader(){
     var wrap=document.createElement('div'); wrap.id='v44Header'; wrap.className='no-print';
     wrap.innerHTML=headerButton('v44File','File',ICON.file,'data-menu="file" aria-haspopup="true" aria-expanded="false"','')
       +headerButton('v44View','View',ICON.view,'data-menu="view" aria-haspopup="true" aria-expanded="false"','')
-      +headerButton('v44Docs','Documents',ICON.docs,'data-menu="docs" aria-haspopup="true" aria-expanded="false"','')
+      +headerButton('v44Docs','Documents',ICON.docs,'data-direct="documents"','')
       +headerButton('v44Compare','Compare',ICON.compare,'data-direct="compare"','')
       +headerButton('v44Tools','Loan tools',ICON.tool,'data-menu="tools" aria-haspopup="true" aria-expanded="false"','')
       +headerButton('v44Live','Live',ICON.live,'data-direct="live" aria-pressed="true"','')
@@ -282,13 +292,14 @@ function buildHeader(){
         if (window.V14 && V14.open) try { V14.open('v14CompareModal'); if (V14.renderCompare) V14.renderCompare(); } catch(x){}
         return;
       }
+      if (b.dataset.direct==='documents') return V.goPage('DOCUMENTS & OCR');
       if (b.dataset.direct==='compare') V.goPage('SCENARIOS');
     });
   }
   if (!$('v44Menu')){
     var menu=document.createElement('div');menu.id='v44Menu';menu.className='no-print';menu.hidden=true;
     menu.addEventListener('click',function(e){
-      var appearance=e.target.closest('[data-theme],[data-tone],[data-surface]');
+      var appearance=e.target.closest('.v44-theme-chip[data-theme],.v44-appearance-chip[data-tone],.v44-appearance-chip[data-surface]');
       if (appearance){
         var theme=appearance.dataset.theme||null,tone=appearance.dataset.tone||null,surface=appearance.dataset.surface||null;
         if (window.V39 && V39.applyLook) V39.applyLook(theme,surface,tone);
@@ -301,6 +312,20 @@ function buildHeader(){
     });
     root.appendChild(menu);
   }
+  return true;
+}
+
+/* Reuse the organized Appearance panel from the shared Look control instead
+   of opening an older theme-only popover. */
+function bindSharedLook(){
+  var shell=$('shellbar'); if (!shell) return false;
+  var look=$$('button',shell).filter(function(button){ return key(button.textContent)==='LOOK'; })[0];
+  if (!look || look.__v44Appearance) return !!look;
+  look.__v44Appearance=true;
+  look.addEventListener('click',function(e){
+    if (!$('suite-root') || !$('suite-root').classList.contains('on')) return;
+    e.preventDefault();e.stopImmediatePropagation();V.openAppearance();
+  },true);
   return true;
 }
 
@@ -358,9 +383,101 @@ function mergeScenarioWorksheet(){
   if (!control) return;
   control.classList.add('v44-worksheet');
   var title=control.querySelector('h3 .ttl');
-  if (title){ title.textContent='Quote worksheet'; title.parentElement.title='Everything that defines the file; changes flow to every linked worksheet.'; }
+  if (title){ title.textContent='Property & loan setup'; title.parentElement.title='Everything that defines the file; changes flow to every linked worksheet.'; }
   var body=control.querySelector(':scope > .body');
   if (body && quick && quick.parentElement!==body) body.insertBefore(quick,body.firstChild);
+}
+
+/* ------------------- quote/setup punch-in workspace --------------------
+   These are live proxy inputs, not a second scenario.  They write to the
+   same paths as the full form so Quote and Setup share one calculation. */
+var PUNCH_FIELDS=[
+  ['Borrower name','borrowerName','text'],['Property address','propertyAddress','text'],
+  ['ZIP code','zipCode','text'],['State','state','text'],['County / area','nyCounty','text'],
+  ['Purchase price','basePurchasePrice','num'],['As-is value','asIsValue','num'],
+  ['After-repair value','afterRepairValue','num'],['Down payment %','finalDownPaymentPct','pct'],
+  ['Renovation budget','reno.baseCost','num']
+];
+function getPath(obj,path){return String(path).split('.').reduce(function(value,part){return value==null?undefined:value[part];},obj);}
+function cleanNumber(value){var n=parseFloat(String(value==null?'':value).replace(/[$,%\s,]/g,''));return isFinite(n)?n:0;}
+function inputPercent(value){var n=cleanNumber(value);return String(Math.round(n*1000000)/10000).replace(/\.0+$/,'');}
+function inputValue(value,kind){if(value==null)return'';if(kind==='pct')return inputPercent(value);return String(value);}
+function applyPunch(input){
+  var s=store(),path=input.dataset.v44Field,kind=input.dataset.kind||'text',raw=input.value;if(!s||!path)return;
+  if(kind!=='text'&&window.V20&&V20.parseNumber){var parsed=V20.parseNumber(raw);if(!parsed.ok&&!parsed.blank)return;}
+  if(window.V20&&V20.setScenario)V20.setScenario(path,raw,kind==='pct'?'pct':kind==='num'?'num':'text');
+  else s.setField(path,raw,'Quote / setup quick edit');
+  if(kind==='pct')input.value=inputPercent(getPath(s.activeInputs,path));
+}
+function punchField(field){var label=field[0],path=field[1],kind=field[2];return'<label><span>'+esc(label)+'</span><input type="text" autocomplete="off" inputmode="'+(kind==='text'?'text':'decimal')+'" data-v44-field="'+esc(path)+'" data-kind="'+esc(kind)+'" aria-label="'+esc(label)+'"></label>';}
+function punchMarkup(){return'<section id="v44PunchIn" class="v44-punch no-print"><div class="v44-punch-head"><div><b>Scenario control center</b><small>Freeform changes update every linked worksheet.</small></div><button type="button" data-v44-address-search>Search address</button></div><div class="v44-punch-grid">'+PUNCH_FIELDS.map(punchField).join('')+'</div><div class="v44-punch-actions"><button type="button" data-v44-preset="fha35">FHA 3.5%</button><button type="button" data-v44-preset="conv5">5% down</button><button type="button" data-v44-zip>Fill city/state/county from ZIP</button><button type="button" data-v44-sync>Sync to Property</button></div><div id="v44AddressResults" class="v44-address-results" hidden></div><div id="v44MetricStrip" class="v44-metric-strip"></div></section>';}
+function setupPunchIn(){
+  var root=$('suite-root'),s=store(),control=root&&root.querySelector('[data-section="control"]'),body=control&&control.querySelector(':scope > .body');if(!s||!body)return;
+  var panel=$('v44PunchIn');if(!panel){body.insertAdjacentHTML('afterbegin',punchMarkup());panel=$('v44PunchIn');
+    $$('[data-v44-field]',panel).forEach(function(input){var apply=function(){applyPunch(input);};input.addEventListener('input',function(){clearTimeout(input.__v44Timer);input.__v44Timer=setTimeout(apply,90);});input.addEventListener('change',apply);});
+    $$('[data-v44-preset]',panel).forEach(function(button){button.onclick=function(){if(window.V35&&V35.applyQuotePreset)V35.applyQuotePreset(button.dataset.v44Preset);};});
+    panel.querySelector('[data-v44-zip]').onclick=function(){try{s.applyZipLookup();}catch(e){say('ZIP lookup','Enter a five-digit ZIP and try again.','warn');}};
+    panel.querySelector('[data-v44-sync]').onclick=function(){try{if(s.saveCurrentBorrowerAndProperty)s.saveCurrentBorrowerAndProperty();say('Property synced','The current borrower and property were saved.');}catch(e){V.goPage('PROPERTY');}};
+    panel.querySelector('[data-v44-address-search]').onclick=V.searchAddress;
+  }
+  if(panel.parentElement!==body)body.insertBefore(panel,body.firstChild);
+  $$('[data-v44-field]',panel).forEach(function(input){if(document.activeElement!==input)input.value=inputValue(getPath(s.activeInputs,input.dataset.v44Field),input.dataset.kind);input.classList.toggle('v44-missing',input.dataset.v44Field==='afterRepairValue'&&!!s.outputs.renovationActive&&!cleanNumber(getPath(s.activeInputs,'afterRepairValue')));});
+  paintMetricStrip();
+}
+
+/* Nominatim's public service forbids client-side autocomplete.  The lookup is
+   therefore an explicit, user-triggered search, limited to one request and
+   cached locally.  Manual entry remains available before and after lookup. */
+V.osmResults=[];V.osmLastRequest=0;
+V.searchAddress=function(){
+  var s=store(),host=$('v44AddressResults');if(!s||!host)return;var i=s.activeInputs||{},query=[i.propertyAddress,i.zipCode,i.state].filter(Boolean).join(', ');
+  if(query.length<4){say('Address search','Enter an address or ZIP first.','warn');return;}
+  var cacheKey='los.v44.osm.'+query.toLowerCase(),cached=safeGet(cacheKey,'');if(cached){try{return showAddressResults(JSON.parse(cached));}catch(e){}}
+  var wait=1000-(Date.now()-V.osmLastRequest);if(wait>0){say('Address search','Please wait a moment before another lookup.','warn');return;}
+  V.osmLastRequest=Date.now();host.hidden=false;host.innerHTML='<span class="v44-address-loading">Searching OpenStreetMap…</span>';
+  var endpoint=window.MORTGAGE_GEOCODER_URL||'https://nominatim.openstreetmap.org/search';
+  fetch(endpoint+'?format=jsonv2&addressdetails=1&countrycodes=us&limit=5&q='+encodeURIComponent(query),{headers:{Accept:'application/json'}}).then(function(response){if(!response.ok)throw new Error('Lookup unavailable');return response.json();}).then(function(rows){safeSet(cacheKey,JSON.stringify(rows.slice(0,5)));showAddressResults(rows);}).catch(function(){host.innerHTML='<span>Address lookup is unavailable. Keep typing manually or try again later.</span>';});
+};
+function showAddressResults(rows){
+  var host=$('v44AddressResults');if(!host)return;V.osmResults=(rows||[]).slice(0,5);host.hidden=false;
+  host.innerHTML=V.osmResults.length?'<div>'+V.osmResults.map(function(row,index){return'<button type="button" data-v44-address-choice="'+index+'">'+esc(row.display_name||'Address result')+'</button>';}).join('')+'</div><small>Address data © OpenStreetMap contributors · selection never locks manual fields.</small>':'<span>No matching address found. Manual entry is still available.</span>';
+  $$('[data-v44-address-choice]',host).forEach(function(button){button.onclick=function(){applyAddressResult(V.osmResults[Number(button.dataset.v44AddressChoice)]);};});
+}
+function applyAddressResult(row){
+  var s=store(),a=row&&row.address||{};if(!s||!row)return;var street=[a.house_number,a.road||a.pedestrian||a.residential].filter(Boolean).join(' '),city=a.city||a.town||a.village||a.hamlet||a.municipality||'',county=String(a.county||'').replace(/\s+County$/i,''),zip=a.postcode||'',state=a.state||'';
+  [['propertyAddress',street||row.display_name],['zipCode',zip],['state',state],['nyCounty',county]].forEach(function(pair){if(pair[1])s.setField(pair[0],pair[1],'OpenStreetMap address selection');});
+  var host=$('v44AddressResults');if(host){host.hidden=true;host.innerHTML='';}setupPunchIn();
+}
+function paintMetricStrip(){
+  var s=store(),host=$('v44MetricStrip');if(!s||!host)return;var o=s.outputs||{},items=[
+    ['MMW value basis',o.value&&o.value.valueBasis,'maxmortgage','valueBasis','HUD-92700 value basis'],
+    ['Maximum base mortgage',o.loan&&o.loan.maximumBaseLoan,'maxmortgage','maximumBaseLoan','Before financed mortgage insurance'],
+    ['Total loan',o.loan&&o.loan.totalLoan,'maxmortgage','totalLoan','Financed balance at closing'],
+    ['Amortization','Open schedule','summary','','Payment and balance schedule']
+  ];var sig=items.map(function(x){return x[1];}).join('|');if(host.dataset.sig===sig)return;host.dataset.sig=sig;
+  host.innerHTML=items.map(function(x){var val=typeof x[1]==='number'?'$'+x[1].toLocaleString('en-US',{maximumFractionDigits:2}):x[1];return'<button type="button" class="v35-live-row" data-v35-label="'+esc(x[0])+'" data-v35-mode="'+esc(x[2])+'"'+(x[3]?' data-v44-trace="'+esc(x[3])+'"':' data-v44-amortization="1"')+'><i>'+ICON.live+'</i><span><small>'+esc(x[0])+'</small><b>'+esc(val)+'</b><em>'+esc(x[4])+'</em></span></button>';}).join('');
+  var amort=host.querySelector('[data-v44-amortization]');if(amort)amort.onclick=function(e){e.stopPropagation();if(window.V20&&V20.openAmortization)V20.openAmortization();else V.goPage('SUMMARY');};
+}
+
+/* ---------------- concise, editable right-side live summary ------------ */
+function dollars(value,digits){var n=cleanNumber(value);return(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:digits||0,maximumFractionDigits:digits==null?0:digits});}
+function liveRow(label,value,mode,trace,cls,sub){return'<button type="button" class="v35-live-row v44-live-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'"'+(trace?' data-v44-trace="'+esc(trace)+'"':'')+'><span>'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><b>'+esc(value)+'</b></button>';}
+function paintLiveSummary(){
+  var s=store(),rail=document.querySelector('#suite-root .cols-main > .rail'),card=rail&&rail.querySelector(':scope > .card'),body=card&&card.querySelector(':scope > .body');if(!s||!body)return;var i=s.activeInputs||{},o=s.outputs||{},loan=o.loan||{},p=o.payment||{},c=o.closing||{},cash=o.cash||{},value=o.value||{},reno=o.renovationOut||{},aus=o.aus||{},isReno=!!o.renovationActive,mi=o.isFha?p.monthlyFhaMip:p.monthlyPmi,warnings=(o.warnings||[]).filter(function(w){if(!isReno&&(w.code==='MISSING_APPRAISAL_VALUE'||w.code==='ARV_SHORTFALL'))return false;if(w.code==='MISSING_TAX_SOURCE'&&i.taxSourceType==='MLS / Zillow / Redfin Estimate')return false;return w.severity==='error'||w.severity==='warning'||w.level==='error'||w.level==='fail'||w.blocking;}),arvFit=window.V21&&V21.valueFit?V21.valueFit(i,o):null;
+  var host=$('v44LiveSummary');if(!host){host=document.createElement('section');host.id='v44LiveSummary';host.className='v44-live-summary';body.appendChild(host);}var sig=[o.programLabel,i.finalDownPaymentPct,i.interestRate,loan.totalLoan,p.totalMonthlyPayment,c.buyerClosingCosts,cash.cashToClose,value.afterRepairValue,warnings.length,arvFit&&arvFit.status].join('|');if(host.dataset.sig===sig)return;host.dataset.sig=sig;
+  var html='<div class="v44-live-title"><div><b>Live summary</b><small>'+esc(o.programLabel||i.loanProgram||'Loan')+' · '+inputPercent(i.finalDownPaymentPct)+'% down · '+inputPercent(i.interestRate)+'%</small></div><span>'+esc(o.programLabel||i.loanProgram||'Loan')+'</span></div>';
+  html+='<h4>Acquisition</h4>'+liveRow('Purchase price',dollars(o.purchase&&o.purchase.finalPurchasePrice||i.basePurchasePrice),'setup','finalPurchasePrice')+(isReno?liveRow('Renovation',dollars(reno.finalRenovationAmount),'renovation','','','Program budget'):'' )+(isReno?liveRow('After-repair value',value.afterRepairValue>0?dollars(value.afterRepairValue):'Pending appraisal','maxmortgage','','','ARV'):'' )+liveRow('Required investment',dollars(loan.requiredInvestment,2),'setup','requiredInvestment');
+  html+='<h4>Loan</h4>'+liveRow('Maximum base loan',dollars(loan.maximumBaseLoan,2),'maxmortgage','maximumBaseLoan')+(o.isFha?liveRow('UFMIP',dollars(loan.ufmip,2),'maxmortgage','ufmip'):'' )+liveRow('Total loan',dollars(loan.totalLoan,2),'maxmortgage','totalLoan','total')+liveRow('Interest rate',inputPercent(i.interestRate)+'%','rates','','','Note rate · '+cleanNumber(i.termYears)+' years');
+  html+='<h4>Monthly payment</h4>'+liveRow('Principal & interest',dollars(p.principalAndInterest,2),'rates','principalAndInterest')+liveRow('Mortgage insurance',dollars(mi,2),o.isFha?'maxmortgage':'qualify',o.isFha?'monthlyFhaMip':'monthlyPmi','',o.isFha?'FHA MIP':'PMI estimate')+liveRow('Taxes & insurance',dollars(p.monthlyTaxesAndInsuranceUsed,2),'escrow','totalMonthlyPayment')+liveRow('Total payment',dollars(p.totalMonthlyPayment,2),'qualify','totalMonthlyPayment','total');
+  html+='<h4>Cash to close</h4>'+liveRow('Closing costs',dollars(c.buyerClosingCosts,2),'closing','buyerClosingCosts')+liveRow('Cash to close',dollars(cash.cashToClose,2),'closing','cashToClose','total');
+  html+='<h4>Checks</h4>'+liveRow('DTI',aus.totalQualifyingIncome>0?inputPercent(aus.backEndDti)+'%':'Enter income','income','')+liveRow('Reserves',aus.reserveShortfall>0?'Short '+dollars(aus.reserveShortfall):'PASS by '+dollars(aus.reserveSurplus||0),'qualify','',aus.reserveShortfall>0?'bad':'pass')+liveRow('Blocking warnings',String(warnings.length),'advanced','',''+(warnings.length?'bad':'pass'));
+  if(isReno&&arvFit){var fit=arvFit.status==='na'?'Enter an after-repair value':(arvFit.status==='pass'?'ARV test passes':'ARV test fails');var detail=arvFit.status==='na'?'Required before the program value test can run.':(arvFit.status==='pass'?arvFit.ratio.toFixed(2)+'% of ARV · threshold '+arvFit.threshold+'%':arvFit.ratio.toFixed(2)+'% of ARV · over by '+dollars(arvFit.shortfall||arvFit.gap));html+='<button type="button" class="v35-live-row v44-arv-check '+(arvFit.status==='fail'?'bad':arvFit.status==='pass'?'pass':'na')+'" data-v35-label="After-repair value" data-v35-mode="maxmortgage"><span><b>'+esc(fit)+'</b><small>'+esc(detail)+'</small></span><i>›</i></button>';}
+  html+='<small class="v44-live-note">Click any line to review its formula, edit a driver, or open the source worksheet.</small>';host.innerHTML=html;
+}
+
+function enhanceRailEditor(){
+  if(!window.V35||!V35.openRailEditor||V35.openRailEditor.__v44Formula)return;var original=V35.openRailEditor;
+  V35.openRailEditor=function(row,label,mode){original.call(V35,row,label,mode);var panel=$('v35RailEditor'),s=store(),traceKey=row&&row.dataset&&(row.dataset.v44Trace||row.dataset.out),trace=s&&s.outputs&&s.outputs.traces&&traceKey?s.outputs.traces[traceKey]:null;if(!panel)return;var current=panel.querySelector('.v44-formula');if(current)current.remove();var formula=trace&&trace.formula;if(!formula){var formulas={'After-repair value':'ARV = the entered as-completed appraisal value.','Interest rate':'Note rate = the annual interest rate entered for this scenario.','Taxes & insurance':'Monthly escrow = annual property taxes ÷ 12 + annual insurance ÷ 12.','DTI':'Back-end DTI = total housing payment and monthly liabilities ÷ qualifying monthly income.','Reserves':'Available reserves − required reserves.','Blocking warnings':'Count of current underwriting warnings that require review.'};formula=formulas[norm(label||row.dataset.v35Label||'')]||'This result updates from the linked scenario inputs.';}var block=document.createElement('div');block.className='v44-formula';block.innerHTML='<span>Formula</span><code>'+esc(formula)+'</code>'+(trace&&trace.inputs&&trace.inputs.length?'<div>'+trace.inputs.slice(0,5).map(function(x){return'<small><span>'+esc(x.label)+'</span><b>'+esc(x.format==='percent'?inputPercent(x.value)+'%':x.format==='currency'?dollars(x.value,2):String(x.value))+'</b></small>';}).join('')+'</div>':'');var anchor=panel.querySelector('.v35-rail-current')||panel.querySelector('header');anchor.insertAdjacentElement('afterend',block);return panel;};V35.openRailEditor.__v44Formula=true;
 }
 
 /* ---------------- Income Calculator: requested Auto agency only ---------- */
@@ -435,6 +552,10 @@ function tick(){
   try { freeformSuite(); } catch(e){}
   try { bindQuoteInputs(); } catch(e){}
   try { mergeScenarioWorksheet(); } catch(e){}
+  try { setupPunchIn(); } catch(e){}
+  try { enhanceRailEditor(); } catch(e){}
+  try { paintLiveSummary(); } catch(e){}
+  try { bindSharedLook(); } catch(e){}
   try { installAutoAgency(); } catch(e){}
   try { enforceEntryShell(); } catch(e){}
 }

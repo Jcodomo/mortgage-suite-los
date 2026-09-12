@@ -17,6 +17,11 @@ Release 44 is the final v21-based Loan Suite merge. It preserves the calculation
 
 - Centers the main work area up to 1560px and adapts cleanly from laptop to ultrawide screens without horizontal overflow.
 - Refines the Loan Suite masthead into the Income Calculator's full-width band style, with centered controls, a denser KPI/action row, aligned scenario fields, and evenly spaced dates.
+- Corrects menu routing so Documents, Loan tools, and Actions items run their intended commands instead of opening Appearance; Documents now opens and scrolls directly to Documents & OCR, and the shared Look control uses the full Appearance panel.
+- Adds a complete freeform scenario-entry surface to Quote with borrower/property details, ZIP/state/county, price/value/ARV/down-payment/renovation inputs, preset chips, and four live mortgage metrics.
+- Rebuilds the right Live Summary into concise Acquisition, Loan, Monthly payment, Cash to close, and Checks groups. Every row opens the existing editable-source popover with formula context; ARV guidance lives under Checks and is omitted for non-renovation loans.
+- Keeps FHA down payment displayed as an exact `3.5%` rather than exposing floating-point noise.
+- Adds an explicit, cached OpenStreetMap address search. Results can fill the editable address, ZIP, state, and county fields only after the user chooses a match.
 - Keeps Light, Dark, and OLED surfaces independent from the color palette and input-field tone.
 - Retains all palette choices and Paper, Mist, Mint, Sand, and Ink input tones.
 - Uses the Midnight/terminal palette treatment for the dark Loan Suite while preserving light mode and accessible menu contrast.

@@ -6063,6 +6063,75 @@ html[data-v25-surface="oled"] #suite-root.v44-final{
 #suite-root.v44-final #v24ScenarioBar input{
   height:30px !important;border-radius:6px !important;font-size:11px !important;line-height:28px !important;
 }
+
+/* Release 44 completion: one punch-in surface shared by Quote and Setup. */
+#suite-root.v44-final #v35QuoteControls{display:none !important}
+#suite-root.v44-final .v44-punch{
+  grid-column:1/-1;display:block;margin:-1px -1px 14px;padding:15px;
+  border:1px solid color-mix(in srgb,var(--v44-accent) 26%,var(--line));border-radius:11px;
+  background:color-mix(in srgb,var(--v44-accent) 3%,var(--panel));
+}
+#suite-root.v44-final .v44-punch-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+#suite-root.v44-final .v44-punch-head b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.09em}
+#suite-root.v44-final .v44-punch-head small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+#suite-root.v44-final .v44-punch-head button,
+#suite-root.v44-final .v44-punch-actions button{min-height:31px;padding:5px 11px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-weight:700;font-size:10.5px}
+#suite-root.v44-final .v44-punch-head button{background:var(--v44-accent);border-color:var(--v44-accent);color:#fff}
+#suite-root.v44-final .v44-punch-grid{display:grid;grid-template-columns:repeat(5,minmax(118px,1fr));gap:10px}
+#suite-root.v44-final .v44-punch-grid label{display:flex;min-width:0;flex-direction:column;gap:4px}
+#suite-root.v44-final .v44-punch-grid label span{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+#suite-root.v44-final .v44-punch-grid input{width:100% !important;height:35px !important;font-size:12px !important}
+#suite-root.v44-final .v44-punch-grid [data-v44-field="afterRepairValue"].v44-missing{border-color:var(--warn-ink,#c18400) !important;box-shadow:0 0 0 2px color-mix(in srgb,var(--warn-ink,#c18400) 14%,transparent) !important}
+#suite-root.v44-final .v44-punch-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+#suite-root.v44-final .v44-punch-actions button:first-child{background:var(--v44-accent);border-color:var(--v44-accent);color:#fff}
+#suite-root.v44-final .v44-address-results{margin-top:10px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+#suite-root.v44-final .v44-address-results>div{display:grid;gap:5px}
+#suite-root.v44-final .v44-address-results button{padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);color:var(--ink);text-align:left;font-size:10.5px}
+#suite-root.v44-final .v44-address-results small,#suite-root.v44-final .v44-address-results>span{display:block;margin-top:7px;color:var(--muted);font-size:9px}
+#suite-root.v44-final .v44-metric-strip{display:grid;grid-template-columns:repeat(4,minmax(145px,1fr));gap:8px;margin-top:13px}
+#suite-root.v44-final .v44-metric-strip>button{display:grid;grid-template-columns:30px 1fr;align-items:center;gap:9px;min-height:72px;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink);text-align:left}
+#suite-root.v44-final .v44-metric-strip>button>i{display:grid;width:30px;height:30px;place-items:center;border-radius:8px;background:var(--v44-accent);color:#fff}
+#suite-root.v44-final .v44-metric-strip svg{width:15px;height:15px;fill:currentColor}
+#suite-root.v44-final .v44-metric-strip span>*{display:block;font-style:normal}
+#suite-root.v44-final .v44-metric-strip small{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+#suite-root.v44-final .v44-metric-strip b{margin-top:2px;font-size:14px;color:var(--ink)}
+#suite-root.v44-final .v44-metric-strip em{margin-top:2px;font-size:8.5px;color:var(--muted)}
+
+/* Reference-style live rail. Native rows remain in the DOM for compatibility,
+   while this concise view becomes the only visible summary. */
+#suite-root.v44-final .rail .card.v39-rail>.body>*:not(#v44LiveSummary){display:none !important}
+#suite-root.v44-final .rail .card.v39-rail>.body{padding:0 !important}
+#suite-root.v44-final .v44-live-summary{display:block !important;padding:12px 14px 14px}
+#suite-root.v44-final .v44-live-title{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+#suite-root.v44-final .v44-live-title b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+#suite-root.v44-final .v44-live-title small{display:block;margin-top:3px;color:var(--muted);font-size:9px}
+#suite-root.v44-final .v44-live-title>span{max-width:145px;padding:4px 8px;border-radius:999px;background:color-mix(in srgb,var(--v44-accent) 12%,var(--panel));color:var(--v44-accent);font-size:9px;font-weight:800;text-align:center}
+#suite-root.v44-final .v44-live-summary h4{margin:14px 0 5px;color:var(--v44-accent);font-size:9px;text-transform:uppercase;letter-spacing:.11em}
+#suite-root.v44-final .v44-live-row{display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-height:30px;padding:5px 2px;border:0;border-bottom:1px solid color-mix(in srgb,var(--line) 65%,transparent);border-radius:0;background:transparent;color:var(--ink);text-align:left}
+#suite-root.v44-final .v44-live-row>span{font-size:11px;color:var(--muted)}
+#suite-root.v44-final .v44-live-row>span small{display:block;margin-top:1px;font-size:8px;color:var(--muted)}
+#suite-root.v44-final .v44-live-row>b{font:700 11.5px/1.2 var(--v24-font-num,monospace);color:var(--ink);text-align:right}
+#suite-root.v44-final .v44-live-row.total>b{font-size:16px;color:var(--v44-accent)}
+#suite-root.v44-final .v44-live-row.pass>b{color:var(--pass-ink,#0b915a)}
+#suite-root.v44-final .v44-live-row.bad>b{color:var(--bad-ink,#c94242)}
+#suite-root.v44-final .v44-arv-check{margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:8px !important;background:var(--panel-2)}
+#suite-root.v44-final .v44-arv-check.bad{border-color:color-mix(in srgb,var(--bad-ink,#c94242) 48%,var(--line));background:color-mix(in srgb,var(--bad-ink,#c94242) 8%,var(--panel))}
+#suite-root.v44-final .v44-arv-check.pass{border-color:color-mix(in srgb,var(--pass-ink,#0b915a) 42%,var(--line))}
+#suite-root.v44-final .v44-arv-check span b{display:block;color:var(--ink);font-size:10.5px}
+#suite-root.v44-final .v44-arv-check>i{font-style:normal;color:var(--v44-accent)}
+#suite-root.v44-final .v44-live-note{display:block;margin-top:11px;color:var(--muted);font-size:8.5px;line-height:1.45}
+
+/* Formula context added to the existing editable-source popover. */
+.v35-rail-editor .v44-formula{margin:10px 12px;padding:10px;border:1px solid color-mix(in srgb,var(--v44-accent,#2675d8) 30%,var(--line,#334));border-radius:8px;background:color-mix(in srgb,var(--v44-accent,#2675d8) 7%,var(--panel,#fff))}
+.v35-rail-editor .v44-formula>span{display:block;margin-bottom:5px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.v35-rail-editor .v44-formula code{display:block;white-space:normal;font:10.5px/1.45 ui-monospace,Consolas,monospace;color:var(--ink)}
+.v35-rail-editor .v44-formula>div{display:grid;gap:3px;margin-top:8px}
+.v35-rail-editor .v44-formula small{display:flex;justify-content:space-between;gap:10px;color:var(--muted)}
+.v35-rail-editor .v44-formula small b{color:var(--ink)}
+
+@media(max-width:1180px){#suite-root.v44-final .v44-punch-grid{grid-template-columns:repeat(3,minmax(130px,1fr))}}
+@media(max-width:800px){#suite-root.v44-final .v44-punch-grid,#suite-root.v44-final .v44-metric-strip{grid-template-columns:repeat(2,minmax(135px,1fr))}}
+@media(max-width:480px){#suite-root.v44-final .v44-punch-grid,#suite-root.v44-final .v44-metric-strip{grid-template-columns:1fr}}
 #suite-root.v44-final .v251-datefield{
   min-width:154px !important;height:38px !important;padding:3px 5px 3px 9px !important;border-radius:8px !important;
 }
@@ -35222,6 +35291,10 @@ V.goPage=function(label){
     try { if (window.V9 && V9.renderDocs) V9.renderDocs(); } catch(e){}
     if (window.V35) V35.documentsActive=true;
     document.querySelector('#suite-root')?.classList.add('v35-documents-active');
+    setTimeout(function(){
+      var panel=$('panel-v9docs') || document.querySelector('#suite-root .panel.active[data-panel="v9docs"], #suite-root .panel.active');
+      if (panel && panel.scrollIntoView) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },90);
     return;
   }
   if (target==='CONTRACT & LE' || target==='TAXES & PRORATION' || target==='ADVANCED'){
@@ -35384,14 +35457,20 @@ V.closeMenu=function(){
   V.menuOpen='';
   $$('#v44Header [aria-expanded]').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
 };
+V.openAppearance=function(){
+  var menu=$('v44Menu'); if (!menu) return;
+  V.menuOpen='appearance';
+  menu.innerHTML=appearanceHtml();
+  menu.hidden=false;
+  $$('#v44Header [aria-expanded]').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
+};
 function runMenuItem(button){
   var kind=button.dataset.kind,value=button.dataset.value;
   V.closeMenu();
   if (kind==='page') return V.goPage(value);
   if (kind==='rail') return V.toggleRail();
   if (kind==='appearance'){
-    var menu=$('v44Menu'); if (menu){ V.menuOpen='appearance'; menu.innerHTML=appearanceHtml(); menu.hidden=false; }
-    return;
+    return V.openAppearance();
   }
   if (kind==='id') { var byId=$(value); return byId ? byId.click() : say('Tool not ready',value+' is still loading.','warn'); }
   if (kind==='save') { var save=$('v23QuickSave') || findControl(['Save a version','Save scenario']); return save ? save.click() : say('Save not ready','Please try again.','warn'); }
@@ -35419,7 +35498,7 @@ function buildHeader(){
     var wrap=document.createElement('div'); wrap.id='v44Header'; wrap.className='no-print';
     wrap.innerHTML=headerButton('v44File','File',ICON.file,'data-menu="file" aria-haspopup="true" aria-expanded="false"','')
       +headerButton('v44View','View',ICON.view,'data-menu="view" aria-haspopup="true" aria-expanded="false"','')
-      +headerButton('v44Docs','Documents',ICON.docs,'data-menu="docs" aria-haspopup="true" aria-expanded="false"','')
+      +headerButton('v44Docs','Documents',ICON.docs,'data-direct="documents"','')
       +headerButton('v44Compare','Compare',ICON.compare,'data-direct="compare"','')
       +headerButton('v44Tools','Loan tools',ICON.tool,'data-menu="tools" aria-haspopup="true" aria-expanded="false"','')
       +headerButton('v44Live','Live',ICON.live,'data-direct="live" aria-pressed="true"','')
@@ -35433,13 +35512,14 @@ function buildHeader(){
         if (window.V14 && V14.open) try { V14.open('v14CompareModal'); if (V14.renderCompare) V14.renderCompare(); } catch(x){}
         return;
       }
+      if (b.dataset.direct==='documents') return V.goPage('DOCUMENTS & OCR');
       if (b.dataset.direct==='compare') V.goPage('SCENARIOS');
     });
   }
   if (!$('v44Menu')){
     var menu=document.createElement('div');menu.id='v44Menu';menu.className='no-print';menu.hidden=true;
     menu.addEventListener('click',function(e){
-      var appearance=e.target.closest('[data-theme],[data-tone],[data-surface]');
+      var appearance=e.target.closest('.v44-theme-chip[data-theme],.v44-appearance-chip[data-tone],.v44-appearance-chip[data-surface]');
       if (appearance){
         var theme=appearance.dataset.theme||null,tone=appearance.dataset.tone||null,surface=appearance.dataset.surface||null;
         if (window.V39 && V39.applyLook) V39.applyLook(theme,surface,tone);
@@ -35452,6 +35532,20 @@ function buildHeader(){
     });
     root.appendChild(menu);
   }
+  return true;
+}
+
+/* Reuse the organized Appearance panel from the shared Look control instead
+   of opening an older theme-only popover. */
+function bindSharedLook(){
+  var shell=$('shellbar'); if (!shell) return false;
+  var look=$$('button',shell).filter(function(button){ return key(button.textContent)==='LOOK'; })[0];
+  if (!look || look.__v44Appearance) return !!look;
+  look.__v44Appearance=true;
+  look.addEventListener('click',function(e){
+    if (!$('suite-root') || !$('suite-root').classList.contains('on')) return;
+    e.preventDefault();e.stopImmediatePropagation();V.openAppearance();
+  },true);
   return true;
 }
 
@@ -35509,9 +35603,101 @@ function mergeScenarioWorksheet(){
   if (!control) return;
   control.classList.add('v44-worksheet');
   var title=control.querySelector('h3 .ttl');
-  if (title){ title.textContent='Quote worksheet'; title.parentElement.title='Everything that defines the file; changes flow to every linked worksheet.'; }
+  if (title){ title.textContent='Property & loan setup'; title.parentElement.title='Everything that defines the file; changes flow to every linked worksheet.'; }
   var body=control.querySelector(':scope > .body');
   if (body && quick && quick.parentElement!==body) body.insertBefore(quick,body.firstChild);
+}
+
+/* ------------------- quote/setup punch-in workspace --------------------
+   These are live proxy inputs, not a second scenario.  They write to the
+   same paths as the full form so Quote and Setup share one calculation. */
+var PUNCH_FIELDS=[
+  ['Borrower name','borrowerName','text'],['Property address','propertyAddress','text'],
+  ['ZIP code','zipCode','text'],['State','state','text'],['County / area','nyCounty','text'],
+  ['Purchase price','basePurchasePrice','num'],['As-is value','asIsValue','num'],
+  ['After-repair value','afterRepairValue','num'],['Down payment %','finalDownPaymentPct','pct'],
+  ['Renovation budget','reno.baseCost','num']
+];
+function getPath(obj,path){return String(path).split('.').reduce(function(value,part){return value==null?undefined:value[part];},obj);}
+function cleanNumber(value){var n=parseFloat(String(value==null?'':value).replace(/[$,%\s,]/g,''));return isFinite(n)?n:0;}
+function inputPercent(value){var n=cleanNumber(value);return String(Math.round(n*1000000)/10000).replace(/\.0+$/,'');}
+function inputValue(value,kind){if(value==null)return'';if(kind==='pct')return inputPercent(value);return String(value);}
+function applyPunch(input){
+  var s=store(),path=input.dataset.v44Field,kind=input.dataset.kind||'text',raw=input.value;if(!s||!path)return;
+  if(kind!=='text'&&window.V20&&V20.parseNumber){var parsed=V20.parseNumber(raw);if(!parsed.ok&&!parsed.blank)return;}
+  if(window.V20&&V20.setScenario)V20.setScenario(path,raw,kind==='pct'?'pct':kind==='num'?'num':'text');
+  else s.setField(path,raw,'Quote / setup quick edit');
+  if(kind==='pct')input.value=inputPercent(getPath(s.activeInputs,path));
+}
+function punchField(field){var label=field[0],path=field[1],kind=field[2];return'<label><span>'+esc(label)+'</span><input type="text" autocomplete="off" inputmode="'+(kind==='text'?'text':'decimal')+'" data-v44-field="'+esc(path)+'" data-kind="'+esc(kind)+'" aria-label="'+esc(label)+'"></label>';}
+function punchMarkup(){return'<section id="v44PunchIn" class="v44-punch no-print"><div class="v44-punch-head"><div><b>Scenario control center</b><small>Freeform changes update every linked worksheet.</small></div><button type="button" data-v44-address-search>Search address</button></div><div class="v44-punch-grid">'+PUNCH_FIELDS.map(punchField).join('')+'</div><div class="v44-punch-actions"><button type="button" data-v44-preset="fha35">FHA 3.5%</button><button type="button" data-v44-preset="conv5">5% down</button><button type="button" data-v44-zip>Fill city/state/county from ZIP</button><button type="button" data-v44-sync>Sync to Property</button></div><div id="v44AddressResults" class="v44-address-results" hidden></div><div id="v44MetricStrip" class="v44-metric-strip"></div></section>';}
+function setupPunchIn(){
+  var root=$('suite-root'),s=store(),control=root&&root.querySelector('[data-section="control"]'),body=control&&control.querySelector(':scope > .body');if(!s||!body)return;
+  var panel=$('v44PunchIn');if(!panel){body.insertAdjacentHTML('afterbegin',punchMarkup());panel=$('v44PunchIn');
+    $$('[data-v44-field]',panel).forEach(function(input){var apply=function(){applyPunch(input);};input.addEventListener('input',function(){clearTimeout(input.__v44Timer);input.__v44Timer=setTimeout(apply,90);});input.addEventListener('change',apply);});
+    $$('[data-v44-preset]',panel).forEach(function(button){button.onclick=function(){if(window.V35&&V35.applyQuotePreset)V35.applyQuotePreset(button.dataset.v44Preset);};});
+    panel.querySelector('[data-v44-zip]').onclick=function(){try{s.applyZipLookup();}catch(e){say('ZIP lookup','Enter a five-digit ZIP and try again.','warn');}};
+    panel.querySelector('[data-v44-sync]').onclick=function(){try{if(s.saveCurrentBorrowerAndProperty)s.saveCurrentBorrowerAndProperty();say('Property synced','The current borrower and property were saved.');}catch(e){V.goPage('PROPERTY');}};
+    panel.querySelector('[data-v44-address-search]').onclick=V.searchAddress;
+  }
+  if(panel.parentElement!==body)body.insertBefore(panel,body.firstChild);
+  $$('[data-v44-field]',panel).forEach(function(input){if(document.activeElement!==input)input.value=inputValue(getPath(s.activeInputs,input.dataset.v44Field),input.dataset.kind);input.classList.toggle('v44-missing',input.dataset.v44Field==='afterRepairValue'&&!!s.outputs.renovationActive&&!cleanNumber(getPath(s.activeInputs,'afterRepairValue')));});
+  paintMetricStrip();
+}
+
+/* Nominatim's public service forbids client-side autocomplete.  The lookup is
+   therefore an explicit, user-triggered search, limited to one request and
+   cached locally.  Manual entry remains available before and after lookup. */
+V.osmResults=[];V.osmLastRequest=0;
+V.searchAddress=function(){
+  var s=store(),host=$('v44AddressResults');if(!s||!host)return;var i=s.activeInputs||{},query=[i.propertyAddress,i.zipCode,i.state].filter(Boolean).join(', ');
+  if(query.length<4){say('Address search','Enter an address or ZIP first.','warn');return;}
+  var cacheKey='los.v44.osm.'+query.toLowerCase(),cached=safeGet(cacheKey,'');if(cached){try{return showAddressResults(JSON.parse(cached));}catch(e){}}
+  var wait=1000-(Date.now()-V.osmLastRequest);if(wait>0){say('Address search','Please wait a moment before another lookup.','warn');return;}
+  V.osmLastRequest=Date.now();host.hidden=false;host.innerHTML='<span class="v44-address-loading">Searching OpenStreetMap…</span>';
+  var endpoint=window.MORTGAGE_GEOCODER_URL||'https://nominatim.openstreetmap.org/search';
+  fetch(endpoint+'?format=jsonv2&addressdetails=1&countrycodes=us&limit=5&q='+encodeURIComponent(query),{headers:{Accept:'application/json'}}).then(function(response){if(!response.ok)throw new Error('Lookup unavailable');return response.json();}).then(function(rows){safeSet(cacheKey,JSON.stringify(rows.slice(0,5)));showAddressResults(rows);}).catch(function(){host.innerHTML='<span>Address lookup is unavailable. Keep typing manually or try again later.</span>';});
+};
+function showAddressResults(rows){
+  var host=$('v44AddressResults');if(!host)return;V.osmResults=(rows||[]).slice(0,5);host.hidden=false;
+  host.innerHTML=V.osmResults.length?'<div>'+V.osmResults.map(function(row,index){return'<button type="button" data-v44-address-choice="'+index+'">'+esc(row.display_name||'Address result')+'</button>';}).join('')+'</div><small>Address data © OpenStreetMap contributors · selection never locks manual fields.</small>':'<span>No matching address found. Manual entry is still available.</span>';
+  $$('[data-v44-address-choice]',host).forEach(function(button){button.onclick=function(){applyAddressResult(V.osmResults[Number(button.dataset.v44AddressChoice)]);};});
+}
+function applyAddressResult(row){
+  var s=store(),a=row&&row.address||{};if(!s||!row)return;var street=[a.house_number,a.road||a.pedestrian||a.residential].filter(Boolean).join(' '),city=a.city||a.town||a.village||a.hamlet||a.municipality||'',county=String(a.county||'').replace(/\s+County$/i,''),zip=a.postcode||'',state=a.state||'';
+  [['propertyAddress',street||row.display_name],['zipCode',zip],['state',state],['nyCounty',county]].forEach(function(pair){if(pair[1])s.setField(pair[0],pair[1],'OpenStreetMap address selection');});
+  var host=$('v44AddressResults');if(host){host.hidden=true;host.innerHTML='';}setupPunchIn();
+}
+function paintMetricStrip(){
+  var s=store(),host=$('v44MetricStrip');if(!s||!host)return;var o=s.outputs||{},items=[
+    ['MMW value basis',o.value&&o.value.valueBasis,'maxmortgage','valueBasis','HUD-92700 value basis'],
+    ['Maximum base mortgage',o.loan&&o.loan.maximumBaseLoan,'maxmortgage','maximumBaseLoan','Before financed mortgage insurance'],
+    ['Total loan',o.loan&&o.loan.totalLoan,'maxmortgage','totalLoan','Financed balance at closing'],
+    ['Amortization','Open schedule','summary','','Payment and balance schedule']
+  ];var sig=items.map(function(x){return x[1];}).join('|');if(host.dataset.sig===sig)return;host.dataset.sig=sig;
+  host.innerHTML=items.map(function(x){var val=typeof x[1]==='number'?'$'+x[1].toLocaleString('en-US',{maximumFractionDigits:2}):x[1];return'<button type="button" class="v35-live-row" data-v35-label="'+esc(x[0])+'" data-v35-mode="'+esc(x[2])+'"'+(x[3]?' data-v44-trace="'+esc(x[3])+'"':' data-v44-amortization="1"')+'><i>'+ICON.live+'</i><span><small>'+esc(x[0])+'</small><b>'+esc(val)+'</b><em>'+esc(x[4])+'</em></span></button>';}).join('');
+  var amort=host.querySelector('[data-v44-amortization]');if(amort)amort.onclick=function(e){e.stopPropagation();if(window.V20&&V20.openAmortization)V20.openAmortization();else V.goPage('SUMMARY');};
+}
+
+/* ---------------- concise, editable right-side live summary ------------ */
+function dollars(value,digits){var n=cleanNumber(value);return(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:digits||0,maximumFractionDigits:digits==null?0:digits});}
+function liveRow(label,value,mode,trace,cls,sub){return'<button type="button" class="v35-live-row v44-live-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'"'+(trace?' data-v44-trace="'+esc(trace)+'"':'')+'><span>'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><b>'+esc(value)+'</b></button>';}
+function paintLiveSummary(){
+  var s=store(),rail=document.querySelector('#suite-root .cols-main > .rail'),card=rail&&rail.querySelector(':scope > .card'),body=card&&card.querySelector(':scope > .body');if(!s||!body)return;var i=s.activeInputs||{},o=s.outputs||{},loan=o.loan||{},p=o.payment||{},c=o.closing||{},cash=o.cash||{},value=o.value||{},reno=o.renovationOut||{},aus=o.aus||{},isReno=!!o.renovationActive,mi=o.isFha?p.monthlyFhaMip:p.monthlyPmi,warnings=(o.warnings||[]).filter(function(w){if(!isReno&&(w.code==='MISSING_APPRAISAL_VALUE'||w.code==='ARV_SHORTFALL'))return false;if(w.code==='MISSING_TAX_SOURCE'&&i.taxSourceType==='MLS / Zillow / Redfin Estimate')return false;return w.severity==='error'||w.severity==='warning'||w.level==='error'||w.level==='fail'||w.blocking;}),arvFit=window.V21&&V21.valueFit?V21.valueFit(i,o):null;
+  var host=$('v44LiveSummary');if(!host){host=document.createElement('section');host.id='v44LiveSummary';host.className='v44-live-summary';body.appendChild(host);}var sig=[o.programLabel,i.finalDownPaymentPct,i.interestRate,loan.totalLoan,p.totalMonthlyPayment,c.buyerClosingCosts,cash.cashToClose,value.afterRepairValue,warnings.length,arvFit&&arvFit.status].join('|');if(host.dataset.sig===sig)return;host.dataset.sig=sig;
+  var html='<div class="v44-live-title"><div><b>Live summary</b><small>'+esc(o.programLabel||i.loanProgram||'Loan')+' · '+inputPercent(i.finalDownPaymentPct)+'% down · '+inputPercent(i.interestRate)+'%</small></div><span>'+esc(o.programLabel||i.loanProgram||'Loan')+'</span></div>';
+  html+='<h4>Acquisition</h4>'+liveRow('Purchase price',dollars(o.purchase&&o.purchase.finalPurchasePrice||i.basePurchasePrice),'setup','finalPurchasePrice')+(isReno?liveRow('Renovation',dollars(reno.finalRenovationAmount),'renovation','','','Program budget'):'' )+(isReno?liveRow('After-repair value',value.afterRepairValue>0?dollars(value.afterRepairValue):'Pending appraisal','maxmortgage','','','ARV'):'' )+liveRow('Required investment',dollars(loan.requiredInvestment,2),'setup','requiredInvestment');
+  html+='<h4>Loan</h4>'+liveRow('Maximum base loan',dollars(loan.maximumBaseLoan,2),'maxmortgage','maximumBaseLoan')+(o.isFha?liveRow('UFMIP',dollars(loan.ufmip,2),'maxmortgage','ufmip'):'' )+liveRow('Total loan',dollars(loan.totalLoan,2),'maxmortgage','totalLoan','total')+liveRow('Interest rate',inputPercent(i.interestRate)+'%','rates','','','Note rate · '+cleanNumber(i.termYears)+' years');
+  html+='<h4>Monthly payment</h4>'+liveRow('Principal & interest',dollars(p.principalAndInterest,2),'rates','principalAndInterest')+liveRow('Mortgage insurance',dollars(mi,2),o.isFha?'maxmortgage':'qualify',o.isFha?'monthlyFhaMip':'monthlyPmi','',o.isFha?'FHA MIP':'PMI estimate')+liveRow('Taxes & insurance',dollars(p.monthlyTaxesAndInsuranceUsed,2),'escrow','totalMonthlyPayment')+liveRow('Total payment',dollars(p.totalMonthlyPayment,2),'qualify','totalMonthlyPayment','total');
+  html+='<h4>Cash to close</h4>'+liveRow('Closing costs',dollars(c.buyerClosingCosts,2),'closing','buyerClosingCosts')+liveRow('Cash to close',dollars(cash.cashToClose,2),'closing','cashToClose','total');
+  html+='<h4>Checks</h4>'+liveRow('DTI',aus.totalQualifyingIncome>0?inputPercent(aus.backEndDti)+'%':'Enter income','income','')+liveRow('Reserves',aus.reserveShortfall>0?'Short '+dollars(aus.reserveShortfall):'PASS by '+dollars(aus.reserveSurplus||0),'qualify','',aus.reserveShortfall>0?'bad':'pass')+liveRow('Blocking warnings',String(warnings.length),'advanced','',''+(warnings.length?'bad':'pass'));
+  if(isReno&&arvFit){var fit=arvFit.status==='na'?'Enter an after-repair value':(arvFit.status==='pass'?'ARV test passes':'ARV test fails');var detail=arvFit.status==='na'?'Required before the program value test can run.':(arvFit.status==='pass'?arvFit.ratio.toFixed(2)+'% of ARV · threshold '+arvFit.threshold+'%':arvFit.ratio.toFixed(2)+'% of ARV · over by '+dollars(arvFit.shortfall||arvFit.gap));html+='<button type="button" class="v35-live-row v44-arv-check '+(arvFit.status==='fail'?'bad':arvFit.status==='pass'?'pass':'na')+'" data-v35-label="After-repair value" data-v35-mode="maxmortgage"><span><b>'+esc(fit)+'</b><small>'+esc(detail)+'</small></span><i>›</i></button>';}
+  html+='<small class="v44-live-note">Click any line to review its formula, edit a driver, or open the source worksheet.</small>';host.innerHTML=html;
+}
+
+function enhanceRailEditor(){
+  if(!window.V35||!V35.openRailEditor||V35.openRailEditor.__v44Formula)return;var original=V35.openRailEditor;
+  V35.openRailEditor=function(row,label,mode){original.call(V35,row,label,mode);var panel=$('v35RailEditor'),s=store(),traceKey=row&&row.dataset&&(row.dataset.v44Trace||row.dataset.out),trace=s&&s.outputs&&s.outputs.traces&&traceKey?s.outputs.traces[traceKey]:null;if(!panel)return;var current=panel.querySelector('.v44-formula');if(current)current.remove();var formula=trace&&trace.formula;if(!formula){var formulas={'After-repair value':'ARV = the entered as-completed appraisal value.','Interest rate':'Note rate = the annual interest rate entered for this scenario.','Taxes & insurance':'Monthly escrow = annual property taxes ÷ 12 + annual insurance ÷ 12.','DTI':'Back-end DTI = total housing payment and monthly liabilities ÷ qualifying monthly income.','Reserves':'Available reserves − required reserves.','Blocking warnings':'Count of current underwriting warnings that require review.'};formula=formulas[norm(label||row.dataset.v35Label||'')]||'This result updates from the linked scenario inputs.';}var block=document.createElement('div');block.className='v44-formula';block.innerHTML='<span>Formula</span><code>'+esc(formula)+'</code>'+(trace&&trace.inputs&&trace.inputs.length?'<div>'+trace.inputs.slice(0,5).map(function(x){return'<small><span>'+esc(x.label)+'</span><b>'+esc(x.format==='percent'?inputPercent(x.value)+'%':x.format==='currency'?dollars(x.value,2):String(x.value))+'</b></small>';}).join('')+'</div>':'');var anchor=panel.querySelector('.v35-rail-current')||panel.querySelector('header');anchor.insertAdjacentElement('afterend',block);return panel;};V35.openRailEditor.__v44Formula=true;
 }
 
 /* ---------------- Income Calculator: requested Auto agency only ---------- */
@@ -35586,6 +35772,10 @@ function tick(){
   try { freeformSuite(); } catch(e){}
   try { bindQuoteInputs(); } catch(e){}
   try { mergeScenarioWorksheet(); } catch(e){}
+  try { setupPunchIn(); } catch(e){}
+  try { enhanceRailEditor(); } catch(e){}
+  try { paintLiveSummary(); } catch(e){}
+  try { bindSharedLook(); } catch(e){}
   try { installAutoAgency(); } catch(e){}
   try { enforceEntryShell(); } catch(e){}
 }
