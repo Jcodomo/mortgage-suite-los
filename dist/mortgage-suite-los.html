@@ -6169,6 +6169,327 @@ html[data-v25-surface="oled"] #suite-root.v44-final{
   #suite-root.v44-final #v24ScenarioBar input{grid-column:1/-1 !important;grid-row:2 !important}
 }
 
+
+/* =====================================================================
+   Release 45 — theme on every popup, the rail to the reference, the
+   third row in the button style, the small floating pieces
+   ===================================================================== */
+
+/* ---- 1. THE THEME REACHES BODY-LEVEL POPUPS ------------------------
+   Every modal appended to <body> read --panel, --line, --ink from its
+   ancestors — and those were defined on #suite-root and #calc-root,
+   never on the root. A popup outside both shells got the browser
+   default. Mirrored onto :root so anything anywhere inherits.         */
+html[data-v24-theme]{
+  --panel:var(--v24-card); --panel-2:color-mix(in srgb, var(--v24-card) 92%, var(--v24-page));
+  --bg:var(--v24-page); --surface:var(--v24-page); --surface-2:var(--v24-card);
+  --ink:var(--v24-text); --text:var(--v24-text); --text-strong:var(--v24-text); --muted:var(--v24-muted);
+  --line:var(--v24-border); --line-2:color-mix(in srgb, var(--v24-border) 70%, var(--v24-card));
+  --accent:var(--v24-accent); --accent-soft:color-mix(in srgb, var(--v24-accent) 14%, var(--v24-card));
+  --pass-ink:#1a7f37; --warn-ink:#cf222e; --amber-ink:#9a6700; --amber-line:color-mix(in srgb,#bf8700 40%,var(--v24-border));
+  color-scheme:light;
+}
+html[data-v25-surface="dark"], html[data-v25-surface="oled"]{ color-scheme:dark; }
+html[data-v25-surface="dark"][data-v24-theme], html[data-v25-surface="oled"][data-v24-theme]{ --pass-ink:#3fb950; --warn-ink:#ff7b72; --amber-ink:#d29922; }
+/* popups that set their own hard colours */
+.v11-modal .rpt-picker, .v12-modal .rpt-picker, .v30-card, .v35-rail-editor, .v39-panel, .v40-pop, .v42-menu, .v43-menu, .v45-pop, .v29-pop{
+  background:var(--panel) !important; color:var(--ink) !important; border-color:var(--line) !important;
+}
+
+/* ---- 2. THE SUITE INHERITS THE CALCULATOR'S CHROME ----------------- */
+#suite-root .topbar, #suite-root .v34-bar, #suite-root .v23-primary-nav, .v23-context-tabs{
+  font-family:var(--v24-font-ui, inherit) !important;
+}
+#suite-root .v34-bar{ background:color-mix(in srgb, var(--v24-header) 92%, #000 8%) !important; }
+#suite-root .v23-primary-nav{ background:color-mix(in srgb, var(--v24-header) 84%, var(--v24-page) 16%) !important; }
+.v23-context-tabs{ background:color-mix(in srgb, var(--v24-header) 76%, var(--v24-page) 24%) !important; }
+
+/* ---- 3. THE THIRD ROW IN THE BUTTON STYLE ---------------------------
+   The context tabs matched the pills of an earlier design; the row of
+   controls above them is 34px rectangles with a 1px border. Same frame
+   here, so the three rows read as one system.                          */
+.v23-context-tabs .tab, .v23-context-tabs .tab[data-v23-visible="1"], #suite-root .tabs .v43-tab{
+  height:32px !important; min-height:32px !important; padding:0 13px !important;
+  border-radius:8px !important;
+  border:1px solid color-mix(in srgb, var(--v24-header-text,#f6f8fa) 22%, transparent) !important;
+  background:color-mix(in srgb, var(--v24-header-text,#f6f8fa) 7%, transparent) !important;
+  color:var(--v24-header-text,#f6f8fa) !important;
+  font:600 12px/30px var(--v24-font-ui, inherit) !important; letter-spacing:0 !important; text-transform:none !important;
+  opacity:.9;
+}
+.v23-context-tabs .tab:hover{ background:color-mix(in srgb, var(--v24-header-text,#f6f8fa) 14%, transparent) !important; opacity:1; }
+.v23-context-tabs .tab.active, .v23-context-tabs .tab[aria-current="page"]{
+  background:var(--v24-accent,#0969da) !important; border-color:transparent !important; color:#fff !important; opacity:1;
+}
+
+/* ---- 4. THE RAIL, TO THE REFERENCE ---------------------------------
+   White card, quiet header with the programme badge, section labels in
+   the accent, bold totals on a rule, a footer line. Values in the
+   numeric face.                                                        */
+#suite-root .rail .card{
+  background:var(--panel) !important; border:1px solid var(--line) !important; border-radius:14px !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.06) !important; padding:0 !important;
+}
+#suite-root .rail .card > h3{
+  display:flex !important; align-items:center !important; justify-content:space-between !important;
+  padding:12px 16px !important; margin:0 !important; border-bottom:1px solid var(--line-2) !important;
+  font:800 10.5px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.08em !important; color:var(--ink) !important;
+}
+#suite-root .rail .card > .body{ padding:6px 16px 12px !important; }
+#suite-root .rail .sec-head, #suite-root .rail .v40-sec{
+  font:800 9.5px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.09em !important; text-transform:uppercase !important;
+  color:var(--accent) !important; margin:14px 0 4px !important; padding:0 !important; border:0 !important;
+}
+#suite-root .rail .out, #suite-root .rail .v40-out{ display:grid !important; grid-template-columns:1fr auto; align-items:baseline; gap:10px; padding:4px 0 !important; }
+#suite-root .rail .out .l, #suite-root .rail .v40-out .l{ font:500 12.5px/1.35 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; }
+#suite-root .rail .out .v, #suite-root .rail .v40-out .v{ font:600 13px/1.3 var(--v24-font-num, ui-monospace, monospace) !important; color:var(--ink) !important; text-align:right; }
+#suite-root .rail .out.total, #suite-root .rail .out[data-out*="TOTAL"], #suite-root .rail .out[data-out^="Total"], #suite-root .rail .out[data-out="Cash to close"]{
+  margin-top:6px !important; padding-top:8px !important; border-top:1px solid var(--line-2) !important;
+}
+#suite-root .rail .out.total .l, #suite-root .rail .out[data-out^="Total"] .l, #suite-root .rail .out[data-out="Cash to close"] .l{ font-weight:800 !important; text-transform:uppercase; letter-spacing:.06em; font-size:11.5px !important; color:var(--accent) !important; }
+#suite-root .rail .out.total .v, #suite-root .rail .out[data-out^="Total"] .v, #suite-root .rail .out[data-out="Cash to close"] .v{ font-size:16px !important; font-weight:800 !important; color:var(--accent) !important; }
+#suite-root .rail .card > .body::after{ content:'Click any line to jump to the field that drives it.'; display:block; margin-top:14px; font-size:10.5px; color:var(--muted); }
+/* the value-test banner */
+#suite-root .rail .notice, #suite-root .rail .v44-banner{ border-radius:10px !important; padding:10px 12px !important; font-size:12.5px !important; }
+#suite-root .rail .v45-fail{ background:color-mix(in srgb,#cf222e 12%,var(--panel)) !important; border:1px solid color-mix(in srgb,#cf222e 45%,transparent) !important; color:var(--warn-ink) !important; }
+
+/* ---- 5. TAX DUE DATES POPOVER -------------------------------------- */
+.v45-pop{ position:absolute; z-index:1900; min-width:280px; max-width:340px; padding:10px 12px; border-radius:10px;
+  background:var(--panel); border:1px solid var(--line); box-shadow:0 16px 40px rgba(0,0,0,.28); color:var(--ink); }
+.v45-pop[hidden]{ display:none !important; }
+.v45-pop-hd{ font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; }
+.v45-date{ display:flex; flex-direction:column; gap:1px; padding:6px 0; border-top:1px solid var(--line-2); font-size:12px; }
+.v45-date:first-of-type{ border-top:0; }
+.v45-date span{ font-size:10.5px; color:var(--muted); }
+.v45-pop-ft{ margin-top:8px; font-size:10.5px; color:var(--muted); line-height:1.45; }
+label:has(+ *), .field > label{ cursor:default; }
+
+/* ---- 6. THE RATE BOARD UNDER THE EDITOR ---------------------------- */
+.v45-board-host{ margin:10px 0 4px; }
+.v45-board{ width:100%; border-collapse:collapse; font-size:12px; }
+.v45-board td{ padding:5px 4px; border-top:1px solid var(--line-2); }
+.v45-board td.n{ text-align:right; font-family:var(--v24-font-num, ui-monospace, monospace); font-weight:700; }
+.v45-use{ padding:3px 10px; border-radius:6px; border:1px solid color-mix(in srgb,var(--accent) 45%,transparent); background:color-mix(in srgb,var(--accent) 12%,transparent); color:var(--accent); font-size:11px; font-weight:700; cursor:pointer; }
+.v45-board-ft, .v45-board-empty{ font-size:10.5px; color:var(--muted); margin-top:6px; }
+
+/* ---- 7. THE RATES PAGE ART ---------------------------------------- */
+#panel-rates svg.icon-lg, #panel-rates .v45-icon{ width:26px !important; height:26px !important; max-width:26px !important; color:var(--accent) !important; fill:currentColor; }
+#panel-rates svg[style*="height:150px"]{ height:150px !important; }
+
+/* ---- 8. ADDRESS LINKS --------------------------------------------- */
+.v45-links{ display:flex; gap:6px; margin-top:5px; flex-wrap:wrap; }
+.v45-links a{ font-size:10.5px; font-weight:700; text-decoration:none; padding:2px 8px; border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--accent) 40%,transparent); color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,transparent); }
+.v45-links a:hover{ background:color-mix(in srgb,var(--accent) 16%,transparent); }
+
+/* ---- 9. MOVABLE SECTIONS ------------------------------------------- */
+#suite-root .v45-flex{ display:flex; flex-direction:column; }
+.v45-grip{ cursor:grab; }
+.v45-grip:active{ cursor:grabbing; }
+.v45-dragging{ opacity:.55; }
+.v45-over{ outline:2px dashed var(--accent); outline-offset:4px; border-radius:12px; }
+.v45-reset{ align-self:flex-end; order:9999; margin:10px 0 0; padding:5px 11px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;
+  border:1px solid var(--line); background:transparent; color:var(--muted); }
+.v45-reset:hover{ color:var(--accent); border-color:var(--accent); }
+
+/* ---- 10. the calculator's mirrored suite actions ------------------ */
+.v45-calc-action{ font-size:11.5px !important; }
+
+
+/* =====================================================================
+   Release 46 — the reference look for the rail, Quote and the control
+   centre; the large cards; the prompt library
+   ===================================================================== */
+
+/* ---- 1. THE RAIL, TO IMAGE 1 ---------------------------------------
+   Card on the page colour, a quiet header with the badge washed into
+   it, the scenario line under the title, dashed row separators, blue
+   section captions, totals larger and blue on a solid rule.            */
+#suite-root .rail .card{
+  background:var(--panel) !important; border:1px solid var(--line-2) !important; border-radius:12px !important;
+  box-shadow:0 1px 3px rgba(20,30,50,.05) !important; padding:0 !important;
+}
+#suite-root .rail .card > h3{
+  display:flex !important; align-items:center !important; justify-content:space-between !important; gap:10px;
+  padding:12px 14px 10px !important; margin:0 !important; border-bottom:0 !important;
+  font:800 11px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.06em !important; text-transform:uppercase; color:var(--ink) !important;
+}
+#suite-root .rail .card > h3 .badge{
+  background:color-mix(in srgb, var(--accent) 10%, transparent) !important; color:color-mix(in srgb, var(--accent) 55%, var(--panel)) !important;
+  border:0 !important; font-size:10px !important; letter-spacing:.06em !important; padding:4px 10px !important; border-radius:999px !important; transition:none !important;
+}
+#suite-root .rail .card > .body{ padding:0 14px 12px !important; }
+#suite-root .rail .v5-scenline, #suite-root .rail .v44-live-note{ display:block !important; font-size:11px !important; color:var(--muted) !important; margin:0 0 8px !important; line-height:1.4; }
+#suite-root .rail .notice{
+  border-radius:10px !important; padding:10px 12px !important; margin:4px 0 8px !important; font:600 13px/1.4 var(--v24-font-ui, inherit) !important;
+  background:color-mix(in srgb,#2da44e 12%, var(--panel)) !important; border:1px solid color-mix(in srgb,#2da44e 40%, transparent) !important; color:#1a7f37 !important;
+}
+#suite-root .rail .notice.v45-fail{ background:color-mix(in srgb,#cf222e 12%, var(--panel)) !important; border-color:color-mix(in srgb,#cf222e 45%, transparent) !important; color:#cf222e !important; }
+#suite-root .rail .notice.info, #suite-root .rail .notice[class*="pending"]{ background:color-mix(in srgb, var(--accent) 8%, var(--panel)) !important; border-color:color-mix(in srgb, var(--accent) 30%, transparent) !important; color:var(--ink) !important; }
+#suite-root .rail .sec-head, #suite-root .rail .v40-sec{
+  font:800 10px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.09em !important; text-transform:uppercase !important;
+  color:var(--accent) !important; margin:14px 0 6px !important; padding:0 !important; border:0 !important; background:transparent !important;
+}
+#suite-root .rail .out, #suite-root .rail .v40-out{
+  display:grid !important; grid-template-columns:1fr auto !important; align-items:baseline; gap:10px;
+  padding:6px 0 !important; margin:0 !important; background:transparent !important; border:0 !important; border-bottom:1px dashed var(--line-2) !important; border-radius:0 !important;
+}
+#suite-root .rail .out .l, #suite-root .rail .v40-out .l{ font:500 13px/1.35 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; }
+#suite-root .rail .out .v, #suite-root .rail .v40-out .v{ font:700 13.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; text-align:right; font-variant-numeric:tabular-nums; }
+#suite-root .rail .out .v small, #suite-root .rail .out .v .sub{ font-size:10.5px; font-weight:500; color:var(--muted); margin-right:8px; }
+#suite-root .rail .out.total, #suite-root .rail .out[data-out^="Total"], #suite-root .rail .out[data-out="Cash to close"], #suite-root .rail .out.lvl-major{
+  margin-top:4px !important; padding:10px 0 8px !important; border-top:1px solid var(--line) !important; border-bottom:0 !important;
+}
+#suite-root .rail .out.total .l, #suite-root .rail .out[data-out^="Total"] .l, #suite-root .rail .out[data-out="Cash to close"] .l, #suite-root .rail .out.lvl-major .l{
+  font-weight:800 !important; text-transform:uppercase; letter-spacing:.04em; font-size:14px !important; color:var(--accent) !important;
+}
+#suite-root .rail .out.total .v, #suite-root .rail .out[data-out^="Total"] .v, #suite-root .rail .out[data-out="Cash to close"] .v, #suite-root .rail .out.lvl-major .v{
+  font-size:18px !important; font-weight:800 !important; color:var(--accent) !important;
+}
+#suite-root .rail .out .pass, #suite-root .rail .v.pass{ color:#1a7f37 !important; font-weight:800 !important; }
+#suite-root .rail .out .warn, #suite-root .rail .v.warn{ color:#cf222e !important; font-weight:800 !important; }
+#suite-root .rail .out .muted, #suite-root .rail .l.muted{ color:var(--muted) !important; }
+#suite-root .rail .card > .body::after{ content:'Click any line to jump to the field that drives it.'; display:block; margin-top:12px; font-size:11px; color:var(--muted); }
+#suite-root .rail .out:hover, #suite-root .rail .v40-out:hover{ background:color-mix(in srgb, var(--accent) 6%, transparent) !important; }
+
+/* ---- 2. QUOTE AND THE CONTROL CENTRE, TO IMAGE 2 -------------------
+   White card, grey title band with the programme label washed to the
+   right, three columns, tinted result rows with soft corners, totals
+   in blue, the green cushion row, and the footer strip.               */
+#suite-root #screen-body .card, #suite-root .v44-punch{
+  background:var(--panel) !important; border:1px solid var(--line-2) !important; border-radius:12px !important;
+  box-shadow:0 1px 3px rgba(20,30,50,.05) !important;
+}
+#suite-root #screen-body .card > h2, #suite-root #screen-body .card > .card-head, #suite-root .v44-punch-head{
+  display:flex !important; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 16px !important; margin:0 !important; border-bottom:1px solid var(--line-2) !important;
+  background:color-mix(in srgb, var(--panel) 92%, var(--page, var(--bg))) !important;
+  font:800 14px/1.2 var(--v24-font-ui, inherit) !important; letter-spacing:.02em; text-transform:uppercase; color:var(--ink) !important;
+}
+#suite-root #screen-body .card > h2 .badge, #suite-root #screen-body .card-head .badge, #suite-root .v44-punch-head small{
+  font:800 10.5px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.06em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--accent) 40%, var(--panel)) !important; background:transparent !important; border:0 !important;
+}
+#suite-root #screen-body .sec-head{ font:800 10px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.09em !important; text-transform:uppercase; color:var(--accent) !important; margin:6px 0 8px !important; border:0 !important; padding:0 !important; }
+#suite-root #screen-body .out{
+  display:grid !important; grid-template-columns:1fr auto; align-items:center; gap:10px;
+  padding:9px 12px !important; margin:0 0 6px !important; border-radius:8px !important;
+  background:color-mix(in srgb, var(--accent) 7%, var(--panel)) !important; border:1px solid color-mix(in srgb, var(--accent) 12%, transparent) !important;
+}
+#suite-root #screen-body .out .l{ font:500 12.5px/1.3 var(--v24-font-ui, inherit) !important; color:color-mix(in srgb, var(--ink) 72%, var(--accent)) !important; }
+#suite-root #screen-body .out .v{ font:700 13.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; font-variant-numeric:tabular-nums; }
+#suite-root #screen-body .out.total, #suite-root #screen-body .out.lvl-major{
+  background:transparent !important; border:0 !important; padding:8px 0 !important; margin-top:6px !important;
+}
+#suite-root #screen-body .out.total .l, #suite-root #screen-body .out.lvl-major .l{ font-weight:800 !important; text-transform:uppercase; letter-spacing:.04em; font-size:15px !important; color:var(--accent) !important; }
+#suite-root #screen-body .out.total .v, #suite-root #screen-body .out.lvl-major .v{ font-size:20px !important; font-weight:800 !important; color:var(--accent) !important; }
+#suite-root #screen-body .out.good, #suite-root #screen-body .out.cushion, #suite-root #screen-body .out[data-out*="cushion" i]{
+  background:color-mix(in srgb,#2da44e 12%, var(--panel)) !important; border-color:color-mix(in srgb,#2da44e 28%, transparent) !important;
+}
+#suite-root #screen-body .out.good .v, #suite-root #screen-body .out.cushion .v, #suite-root #screen-body .out[data-out*="cushion" i] .v{ color:#1a7f37 !important; }
+#suite-root #screen-body .card .foot, #suite-root #screen-body .card > .card-foot, #suite-root #screen-body .v20-footline{
+  display:flex; gap:14px; flex-wrap:wrap; padding:10px 16px !important; border-top:1px solid var(--line-2) !important;
+  font:700 12.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--ink) !important;
+}
+#suite-root #screen-body .card .foot .warn, #suite-root #screen-body .card > .card-foot .warn{ color:#cf222e !important; }
+#suite-root #screen-body .field label, #suite-root .v44-punch-grid label{ font:500 12.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--muted) !important; text-transform:none !important; letter-spacing:0 !important; }
+#suite-root #screen-body input, #suite-root #screen-body select, #suite-root .v44-punch-grid input, #suite-root .v44-punch-grid select{
+  height:40px !important; border-radius:8px !important; font-size:14px !important; padding:0 12px !important;
+  background:color-mix(in srgb, var(--panel) 90%, var(--page, var(--bg))) !important; border:1px solid var(--line) !important; color:var(--ink) !important;
+}
+
+/* ---- 3. THE LARGE CARDS, FIRST -------------------------------------- */
+#suite-root .v44-metric-strip.v46-strip{
+  display:grid !important; grid-template-columns:repeat(4, minmax(0,1fr)) !important; gap:10px !important; margin:12px 16px 4px !important;
+}
+#suite-root #v46Extra{ margin-top:0 !important; margin-bottom:14px !important; }
+#suite-root .v46-strip .v35-live-row, #suite-root .v46-card{
+  display:grid !important; grid-template-columns:auto 1fr auto !important; align-items:center !important; gap:12px !important;
+  padding:12px 14px !important; min-height:74px; text-align:left !important;
+  background:color-mix(in srgb, var(--panel) 94%, var(--page, var(--bg))) !important; border:1px solid var(--line-2) !important; border-radius:12px !important;
+  color:var(--ink) !important; cursor:pointer; transition:border-color .12s ease, box-shadow .12s ease;
+}
+#suite-root .v46-strip .v35-live-row:hover, #suite-root .v46-card:hover{ border-color:var(--accent) !important; box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
+#suite-root .v46-ic, #suite-root .v46-strip .v35-live-row > i:first-child{
+  width:34px; height:34px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--accent); color:#fff; flex:none;
+}
+#suite-root .v46-ic svg{ width:16px; height:16px; fill:currentColor; }
+#suite-root .v46-body{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+#suite-root .v46-body small, #suite-root .v46-strip .v35-live-row small{ font:800 9.5px/1 var(--v24-font-ui, inherit); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+#suite-root .v46-body b, #suite-root .v46-strip .v35-live-row b{ font:800 18px/1.15 var(--v24-font-ui, inherit); color:var(--ink); font-variant-numeric:tabular-nums; }
+#suite-root .v46-body em, #suite-root .v46-strip .v35-live-row em{ font:400 10.5px/1.3 var(--v24-font-ui, inherit); font-style:normal; color:var(--muted); }
+#suite-root .v46-chev{ display:none !important; }
+
+/* A four-column strip is comfortable only once the main canvas has enough
+   room beside the live rail. Measuring the remaining worksheet width avoids
+   clipped figures on common 1280/1366px laptops. */
+@media (max-width:1540px){
+  #suite-root .v44-metric-strip.v46-strip{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; }
+}
+
+/* Keep Live Summary in the layout instead of letting the older drawer rule
+   cover the worksheet. It remains a side rail on desktop and becomes an
+   ordinary full-width section on narrower screens. */
+@media (min-width:1181px) and (max-width:1360px){
+  #suite-root.v44-final .cols-main,
+  #suite-root.v44-final.v24-summary-open .cols-main{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 340px !important;
+    gap:14px !important;
+  }
+  #suite-root.v44-final .cols-main > .rail.v31-rail,
+  #suite-root.v44-final.v24-summary-open .cols-main > .rail.v31-rail{
+    display:block !important;
+    position:sticky !important;
+    inset:auto !important;
+    top:16px !important;
+    grid-column:2 !important;
+    width:340px !important;
+    max-width:340px !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+}
+@media (max-width:1180px){
+  #suite-root.v44-final .cols-main,
+  #suite-root.v44-final.v24-summary-open .cols-main{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  #suite-root.v44-final .cols-main > .rail.v31-rail,
+  #suite-root.v44-final.v24-summary-open .cols-main > .rail.v31-rail{
+    display:block !important;
+    position:static !important;
+    inset:auto !important;
+    grid-column:1 !important;
+    width:100% !important;
+    max-width:none !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+}
+@media (max-width:640px){
+  #suite-root .v44-metric-strip.v46-strip{ grid-template-columns:1fr !important; }
+}
+
+/* ---- 4. THE PROMPT LIBRARY ----------------------------------------- */
+.v46-lib{ display:grid; grid-template-columns:auto minmax(220px,1fr) auto; gap:8px; align-items:center; margin:10px 0 6px; }
+.v46-lib label{ font:800 10px/1 var(--v24-font-ui, inherit); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.v46-lib select{ height:36px; }
+.v46-hint{ grid-column:1 / -1; font-size:11px; color:var(--muted); line-height:1.45; }
+@media (max-width:700px){ .v46-lib{ grid-template-columns:1fr; } }
+
 </style>
 <!-- ===== LOS PATCH LAYER — END ===== -->
 </head>
@@ -35786,6 +36107,520 @@ setTimeout(enforceEntryShell,80);
 setTimeout(enforceEntryShell,360);
 setTimeout(function(){ enforceEntryShell(); enforceEntryPage(); },1450);
 if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick,1250); else setInterval(tick,1000);
+})();
+
+
+/* =====================================================================
+   Release 45 — theme reaches every popup, the rail styled to the
+   reference, seller credit in dollars, draw tiers and the conventional
+   per-draw fee, due dates on the tax schedule, an address that fills
+   the file, Full as a toggle, movable sections saved with the scenario,
+   and every menu closing on an outside click.
+   Additive over 44. Two source edits noted in the changelog.
+   ===================================================================== */
+(function(){
+"use strict";
+var $  = function(id){ return document.getElementById(id); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+function G(n){ try { return (0, eval)(n); } catch(e){ return undefined; } }
+function N(v){ v = parseFloat(String(v==null?'':v).replace(/[$,%\s]/g,'')); return isFinite(v)?v:0; }
+function norm(s){ return String(s||'').replace(/\s+/g,' ').trim(); }
+function key(s){ return norm(s).toUpperCase(); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+function usd(v,dp){ dp=dp===undefined?0:dp; var n=N(v);
+  return (n<0?'\u2212':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp}); }
+function get(k,d){ try{ var v=localStorage.getItem(k); return v==null?d:v; }catch(e){ return d; } }
+function set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function setClass(el,c,on){ if (el && el.classList.contains(c)!==!!on) el.classList.toggle(c,!!on); }
+function say(t,b,k,ms){ if (window.LOS && LOS.say) LOS.say(t,b,k,ms); }
+function store(){ try { return window.mortgageSuite.store; } catch(e){ return null; } }
+var V45 = window.V45 = { version:'45.0' };
+
+/* =================================================================== 1
+   NUMBERS THAT PRINT AS THEIR TRUE VALUE
+
+   The rate editor showed 6.875000000000001. That is 0.06875 × 100 in
+   binary floating point. Every percent shown for editing is rounded to
+   the precision it was entered at.
+   =================================================================== */
+V45.cleanPct = function(v){ var n = N(v); return String(parseFloat(n.toFixed(6))); };
+function cleanEditors(){
+  $$('.v35-rail-editor input, .v45-editor input').forEach(function(inp){
+    var v = inp.value; if (/\d\.\d{7,}/.test(v)){ var c = V45.cleanPct(v); if (c !== v) inp.value = c; }
+  });
+}
+
+/* =================================================================== 2
+   SELLER CREDIT IN DOLLARS
+
+   The dollar field was disabled unless a separate "entered as" select
+   said dollars, and the percent field the reverse — so a typed amount
+   went nowhere. Both fields take input now; typing in one switches the
+   basis to it. The select stays and still works.
+   =================================================================== */
+function sellerCredit(){
+  var s = store(); if (!s) return;
+  $$('#suite-root [data-path="sellerConcessionAmount"], #suite-root [data-path="sellerConcessionPct"]').forEach(function(inp){
+    if (inp.disabled) inp.disabled = false;
+    if (inp.__v45) return; inp.__v45 = true;
+    inp.addEventListener('input', function(){
+      var want = inp.dataset.path === 'sellerConcessionAmount' ? 'dollar' : 'percent';
+      try { if (s.activeInputs.concessionInputMode !== want) s.setField('concessionInputMode', want, 'Seller credit typed as ' + want); } catch(e){}
+    }, true);
+  });
+}
+
+/* =================================================================== 3
+   DRAW TIERS AND THE CONVENTIONAL PER-DRAW FEE
+
+   The engine's draw table is a sealed module constant with three bands.
+   The bands asked for are four:
+
+     under $25,000          2 draws
+     $25,000 – $59,999      3 draws
+     $60,000 – $99,999      4 draws
+     $100,000 and up        5 draws
+
+   They are applied through the engine's own manual-override path, and
+   only while the count still equals what this rule last set — a count
+   the user typed is never overwritten. Conventional renovation files
+   (HomeStyle) get a $150 inspection fee per draw where the field still
+   holds the engine default of $375; a fee someone entered is kept.
+   =================================================================== */
+V45.tierDraws = function(repair){
+  repair = N(repair);
+  if (repair <= 0) return 0;
+  if (repair < 25000) return 2;
+  if (repair < 60000) return 3;
+  if (repair < 100000) return 4;
+  return 5;
+};
+function draws(){
+  var s = store(); if (!s) return;
+  var i = s.activeInputs; if (!i || !i.reno || !i.draws) return;
+  var want = V45.tierDraws(i.reno.baseCost);
+  if (!i.renovation || !want) return;
+  var last = i.draws.v45Last;
+  var untouched = !i.draws.manualOverride || last == null || N(i.draws.manualDrawCount) === N(last);
+  if (untouched && (N(i.draws.manualDrawCount) !== want || !i.draws.manualOverride)){
+    try { s.setField('draws.manualOverride', true, 'Draw tier'); s.setField('draws.manualDrawCount', want, 'Draw tier'); i.draws.v45Last = want; } catch(e){}
+  }
+  if (/conventional/i.test(i.loanProgram||'') && N(i.draws.inspectionFeePerDraw) === 375){
+    try { s.setField('draws.inspectionFeePerDraw', 150, 'Conventional draw fee'); } catch(e){}
+  }
+}
+
+/* =================================================================== 4
+   SCENARIO NAMES
+
+   "Unnamed · FHA 203(k) · 3.50% down · 6.875% · 09-08 – Conventional":
+   the placeholder where a name should be, and the programme appended
+   to a label that already carried it. A file with no borrower yet is
+   named from the property, then the city, then the date it was
+   started — never "Unnamed" — and the programme appears once.
+   =================================================================== */
+V45.nameFor = function(i, o){
+  i = i || {}; o = o || {};
+  var who = norm(i.borrowerName || '');
+  if (!who){
+    var street = norm(i.propertyAddress || '').split(',')[0];
+    who = street && !/^\d{5}$/.test(street) ? street : (norm(i.city||'') ? norm(i.city) : 'File ' + new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+  }
+  var dp = N(i.finalDownPaymentPct); if (dp <= 1) dp *= 100;
+  var prog = o.programLabel || ((i.loanProgram||'') + (i.renovation ? (i.loanProgram==='FHA' ? ' 203(k)' : ' HomeStyle') : ''));
+  var rate = N(i.interestRate); if (rate <= 1) rate *= 100;
+  return [who, prog, (dp ? parseFloat(dp.toFixed(2)) + '% down' : ''), (rate ? parseFloat(rate.toFixed(3)) + '%' : '')].filter(Boolean).join(' · ');
+};
+function wrapNaming(){
+  if (window.V13 && V13.scenarioName && !V13.scenarioName.__v45){
+    var f = function(){ var s = store(); return V45.nameFor(s && s.activeInputs, s && s.outputs); };
+    f.__v45 = true; V13.scenarioName = f;
+  }
+  $$('#suite-root input, #suite-root option, #suite-root .v24-scenario-bar *').forEach(function(el){
+    var t = el.value !== undefined && el.tagName === 'INPUT' ? el.value : el.textContent;
+    if (/^Unnamed\b/.test(t||'')){ var s = store(); var nm = V45.nameFor(s && s.activeInputs, s && s.outputs);
+      if (el.tagName === 'INPUT'){ if (el.value !== nm) el.value = nm; } else if (el.childNodes.length === 1 && el.textContent !== nm) el.textContent = nm; }
+  });
+}
+
+/* =================================================================== 5
+   THE VALUE TEST BANNER — red when it fails
+   =================================================================== */
+function arvBanner(){
+  var s = store(); var o = s && s.outputs || {}; var mmw = o.mmw || {};
+  $$('#suite-root .rail .notice, #suite-root .rail .v44-banner, #suite-root .rail [class*="fit"]').forEach(function(b){
+    var t = (b.textContent||'').toLowerCase();
+    var fail = /over the|exceeds|does not fit|fails/.test(t) || (mmw.valueFitPass === false && /fit|after-repair/.test(t));
+    setClass(b, 'v45-fail', !!fail);
+  });
+}
+
+/* =================================================================== 6
+   TAX SCHEDULE — click the rule or the structure to see the dates
+
+   The proration worksheet stores a cycle name like "Nassau County, NY —
+   Jan 10 / Jul 10" and the engine a disbursement month list. Clicking
+   either label opens a small list of the actual due dates for the
+   closing year, with what each instalment covers.
+   =================================================================== */
+V45.dueDates = function(cycleName, year){
+  var T = window.TAX || window.TAXPRO; var cyc = T && T.CYCLES && T.CYCLES[cycleName];
+  year = year || new Date().getFullYear();
+  if (!cyc) return [];
+  return cyc.map(function(c){ var m = c.due.split('-'); var d = new Date(year, +m[0]-1, +m[1]);
+    return { date:d, label:d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}), pct:c.pct, covers:c.covers }; });
+};
+function showDates(anchor){
+  var T = window.TAX || window.TAXPRO; var st = T && T.state; if (!st) return;
+  var yr = st.closing ? new Date(st.closing).getFullYear() : new Date().getFullYear();
+  var list = V45.dueDates(st.cycle, yr).concat(V45.dueDates(st.cycle, yr+1));
+  var pop = $('v45Dates'); if (!pop){ pop = document.createElement('div'); pop.id='v45Dates'; pop.className='v45-pop no-print'; document.body.appendChild(pop); }
+  pop.innerHTML = '<div class="v45-pop-hd">' + esc(st.cycle || 'Tax schedule') + '</div>'
+    + (list.length ? list.map(function(x){ return '<div class="v45-date"><b>' + esc(x.label) + '</b><span>' + Math.round(x.pct*100) + '% of the annual bill' + (x.covers ? ' · covers from ' + esc(x.covers) : '') + '</span></div>'; }).join('')
+                  : '<div class="v45-date">No dated cycle on this jurisdiction yet.</div>')
+    + '<div class="v45-pop-ft">Instalments after closing are the ones the escrow account must have funds for.</div>';
+  var r = anchor.getBoundingClientRect();
+  pop.style.left = Math.max(8, Math.min(innerWidth-340, r.left + scrollX)) + 'px'; pop.style.top = (r.bottom + scrollY + 6) + 'px';
+  pop.hidden = false;
+}
+document.addEventListener('click', function(e){
+  var lab = e.target.closest('label, .field > label, th, .sec-head, .l, b, span');
+  if (!lab) return;
+  var t = norm(lab.textContent).toLowerCase();
+  if (/^(disbursement rule|tax structure|tax cycle|payment cycle)/.test(t)){ e.preventDefault(); showDates(lab); }
+}, true);
+
+/* =================================================================== 7
+   THE INTEREST-RATE EDITOR — a rate board under it, and a real page
+
+   Same editor, plus a small survey table beneath the inputs with a Use
+   button on each row when the board has been pulled. "Open Mortgage
+   Rates" leaves the full form and opens the rates workspace as its own
+   page.
+   =================================================================== */
+function rateBoardHtml(){
+  var R = window.RATES, rows = R && R.state && R.state.rows; if (!rows) return '<div class="v45-board-empty">Pull the survey from the rates page and the board appears here.</div>';
+  var keys = [['fixed30','30-yr fixed'],['fixed15','15-yr fixed'],['jumbo30','30-yr jumbo'],['fha30','30-yr FHA'],['va30','30-yr VA']];
+  var have = keys.filter(function(k){ return rows[k[0]] && N(rows[k[0]].rate); });
+  if (!have.length) return '<div class="v45-board-empty">No survey figures yet.</div>';
+  return '<table class="v45-board"><tbody>' + have.map(function(k){ var r = N(rows[k[0]].rate);
+    return '<tr><td>' + esc(k[1]) + '</td><td class="n">' + r.toFixed(3).replace(/0+$/,'').replace(/\.$/,'') + '%</td><td><button type="button" class="v45-use" data-rate="' + r + '">Use</button></td></tr>'; }).join('')
+    + '</tbody></table><div class="v45-board-ft">' + (R.state.fetchedAt ? 'Survey as of ' + esc(new Date(R.state.fetchedAt).toLocaleDateString()) : '') + ' · national averages, not a lock quote</div>';
+}
+function rateEditor(){
+  var ed = document.querySelector('.v35-rail-editor'); if (!ed) return;
+  var title = ed.querySelector('h3, .v35-ed-title, [class*="title"]'); if (!title || !/interest rate|note rate|^rate/i.test(title.textContent||'')) return;
+  var host = ed.querySelector('#v45Board');
+  if (!host){ host = document.createElement('div'); host.id='v45Board'; host.className='v45-board-host';
+    var actions = ed.querySelector('.v35-ed-actions, .actions, [class*="actions"]'); if (actions) ed.insertBefore(host, actions); else ed.appendChild(host);
+    host.addEventListener('click', function(e){ var b = e.target.closest('.v45-use'); if (!b) return;
+      var inp = ed.querySelector('input'); if (inp){ inp.value = V45.cleanPct(b.dataset.rate); inp.dispatchEvent(new Event('input',{bubbles:true})); } });
+  }
+  var html = rateBoardHtml(); if (host.__sig !== html){ host.__sig = html; host.innerHTML = html; }
+  $$('button', ed).forEach(function(b){ if (/open mortgage rates/i.test(b.textContent||'') && !b.__v45){ b.__v45 = true;
+    b.addEventListener('click', function(ev){ ev.stopPropagation(); ev.preventDefault();
+      try { if (window.V35 && V35.closeRailEditor) V35.closeRailEditor(); } catch(e){}
+      var root = $('suite-root'); if (root) root.classList.remove('v25-full-active','v251-full-active');
+      if (window.V8 && V8.go) V8.go('rates'); try { if (window.RATES) RATES.render(); } catch(e){}
+      try { window.scrollTo(0,0); } catch(e){}
+    }, true); } });
+}
+
+/* =================================================================== 8
+   MORTGAGE RATES — the page, and the tier lookup on open
+   =================================================================== */
+function ratesOpen(){
+  var p = $('panel-rates'); if (!p || !p.classList.contains('active') || p.__v45open) return;
+  p.__v45open = true; setTimeout(function(){ p.__v45open = false; }, 4000);
+  var s = store(); try { if (s && s.activeInputs.zipCode && s.applyZipLookup) s.applyZipLookup(); } catch(e){}
+  try { if (window.LOANSUITE && LOANSUITE.PROP && LOANSUITE.PROP.state.zip && LOANSUITE.PROP.lookupZip) LOANSUITE.PROP.lookupZip(); } catch(e){}
+  /* the header art: an oversized <use> that painted as a black disc */
+  $$('#panel-rates svg.icon-lg, #panel-rates .hero svg, #panel-rates h1 svg, #panel-rates h2 svg').forEach(function(sv){ setClass(sv,'v45-icon',true); });
+}
+
+/* =================================================================== 9
+   ADDRESS → THE FILE
+
+   Release 44's search fills after a match is chosen. This makes the
+   fill complete and clean: the street line without the country, the
+   city, ZIP and county into their own fields wherever they sit, and
+   an "Open in Google Maps" plus listing-site searches beside every
+   address field — links, because there is no keyless address API from
+   Google and no public one from USPS, and a link is what can be
+   promised honestly.
+   =================================================================== */
+V45.cleanAddress = function(line){
+  return norm(line).replace(/,\s*(United States( of America)?|USA|US)\s*$/i,'').replace(/\s*,\s*,/g,',').replace(/,\s*$/,'');
+};
+V45.parseNominatim = function(r){
+  var a = r && r.address || {};
+  var city = a.city || a.town || a.village || a.hamlet || a.municipality || '';
+  var county = String(a.county||'').replace(/ county$/i,'');
+  var street = [a.house_number, a.road].filter(Boolean).join(' ');
+  var line = street || V45.cleanAddress((r && r.display_name || '').split(',').slice(0,2).join(','));
+  return { line:line, city:city, state:a.state||'', zip:String(a.postcode||'').slice(0,5), county:county };
+};
+function fillEmpty(el, v){ if (!el || !v) return false; if (el.tagName === 'SELECT'){ var o = Array.prototype.filter.call(el.options, function(x){ return key(x.value)===key(v)||key(x.textContent)===key(v); })[0]; if (!o || el.value===o.value) return false; el.value = o.value; }
+  else { if (norm(el.value)) return false; el.value = v; } el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); return true; }
+function sib(el, re){ var scope = el.closest('.card, .grid, form, fieldset, .card-body, section') || el.parentNode.parentNode;
+  return $$('input, select', scope).filter(function(x){ if (x===el) return false; var k=((x.id||'')+' '+(x.name||'')+' '+(x.placeholder||'')+' '+(x.dataset.path||'')).toLowerCase(); var lab=x.closest('label'); var lt=lab?lab.textContent.toLowerCase():''; return re.test(k)||re.test(lt); })[0]; }
+/* when release 44's result list applies a choice, clean and complete it */
+document.addEventListener('change', function(e){
+  var el = e.target; if (!el || el.tagName !== 'INPUT') return;
+  var k = ((el.id||'')+' '+(el.name||'')+' '+(el.dataset.path||'')+' '+(el.placeholder||'')).toLowerCase();
+  if (!/address|street/.test(k) || /email/.test(k)) return;
+  var cleaned = V45.cleanAddress(el.value);
+  if (cleaned !== el.value){ el.value = cleaned; }
+  /* a full "street, city, state zip" line in one field: split what is missing beside it */
+  var m = el.value.match(/^(.*?),\s*([^,]+?),\s*([A-Za-z .]+?)\s*(\d{5})?\s*$/);
+  if (m){ fillEmpty(sib(el,/\bcity\b|town/), norm(m[2])); fillEmpty(sib(el,/\bstate\b/), norm(m[3])); if (m[4]) fillEmpty(sib(el,/zip|postal/), m[4]); }
+}, true);
+function addressLinks(){
+  $$('#suite-root input, #calc-root input').forEach(function(el){
+    var k = ((el.id||'')+' '+(el.name||'')+' '+(el.dataset.path||'')+' '+(el.placeholder||'')).toLowerCase();
+    if (!/address|street/.test(k) || /email/.test(k)) return;
+    var host = el.parentNode; if (!host || host.querySelector('.v45-links')) return;
+    var box = document.createElement('div'); box.className='v45-links no-print';
+    box.innerHTML = '<a target="_blank" rel="noopener" data-k="maps">Maps</a><a target="_blank" rel="noopener" data-k="zillow">Zillow</a><a target="_blank" rel="noopener" data-k="redfin">Redfin</a><a target="_blank" rel="noopener" data-k="realtor">Realtor</a>';
+    host.appendChild(box);
+    var paint = function(){ var q = encodeURIComponent(V45.cleanAddress(el.value)); if (!q){ box.style.display='none'; return; } box.style.display='';
+      var m = { maps:'https://www.google.com/maps/search/?api=1&query='+q, zillow:'https://www.zillow.com/homes/'+q+'_rb/', redfin:'https://www.redfin.com/search/results?query='+q, realtor:'https://www.realtor.com/realestateandhomes-search/'+q };
+      $$('a', box).forEach(function(a){ a.href = m[a.dataset.k]; }); };
+    el.addEventListener('input', paint); el.addEventListener('change', paint); paint();
+  });
+}
+
+/* =================================================================== 10
+   FULL IS A TOGGLE — click it again to return to the last group
+   =================================================================== */
+function fullToggle(){
+  var b = document.querySelector('#v23SuitePrimaryNav [data-group="full"]'); if (!b || b.__v45) return; b.__v45 = true;
+  b.addEventListener('click', function(e){
+    var root = $('suite-root'); var on = root && (root.classList.contains('v25-full-active') || root.classList.contains('v251-full-active'));
+    if (!on) return;                                  /* the layer that owns Full opens it */
+    e.stopImmediatePropagation(); e.preventDefault();
+    root.classList.remove('v25-full-active','v251-full-active'); if (window.V25) V25.fullActive=false; if (window.V251) V251.fullActive=false;
+    var last = get('los.v23.suiteGroup','file'); var g = document.querySelector('#v23SuitePrimaryNav [data-group="'+last+'"]'); if (g && g !== b) g.click();
+  }, true);
+}
+
+/* =================================================================== 11
+   MOVABLE SECTIONS, SAVED WITH THE SCENARIO
+
+   Drag a section header to reorder the cards on a workspace. The order
+   is stored on the scenario's inputs under `v45Layout[mode]`, so it
+   travels with the file, saves with it, and is gone when the file is
+   reset or a new one started. "Reset layout" puts the default back.
+   =================================================================== */
+function sectionsHost(){ return document.querySelector('#suite-root #screen-body, #suite-root .screen-body'); }
+function cards(host){ return $$(':scope > .card, :scope > section, :scope > .v35-quote-card', host); }
+function cardKey(c){ var h = c.querySelector('h2, h3, .card-head, .sec-head'); return key(h ? h.textContent : c.id || c.className).slice(0,60); }
+function layoutApply(){
+  var s = store(), host = sectionsHost(); if (!s || !host) return;
+  var mode = s.snapshot && s.snapshot.mode; var lay = s.activeInputs && s.activeInputs.v45Layout; var order = lay && lay[mode];
+  if (!order){ if (host.__v45order){ host.__v45order = null; cards(host).forEach(function(c){ c.style.order=''; }); } return; }
+  var sig = order.join('|'); if (host.__v45order === sig) return; host.__v45order = sig;
+  host.classList.add('v45-flex');
+  cards(host).forEach(function(c){ var k = cardKey(c), i = order.indexOf(k); c.style.order = i >= 0 ? String(i) : '999'; });
+}
+function layoutSave(host){
+  var s = store(); if (!s) return; var mode = s.snapshot && s.snapshot.mode;
+  var order = cards(host).slice().sort(function(a,b){ return (N(a.style.order)||0) - (N(b.style.order)||0); }).map(cardKey);
+  var lay = Object.assign({}, s.activeInputs.v45Layout||{}); lay[mode] = order;
+  try { s.setField('v45Layout', lay, 'Section layout'); } catch(e){ s.activeInputs.v45Layout = lay; }
+  host.__v45order = order.join('|');
+}
+V45.resetLayout = function(){ var s = store(); if (!s) return; var lay = Object.assign({}, s.activeInputs.v45Layout||{}); delete lay[s.snapshot.mode];
+  try { s.setField('v45Layout', lay, 'Layout reset'); } catch(e){ s.activeInputs.v45Layout = lay; } var host = sectionsHost(); if (host){ host.__v45order = null; cards(host).forEach(function(c){ c.style.order=''; }); } say('Layout reset','Default arrangement restored for this page.','info',4000); };
+function dragWire(){
+  var host = sectionsHost(); if (!host) return;
+  cards(host).forEach(function(c, idx){
+    if (c.__v45drag) return; c.__v45drag = true;
+    var h = c.querySelector('h2, h3, .card-head'); if (!h) return;
+    h.setAttribute('draggable','true'); h.classList.add('v45-grip'); h.title = 'Drag to move this section';
+    h.addEventListener('dragstart', function(e){ host.__v45from = c; e.dataTransfer.effectAllowed='move'; try { e.dataTransfer.setData('text/plain', cardKey(c)); } catch(x){} c.classList.add('v45-dragging'); });
+    h.addEventListener('dragend', function(){ c.classList.remove('v45-dragging'); });
+    c.addEventListener('dragover', function(e){ if (host.__v45from && host.__v45from !== c){ e.preventDefault(); c.classList.add('v45-over'); } });
+    c.addEventListener('dragleave', function(){ c.classList.remove('v45-over'); });
+    c.addEventListener('drop', function(e){ e.preventDefault(); c.classList.remove('v45-over'); var from = host.__v45from; if (!from || from === c) return;
+      host.classList.add('v45-flex');
+      var list = cards(host); list.forEach(function(x,i){ if (!x.style.order) x.style.order = String(i); });
+      var fo = N(from.style.order), to = N(c.style.order); list.forEach(function(x){ var o = N(x.style.order); if (fo < to){ if (o > fo && o <= to) x.style.order = String(o-1); } else { if (o >= to && o < fo) x.style.order = String(o+1); } }); from.style.order = String(to);
+      layoutSave(host); });
+  });
+  if (!host.querySelector('#v45LayoutReset') && cards(host).length > 1){ var b = document.createElement('button'); b.type='button'; b.id='v45LayoutReset'; b.className='v45-reset no-print'; b.textContent='Reset layout'; b.onclick = V45.resetLayout; host.appendChild(b); }
+}
+
+/* =================================================================== 12
+   THE CALCULATOR'S FILE ACTIONS CARRY THE SUITE'S ACTIONS TOO
+   =================================================================== */
+function calcActions(){
+  var grid = document.querySelector('#v23CalcActions .v23-actions-grid'); if (!grid || grid.__v45) return;
+  var inv = {}; $$('#v23SuiteActions button, #v24LoanTools button, #v35Panel button').forEach(function(b){ var l = norm(b.textContent).replace(/\s*\u25BE\s*$/,''); if (l && l.length <= 40 && !inv[key(l)]) inv[key(l)] = b; });
+  var labels = Object.keys(inv); if (!labels.length) return; grid.__v45 = true;
+  var head = document.createElement('div'); head.className='v30-mhead'; head.textContent='Loan Suite'; grid.appendChild(head);
+  labels.sort().forEach(function(k){ var b = document.createElement('button'); b.type='button'; b.className='btn v23-action v45-calc-action'; b.textContent = norm(inv[k].textContent).replace(/\s*\u25BE\s*$/,'');
+    b.onclick = function(){ try { if (window.LOS && LOS.go) LOS.go('s'); } catch(e){} setTimeout(function(){ try { inv[k].click(); } catch(e){} }, 120); }; grid.appendChild(b); });
+}
+
+/* =================================================================== 13
+   EVERY ROW ON THE SCENARIO SUMMARY OPENS ITS SOURCE
+   =================================================================== */
+document.addEventListener('click', function(e){
+  var s = store(); if (!s || !s.snapshot || s.snapshot.mode !== 'summary') return;
+  var row = e.target.closest('#suite-root #screen-body tr, #suite-root #screen-body .out, #suite-root #screen-body li, #suite-root #screen-body .row'); if (!row || e.target.closest('button, a, input, select')) return;
+  var label = norm((row.querySelector('td, .l, b, span') || row).textContent).slice(0,60); if (!label) return;
+  if (window.V35 && V35.openRailEditor){ try { V35.openRailEditor(row, label, ''); } catch(x){} }
+}, true);
+
+/* =================================================================== 14
+   OUTSIDE CLICK CLOSES EVERYTHING THAT FLOATS
+   =================================================================== */
+document.addEventListener('mousedown', function(e){
+  var t = e.target;
+  if (!t.closest('.v35-rail-editor') && !t.closest('.rail') && window.V35 && V35.closeRailEditor && document.querySelector('.v35-rail-editor')){ try { V35.closeRailEditor(); } catch(x){} }
+  if (!t.closest('#v39Look') && !t.closest('#v39LookBtn')){ var l = $('v39Look'); if (l && l.classList.contains('on')){ l.classList.remove('on'); l.hidden = true; } }
+  var d = $('v45Dates'); if (d && !t.closest('#v45Dates')) d.hidden = true;
+  ['v11LeModal','v12Modal','v30GenModal','v36AssetAiModal','v36AssetGuideModal'].forEach(function(id){ var m = $(id); if (m && m.classList.contains('on') && t === m) m.classList.remove('on'); });
+});
+
+/* =================================================================== 15
+   WIRING
+   =================================================================== */
+function tick(){
+  try { cleanEditors(); } catch(e){}
+  try { sellerCredit(); } catch(e){}
+  try { draws(); } catch(e){}
+  try { wrapNaming(); } catch(e){}
+  try { arvBanner(); } catch(e){}
+  try { rateEditor(); } catch(e){}
+  try { ratesOpen(); } catch(e){}
+  try { addressLinks(); } catch(e){}
+  try { fullToggle(); } catch(e){}
+  try { layoutApply(); dragWire(); } catch(e){}
+  try { calcActions(); } catch(e){}
+}
+if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1200); else setInterval(tick, 900);
+setTimeout(tick, 240);
+})();
+
+
+/* =====================================================================
+   Release 46 — the big metric cards first, more of them, and an
+   assistant panel with a prompt library and a copy button.
+   Additive over 45.
+   ===================================================================== */
+(function(){
+"use strict";
+var $  = function(id){ return document.getElementById(id); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+function N(v){ v = parseFloat(String(v==null?'':v).replace(/[$,%\s]/g,'')); return isFinite(v)?v:0; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+function usd(v,dp){ dp=dp===undefined?0:dp; var n=N(v);
+  return (n<0?'\u2212':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp}); }
+function pct(v,dp){ dp=dp===undefined?2:dp; var n=N(v); if (Math.abs(n)<=1) n*=100; return n.toFixed(dp)+'%'; }
+function say(t,b,k,ms){ if (window.LOS && LOS.say) LOS.say(t,b,k,ms); }
+function store(){ try { return window.mortgageSuite.store; } catch(e){ return null; } }
+var V46 = window.V46 = { version:'46.0' };
+
+/* =================================================================== 1
+   METRIC CARDS — first thing in the control centre, and more of them
+
+   Release 44 put its four large cards at the bottom of the Scenario
+   control centre, under the fields. They are the summary a person reads
+   before touching anything, so they go directly under the title. Four
+   more join them, each a live row that opens its source, in the same
+   icon-and-figure card.
+   =================================================================== */
+var IC = {
+  home:'<svg viewBox="0 0 16 16"><path d="M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366Z"/></svg>',
+  card:'<svg viewBox="0 0 16 16"><path d="M1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25v-8.5C0 2.784.784 2 1.75 2ZM1.5 5.5v6.75c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V5.5Zm0-1.5h13v-.25a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25Z"/></svg>',
+  chart:'<svg viewBox="0 0 16 16"><path d="M1.5 1.75V13.5h13.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75V1.75a.75.75 0 0 1 1.5 0Zm14.28 2.53-5.25 5.25a.75.75 0 0 1-1.06 0L7 7.06 4.28 9.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.25-3.25a.75.75 0 0 1 1.06 0L10 7.94l4.72-4.72a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042Z"/></svg>',
+  cash:'<svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0Zm.75 2.5a.75.75 0 0 0-1.5 0V3c-1.53.164-2.5 1.113-2.5 2.5 0 1.6 1.35 2.115 2.5 2.4v2.55c-.55-.108-1-.35-1-.95a.75.75 0 0 0-1.5 0c0 1.387.97 2.336 2.5 2.5v.5a.75.75 0 0 0 1.5 0V13c1.53-.164 2.5-1.113 2.5-2.5 0-1.6-1.35-2.115-2.5-2.4V5.55c.55.108 1 .35 1 .95a.75.75 0 0 0 1.5 0c0-1.387-.97-2.336-2.5-2.5Z"/></svg>',
+  pct:'<svg viewBox="0 0 16 16"><path d="M13.78 2.22a.75.75 0 0 1 0 1.06l-10.5 10.5a.75.75 0 1 1-1.06-1.06l10.5-10.5a.75.75 0 0 1 1.06 0ZM4.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm7 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>',
+  check:'<svg viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"/></svg>'
+};
+function card(label, value, mode, note, icon){
+  return '<button type="button" class="v35-live-row v46-card" data-v35-label="' + esc(label) + '" data-v35-mode="' + esc(mode) + '">'
+    + '<i class="v46-ic">' + IC[icon] + '</i><span class="v46-body"><small>' + esc(label) + '</small><b>' + value + '</b><em>' + esc(note||'') + '</em></span><i class="v46-chev">\u203A</i></button>';
+}
+function metricCards(){
+  var punch = $('v44PunchIn'), strip = $('v44MetricStrip'); if (!punch || !strip) return false;
+  var head = punch.querySelector('.v44-punch-head');
+  if (head && head.nextElementSibling !== strip) head.parentNode.insertBefore(strip, head.nextSibling);
+  var s = store(); if (!s) return true;
+  var o = s.outputs || {}, p = o.payment || {}, cash = o.cash || {}, a = o.aus || {}, mmw = o.mmw || {};
+  var extra = $('v46Extra');
+  if (!extra){ extra = document.createElement('div'); extra.id = 'v46Extra'; extra.className = 'v44-metric-strip v46-strip'; strip.parentNode.insertBefore(extra, strip.nextSibling); }
+  var html = card('Monthly payment', usd(p.totalMonthlyPayment,2), 'setup', 'P&I, MI, taxes and insurance', 'card')
+    + card('Cash to close', usd(cash.cashToClose,2), 'closing', 'After credits and deposits', 'cash')
+    + card('LTV', N(p.currentLtv) ? pct(p.currentLtv,2) : '\u2014', 'maxmortgage', N(o.value && o.value.valueBasis) ? 'on ' + usd(o.value.valueBasis) : 'value basis', 'pct')
+    + card('Back-end DTI', N(a.backEndDti) ? pct(a.backEndDti,1) : 'Enter income', 'income', N(a.backEndLimit) ? 'cap ' + pct(a.backEndLimit,1) : 'against the programme cap', 'check');
+  if (extra.__sig !== html){ extra.__sig = html; extra.innerHTML = html; }
+  strip.classList.add('v46-strip');
+  return true;
+}
+
+/* =================================================================== 2
+   THE ASSISTANT PANEL — a prompt library, and a copy button
+
+   The panel had one route: build a prompt from a document already
+   loaded. Now it also carries a library — one generic reading prompt
+   and one per document type — chosen from a select, filled into the
+   box, copied with a button. Every prompt asks for JSON only, with the
+   keys this file actually imports, and tells the assistant not to
+   guess at blanks.
+   =================================================================== */
+var RULES = '\n\nRules:\n- Return ONLY a JSON object. No prose, no markdown fence.\n- Numbers as plain numbers: no $ signs, no commas, no % signs.\n- Rates as printed (6.875), never as decimals (0.06875).\n- Dates as YYYY-MM-DD.\n- If a field is blank or unreadable on the document, OMIT the key. Never guess a value.\n- Copy what is printed. Do not calculate, average, annualise or reconcile anything.';
+var PROMPTS = {
+  generic: { label:'Generic — any loan document', text:
+    'You are reading a mortgage loan document. Identify what it is and extract every dollar figure, date, rate, name and identifier it prints, using descriptive camelCase keys. Add a "documentType" key with one of: paystub, w2, 1040, scheduleC, k1, bankStatement, loanEstimate, closingDisclosure, creditReport, lease, appraisal, contractorEstimate, voe, awardLetter, other.' + RULES },
+  paystub: { label:'Paystub / earnings statement', text:
+    'You are reading a paystub. Return: {"documentType":"paystub","employer","employeeName","payDate","periodStart","periodEnd","payFrequency" (weekly/biweekly/semimonthly/monthly),"hourlyRate","hoursThisPeriod","grossThisPeriod","grossYtd","baseYtd","overtimeYtd","bonusYtd","commissionYtd","otherYtd","hireDate"}.' + RULES },
+  w2: { label:'W-2', text:
+    'You are reading an IRS Form W-2. Return: {"documentType":"w2","taxYear","employer","employerEin","employeeName","box1Wages","box3SocialSecurityWages","box5MedicareWages","box12Codes":[{"code","amount"}]}.' + RULES },
+  tax1040: { label:'1040 with Schedule C', text:
+    'You are reading a Form 1040 with Schedule C. Return: {"documentType":"1040","taxYear","filers":[names],"line1Wages","line8OtherIncome","adjustedGrossIncome","scheduleC":[{"businessName","line31NetProfit","line13Depreciation","line30HomeOffice","line24bMealsDeducted","line12Depletion","line9CarExpenses"}]}.' + RULES },
+  bank: { label:'Bank statement — large deposits', text:
+    'You are reading a bank statement. Return: {"documentType":"bankStatement","institution","accountLast4","statementStart","statementEnd","beginningBalance","endingBalance","averageBalance" (only if printed),"deposits":[{"date","amount","description"}]}. Include EVERY deposit, not only large ones; the file applies its own threshold.' + RULES },
+  le: { label:'Loan Estimate(s) — one object per LE', text:
+    'You are reading one or more Loan Estimates. Return {"version":"nmb-loan-extract/1","estimates":[ one object per LE ]}, each with: {"label","loanProgram","renovation","basePurchasePrice","totalLoanAmount","interestRate","termYears","principalAndInterest","monthlyMi","monthlyEscrow","totalMonthlyPayment","insuranceAnnual","totalClosingCosts","loanCostsD","otherCostsI","closingCostsFinanced" (positive),"cashToClose" (keeps its sign),"points","originationFee","apr","dateIssued"}.' + RULES },
+  credit: { label:'Credit report — tradelines', text:
+    'You are reading a tri-merge credit report. Return: {"documentType":"creditReport","scores":{"equifax","experian","transunion"},"tradelines":[{"creditor","type" (mortgage/auto/lease/student/revolving/installment/collection),"balance","monthlyPayment","monthsRemaining" (if printed),"creditLimit","late30","late60","late90","pastDue","disputed":true/false,"authorizedUser":true/false,"dateOpened"}],"inquiriesLast12Months","publicRecords":[{"type","amount","date"}]}.' + RULES },
+  lease: { label:'Lease agreement', text:
+    'You are reading a residential lease. Return: {"documentType":"lease","propertyAddress","landlord","tenants":[names],"leaseStart","leaseEnd","monthlyRent","securityDeposit","utilitiesIncluded":[list],"unitCount" (if the building has more than one)}.' + RULES },
+  appraisal: { label:'Appraisal (1004 / 203k)', text:
+    'You are reading a residential appraisal. Return: {"documentType":"appraisal","propertyAddress","effectiveDate","opinionOfValue","asRepairedValue" (if a subject-to appraisal),"grossLivingArea","siteArea","yearBuilt","units","condition","comparables":[{"address","salePrice","saleDate","grossLivingArea","adjustedValue"}]}.' + RULES },
+  contractor: { label:'Contractor estimate / bid', text:
+    'You are reading a contractor estimate for a renovation. Return: {"documentType":"contractorEstimate","contractor","licenseNumber","propertyAddress","estimateDate","lineItems":[{"item","description","amount"}],"total","paymentTerms","drawSchedule":[{"milestone","amount"}] (only if printed)}.' + RULES },
+  voe: { label:'Work Number / written VOE', text:
+    'You are reading an employment verification. Return: {"documentType":"voe","employer","employeeName","hireDate","position","employmentStatus","payFrequency","baseRate","currentYearBase","currentYearOvertime","currentYearBonus","currentYearCommission","priorYearTotal","twoYearsPriorTotal","verifiedOn"}.' + RULES },
+  award: { label:'Social Security / pension award letter', text:
+    'You are reading a benefit award letter. Return: {"documentType":"awardLetter","agency","beneficiary","benefitType","monthlyBenefit","effectiveDate","medicarePremiumDeducted","taxable":true/false/unknown}.' + RULES }
+};
+V46.pick = function(k){ var p = PROMPTS[k]; var box = $('v9PromptBox'); if (!p || !box) return; box.value = p.text; box.dispatchEvent(new Event('input',{bubbles:true})); };
+V46.copy = function(){ var box = $('v9PromptBox'); if (!box || !box.value.trim()) return say('Nothing to copy','Pick a prompt or build one from a document first.','warn',4000);
+  var done = function(){ say('Prompt copied','Paste it to the assistant with the document, then paste the JSON back here.','good',5000); };
+  try { navigator.clipboard.writeText(box.value).then(done, function(){ box.select(); document.execCommand && document.execCommand('copy'); done(); }); } catch(e){ box.select(); try { document.execCommand('copy'); } catch(x){} done(); } };
+function aiPanel(){
+  var box = $('v9PromptBox'); if (!box || $('v46Library')) return false;
+  var lbl = box.previousElementSibling;
+  var bar = document.createElement('div'); bar.id = 'v46Library'; bar.className = 'v46-lib';
+  bar.innerHTML = '<label>Prompt library</label><select id="v46Pick" class="cell-input"><option value="">Choose a prompt\u2026</option>'
+    + Object.keys(PROMPTS).map(function(k){ return '<option value="' + k + '">' + esc(PROMPTS[k].label) + '</option>'; }).join('')
+    + '</select><button type="button" class="btn btn-primary btn-sm" onclick="V46.copy()">Copy prompt</button>'
+    + '<span class="v46-hint">Generic reads anything; the specific ones ask for exactly the keys this file imports.</span>';
+  (lbl && /prompt/i.test(lbl.textContent||'') ? lbl : box).parentNode.insertBefore(bar, lbl && /prompt/i.test(lbl.textContent||'') ? lbl : box);
+  $('v46Pick').onchange = function(){ V46.pick(this.value); };
+  return true;
+}
+V46.prompts = PROMPTS;
+
+function tick(){ try { metricCards(); } catch(e){} try { aiPanel(); } catch(e){} }
+if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1200); else setInterval(tick, 900);
+setTimeout(tick, 240);
 })();
 
 </script>

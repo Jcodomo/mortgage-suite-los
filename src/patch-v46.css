@@ -1,0 +1,193 @@
+/* =====================================================================
+   Release 46 — the reference look for the rail, Quote and the control
+   centre; the large cards; the prompt library
+   ===================================================================== */
+
+/* ---- 1. THE RAIL, TO IMAGE 1 ---------------------------------------
+   Card on the page colour, a quiet header with the badge washed into
+   it, the scenario line under the title, dashed row separators, blue
+   section captions, totals larger and blue on a solid rule.            */
+#suite-root .rail .card{
+  background:var(--panel) !important; border:1px solid var(--line-2) !important; border-radius:12px !important;
+  box-shadow:0 1px 3px rgba(20,30,50,.05) !important; padding:0 !important;
+}
+#suite-root .rail .card > h3{
+  display:flex !important; align-items:center !important; justify-content:space-between !important; gap:10px;
+  padding:12px 14px 10px !important; margin:0 !important; border-bottom:0 !important;
+  font:800 11px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.06em !important; text-transform:uppercase; color:var(--ink) !important;
+}
+#suite-root .rail .card > h3 .badge{
+  background:color-mix(in srgb, var(--accent) 10%, transparent) !important; color:color-mix(in srgb, var(--accent) 55%, var(--panel)) !important;
+  border:0 !important; font-size:10px !important; letter-spacing:.06em !important; padding:4px 10px !important; border-radius:999px !important; transition:none !important;
+}
+#suite-root .rail .card > .body{ padding:0 14px 12px !important; }
+#suite-root .rail .v5-scenline, #suite-root .rail .v44-live-note{ display:block !important; font-size:11px !important; color:var(--muted) !important; margin:0 0 8px !important; line-height:1.4; }
+#suite-root .rail .notice{
+  border-radius:10px !important; padding:10px 12px !important; margin:4px 0 8px !important; font:600 13px/1.4 var(--v24-font-ui, inherit) !important;
+  background:color-mix(in srgb,#2da44e 12%, var(--panel)) !important; border:1px solid color-mix(in srgb,#2da44e 40%, transparent) !important; color:#1a7f37 !important;
+}
+#suite-root .rail .notice.v45-fail{ background:color-mix(in srgb,#cf222e 12%, var(--panel)) !important; border-color:color-mix(in srgb,#cf222e 45%, transparent) !important; color:#cf222e !important; }
+#suite-root .rail .notice.info, #suite-root .rail .notice[class*="pending"]{ background:color-mix(in srgb, var(--accent) 8%, var(--panel)) !important; border-color:color-mix(in srgb, var(--accent) 30%, transparent) !important; color:var(--ink) !important; }
+#suite-root .rail .sec-head, #suite-root .rail .v40-sec{
+  font:800 10px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.09em !important; text-transform:uppercase !important;
+  color:var(--accent) !important; margin:14px 0 6px !important; padding:0 !important; border:0 !important; background:transparent !important;
+}
+#suite-root .rail .out, #suite-root .rail .v40-out{
+  display:grid !important; grid-template-columns:1fr auto !important; align-items:baseline; gap:10px;
+  padding:6px 0 !important; margin:0 !important; background:transparent !important; border:0 !important; border-bottom:1px dashed var(--line-2) !important; border-radius:0 !important;
+}
+#suite-root .rail .out .l, #suite-root .rail .v40-out .l{ font:500 13px/1.35 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; }
+#suite-root .rail .out .v, #suite-root .rail .v40-out .v{ font:700 13.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; text-align:right; font-variant-numeric:tabular-nums; }
+#suite-root .rail .out .v small, #suite-root .rail .out .v .sub{ font-size:10.5px; font-weight:500; color:var(--muted); margin-right:8px; }
+#suite-root .rail .out.total, #suite-root .rail .out[data-out^="Total"], #suite-root .rail .out[data-out="Cash to close"], #suite-root .rail .out.lvl-major{
+  margin-top:4px !important; padding:10px 0 8px !important; border-top:1px solid var(--line) !important; border-bottom:0 !important;
+}
+#suite-root .rail .out.total .l, #suite-root .rail .out[data-out^="Total"] .l, #suite-root .rail .out[data-out="Cash to close"] .l, #suite-root .rail .out.lvl-major .l{
+  font-weight:800 !important; text-transform:uppercase; letter-spacing:.04em; font-size:14px !important; color:var(--accent) !important;
+}
+#suite-root .rail .out.total .v, #suite-root .rail .out[data-out^="Total"] .v, #suite-root .rail .out[data-out="Cash to close"] .v, #suite-root .rail .out.lvl-major .v{
+  font-size:18px !important; font-weight:800 !important; color:var(--accent) !important;
+}
+#suite-root .rail .out .pass, #suite-root .rail .v.pass{ color:#1a7f37 !important; font-weight:800 !important; }
+#suite-root .rail .out .warn, #suite-root .rail .v.warn{ color:#cf222e !important; font-weight:800 !important; }
+#suite-root .rail .out .muted, #suite-root .rail .l.muted{ color:var(--muted) !important; }
+#suite-root .rail .card > .body::after{ content:'Click any line to jump to the field that drives it.'; display:block; margin-top:12px; font-size:11px; color:var(--muted); }
+#suite-root .rail .out:hover, #suite-root .rail .v40-out:hover{ background:color-mix(in srgb, var(--accent) 6%, transparent) !important; }
+
+/* ---- 2. QUOTE AND THE CONTROL CENTRE, TO IMAGE 2 -------------------
+   White card, grey title band with the programme label washed to the
+   right, three columns, tinted result rows with soft corners, totals
+   in blue, the green cushion row, and the footer strip.               */
+#suite-root #screen-body .card, #suite-root .v44-punch{
+  background:var(--panel) !important; border:1px solid var(--line-2) !important; border-radius:12px !important;
+  box-shadow:0 1px 3px rgba(20,30,50,.05) !important;
+}
+#suite-root #screen-body .card > h2, #suite-root #screen-body .card > .card-head, #suite-root .v44-punch-head{
+  display:flex !important; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 16px !important; margin:0 !important; border-bottom:1px solid var(--line-2) !important;
+  background:color-mix(in srgb, var(--panel) 92%, var(--page, var(--bg))) !important;
+  font:800 14px/1.2 var(--v24-font-ui, inherit) !important; letter-spacing:.02em; text-transform:uppercase; color:var(--ink) !important;
+}
+#suite-root #screen-body .card > h2 .badge, #suite-root #screen-body .card-head .badge, #suite-root .v44-punch-head small{
+  font:800 10.5px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.06em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--accent) 40%, var(--panel)) !important; background:transparent !important; border:0 !important;
+}
+#suite-root #screen-body .sec-head{ font:800 10px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.09em !important; text-transform:uppercase; color:var(--accent) !important; margin:6px 0 8px !important; border:0 !important; padding:0 !important; }
+#suite-root #screen-body .out{
+  display:grid !important; grid-template-columns:1fr auto; align-items:center; gap:10px;
+  padding:9px 12px !important; margin:0 0 6px !important; border-radius:8px !important;
+  background:color-mix(in srgb, var(--accent) 7%, var(--panel)) !important; border:1px solid color-mix(in srgb, var(--accent) 12%, transparent) !important;
+}
+#suite-root #screen-body .out .l{ font:500 12.5px/1.3 var(--v24-font-ui, inherit) !important; color:color-mix(in srgb, var(--ink) 72%, var(--accent)) !important; }
+#suite-root #screen-body .out .v{ font:700 13.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; font-variant-numeric:tabular-nums; }
+#suite-root #screen-body .out.total, #suite-root #screen-body .out.lvl-major{
+  background:transparent !important; border:0 !important; padding:8px 0 !important; margin-top:6px !important;
+}
+#suite-root #screen-body .out.total .l, #suite-root #screen-body .out.lvl-major .l{ font-weight:800 !important; text-transform:uppercase; letter-spacing:.04em; font-size:15px !important; color:var(--accent) !important; }
+#suite-root #screen-body .out.total .v, #suite-root #screen-body .out.lvl-major .v{ font-size:20px !important; font-weight:800 !important; color:var(--accent) !important; }
+#suite-root #screen-body .out.good, #suite-root #screen-body .out.cushion, #suite-root #screen-body .out[data-out*="cushion" i]{
+  background:color-mix(in srgb,#2da44e 12%, var(--panel)) !important; border-color:color-mix(in srgb,#2da44e 28%, transparent) !important;
+}
+#suite-root #screen-body .out.good .v, #suite-root #screen-body .out.cushion .v, #suite-root #screen-body .out[data-out*="cushion" i] .v{ color:#1a7f37 !important; }
+#suite-root #screen-body .card .foot, #suite-root #screen-body .card > .card-foot, #suite-root #screen-body .v20-footline{
+  display:flex; gap:14px; flex-wrap:wrap; padding:10px 16px !important; border-top:1px solid var(--line-2) !important;
+  font:700 12.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--ink) !important;
+}
+#suite-root #screen-body .card .foot .warn, #suite-root #screen-body .card > .card-foot .warn{ color:#cf222e !important; }
+#suite-root #screen-body .field label, #suite-root .v44-punch-grid label{ font:500 12.5px/1.3 var(--v24-font-ui, inherit) !important; color:var(--muted) !important; text-transform:none !important; letter-spacing:0 !important; }
+#suite-root #screen-body input, #suite-root #screen-body select, #suite-root .v44-punch-grid input, #suite-root .v44-punch-grid select{
+  height:40px !important; border-radius:8px !important; font-size:14px !important; padding:0 12px !important;
+  background:color-mix(in srgb, var(--panel) 90%, var(--page, var(--bg))) !important; border:1px solid var(--line) !important; color:var(--ink) !important;
+}
+
+/* ---- 3. THE LARGE CARDS, FIRST -------------------------------------- */
+#suite-root .v44-metric-strip.v46-strip{
+  display:grid !important; grid-template-columns:repeat(4, minmax(0,1fr)) !important; gap:10px !important; margin:12px 16px 4px !important;
+}
+#suite-root #v46Extra{ margin-top:0 !important; margin-bottom:14px !important; }
+#suite-root .v46-strip .v35-live-row, #suite-root .v46-card{
+  display:grid !important; grid-template-columns:auto 1fr auto !important; align-items:center !important; gap:12px !important;
+  padding:12px 14px !important; min-height:74px; text-align:left !important;
+  background:color-mix(in srgb, var(--panel) 94%, var(--page, var(--bg))) !important; border:1px solid var(--line-2) !important; border-radius:12px !important;
+  color:var(--ink) !important; cursor:pointer; transition:border-color .12s ease, box-shadow .12s ease;
+}
+#suite-root .v46-strip .v35-live-row:hover, #suite-root .v46-card:hover{ border-color:var(--accent) !important; box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
+#suite-root .v46-ic, #suite-root .v46-strip .v35-live-row > i:first-child{
+  width:34px; height:34px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--accent); color:#fff; flex:none;
+}
+#suite-root .v46-ic svg{ width:16px; height:16px; fill:currentColor; }
+#suite-root .v46-body{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+#suite-root .v46-body small, #suite-root .v46-strip .v35-live-row small{ font:800 9.5px/1 var(--v24-font-ui, inherit); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+#suite-root .v46-body b, #suite-root .v46-strip .v35-live-row b{ font:800 18px/1.15 var(--v24-font-ui, inherit); color:var(--ink); font-variant-numeric:tabular-nums; }
+#suite-root .v46-body em, #suite-root .v46-strip .v35-live-row em{ font:400 10.5px/1.3 var(--v24-font-ui, inherit); font-style:normal; color:var(--muted); }
+#suite-root .v46-chev{ display:none !important; }
+
+/* A four-column strip is comfortable only once the main canvas has enough
+   room beside the live rail. Measuring the remaining worksheet width avoids
+   clipped figures on common 1280/1366px laptops. */
+@media (max-width:1540px){
+  #suite-root .v44-metric-strip.v46-strip{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; }
+}
+
+/* Keep Live Summary in the layout instead of letting the older drawer rule
+   cover the worksheet. It remains a side rail on desktop and becomes an
+   ordinary full-width section on narrower screens. */
+@media (min-width:1181px) and (max-width:1360px){
+  #suite-root.v44-final .cols-main,
+  #suite-root.v44-final.v24-summary-open .cols-main{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 340px !important;
+    gap:14px !important;
+  }
+  #suite-root.v44-final .cols-main > .rail.v31-rail,
+  #suite-root.v44-final.v24-summary-open .cols-main > .rail.v31-rail{
+    display:block !important;
+    position:sticky !important;
+    inset:auto !important;
+    top:16px !important;
+    grid-column:2 !important;
+    width:340px !important;
+    max-width:340px !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+}
+@media (max-width:1180px){
+  #suite-root.v44-final .cols-main,
+  #suite-root.v44-final.v24-summary-open .cols-main{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  #suite-root.v44-final .cols-main > .rail.v31-rail,
+  #suite-root.v44-final.v24-summary-open .cols-main > .rail.v31-rail{
+    display:block !important;
+    position:static !important;
+    inset:auto !important;
+    grid-column:1 !important;
+    width:100% !important;
+    max-width:none !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+}
+@media (max-width:640px){
+  #suite-root .v44-metric-strip.v46-strip{ grid-template-columns:1fr !important; }
+}
+
+/* ---- 4. THE PROMPT LIBRARY ----------------------------------------- */
+.v46-lib{ display:grid; grid-template-columns:auto minmax(220px,1fr) auto; gap:8px; align-items:center; margin:10px 0 6px; }
+.v46-lib label{ font:800 10px/1 var(--v24-font-ui, inherit); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.v46-lib select{ height:36px; }
+.v46-hint{ grid-column:1 / -1; font-size:11px; color:var(--muted); line-height:1.45; }
+@media (max-width:700px){ .v46-lib{ grid-template-columns:1fr; } }

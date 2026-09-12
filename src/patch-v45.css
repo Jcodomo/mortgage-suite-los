@@ -1,0 +1,124 @@
+/* =====================================================================
+   Release 45 — theme on every popup, the rail to the reference, the
+   third row in the button style, the small floating pieces
+   ===================================================================== */
+
+/* ---- 1. THE THEME REACHES BODY-LEVEL POPUPS ------------------------
+   Every modal appended to <body> read --panel, --line, --ink from its
+   ancestors — and those were defined on #suite-root and #calc-root,
+   never on the root. A popup outside both shells got the browser
+   default. Mirrored onto :root so anything anywhere inherits.         */
+html[data-v24-theme]{
+  --panel:var(--v24-card); --panel-2:color-mix(in srgb, var(--v24-card) 92%, var(--v24-page));
+  --bg:var(--v24-page); --surface:var(--v24-page); --surface-2:var(--v24-card);
+  --ink:var(--v24-text); --text:var(--v24-text); --text-strong:var(--v24-text); --muted:var(--v24-muted);
+  --line:var(--v24-border); --line-2:color-mix(in srgb, var(--v24-border) 70%, var(--v24-card));
+  --accent:var(--v24-accent); --accent-soft:color-mix(in srgb, var(--v24-accent) 14%, var(--v24-card));
+  --pass-ink:#1a7f37; --warn-ink:#cf222e; --amber-ink:#9a6700; --amber-line:color-mix(in srgb,#bf8700 40%,var(--v24-border));
+  color-scheme:light;
+}
+html[data-v25-surface="dark"], html[data-v25-surface="oled"]{ color-scheme:dark; }
+html[data-v25-surface="dark"][data-v24-theme], html[data-v25-surface="oled"][data-v24-theme]{ --pass-ink:#3fb950; --warn-ink:#ff7b72; --amber-ink:#d29922; }
+/* popups that set their own hard colours */
+.v11-modal .rpt-picker, .v12-modal .rpt-picker, .v30-card, .v35-rail-editor, .v39-panel, .v40-pop, .v42-menu, .v43-menu, .v45-pop, .v29-pop{
+  background:var(--panel) !important; color:var(--ink) !important; border-color:var(--line) !important;
+}
+
+/* ---- 2. THE SUITE INHERITS THE CALCULATOR'S CHROME ----------------- */
+#suite-root .topbar, #suite-root .v34-bar, #suite-root .v23-primary-nav, .v23-context-tabs{
+  font-family:var(--v24-font-ui, inherit) !important;
+}
+#suite-root .v34-bar{ background:color-mix(in srgb, var(--v24-header) 92%, #000 8%) !important; }
+#suite-root .v23-primary-nav{ background:color-mix(in srgb, var(--v24-header) 84%, var(--v24-page) 16%) !important; }
+.v23-context-tabs{ background:color-mix(in srgb, var(--v24-header) 76%, var(--v24-page) 24%) !important; }
+
+/* ---- 3. THE THIRD ROW IN THE BUTTON STYLE ---------------------------
+   The context tabs matched the pills of an earlier design; the row of
+   controls above them is 34px rectangles with a 1px border. Same frame
+   here, so the three rows read as one system.                          */
+.v23-context-tabs .tab, .v23-context-tabs .tab[data-v23-visible="1"], #suite-root .tabs .v43-tab{
+  height:32px !important; min-height:32px !important; padding:0 13px !important;
+  border-radius:8px !important;
+  border:1px solid color-mix(in srgb, var(--v24-header-text,#f6f8fa) 22%, transparent) !important;
+  background:color-mix(in srgb, var(--v24-header-text,#f6f8fa) 7%, transparent) !important;
+  color:var(--v24-header-text,#f6f8fa) !important;
+  font:600 12px/30px var(--v24-font-ui, inherit) !important; letter-spacing:0 !important; text-transform:none !important;
+  opacity:.9;
+}
+.v23-context-tabs .tab:hover{ background:color-mix(in srgb, var(--v24-header-text,#f6f8fa) 14%, transparent) !important; opacity:1; }
+.v23-context-tabs .tab.active, .v23-context-tabs .tab[aria-current="page"]{
+  background:var(--v24-accent,#0969da) !important; border-color:transparent !important; color:#fff !important; opacity:1;
+}
+
+/* ---- 4. THE RAIL, TO THE REFERENCE ---------------------------------
+   White card, quiet header with the programme badge, section labels in
+   the accent, bold totals on a rule, a footer line. Values in the
+   numeric face.                                                        */
+#suite-root .rail .card{
+  background:var(--panel) !important; border:1px solid var(--line) !important; border-radius:14px !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.06) !important; padding:0 !important;
+}
+#suite-root .rail .card > h3{
+  display:flex !important; align-items:center !important; justify-content:space-between !important;
+  padding:12px 16px !important; margin:0 !important; border-bottom:1px solid var(--line-2) !important;
+  font:800 10.5px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.08em !important; color:var(--ink) !important;
+}
+#suite-root .rail .card > .body{ padding:6px 16px 12px !important; }
+#suite-root .rail .sec-head, #suite-root .rail .v40-sec{
+  font:800 9.5px/1 var(--v24-font-ui, inherit) !important; letter-spacing:.09em !important; text-transform:uppercase !important;
+  color:var(--accent) !important; margin:14px 0 4px !important; padding:0 !important; border:0 !important;
+}
+#suite-root .rail .out, #suite-root .rail .v40-out{ display:grid !important; grid-template-columns:1fr auto; align-items:baseline; gap:10px; padding:4px 0 !important; }
+#suite-root .rail .out .l, #suite-root .rail .v40-out .l{ font:500 12.5px/1.35 var(--v24-font-ui, inherit) !important; color:var(--ink) !important; }
+#suite-root .rail .out .v, #suite-root .rail .v40-out .v{ font:600 13px/1.3 var(--v24-font-num, ui-monospace, monospace) !important; color:var(--ink) !important; text-align:right; }
+#suite-root .rail .out.total, #suite-root .rail .out[data-out*="TOTAL"], #suite-root .rail .out[data-out^="Total"], #suite-root .rail .out[data-out="Cash to close"]{
+  margin-top:6px !important; padding-top:8px !important; border-top:1px solid var(--line-2) !important;
+}
+#suite-root .rail .out.total .l, #suite-root .rail .out[data-out^="Total"] .l, #suite-root .rail .out[data-out="Cash to close"] .l{ font-weight:800 !important; text-transform:uppercase; letter-spacing:.06em; font-size:11.5px !important; color:var(--accent) !important; }
+#suite-root .rail .out.total .v, #suite-root .rail .out[data-out^="Total"] .v, #suite-root .rail .out[data-out="Cash to close"] .v{ font-size:16px !important; font-weight:800 !important; color:var(--accent) !important; }
+#suite-root .rail .card > .body::after{ content:'Click any line to jump to the field that drives it.'; display:block; margin-top:14px; font-size:10.5px; color:var(--muted); }
+/* the value-test banner */
+#suite-root .rail .notice, #suite-root .rail .v44-banner{ border-radius:10px !important; padding:10px 12px !important; font-size:12.5px !important; }
+#suite-root .rail .v45-fail{ background:color-mix(in srgb,#cf222e 12%,var(--panel)) !important; border:1px solid color-mix(in srgb,#cf222e 45%,transparent) !important; color:var(--warn-ink) !important; }
+
+/* ---- 5. TAX DUE DATES POPOVER -------------------------------------- */
+.v45-pop{ position:absolute; z-index:1900; min-width:280px; max-width:340px; padding:10px 12px; border-radius:10px;
+  background:var(--panel); border:1px solid var(--line); box-shadow:0 16px 40px rgba(0,0,0,.28); color:var(--ink); }
+.v45-pop[hidden]{ display:none !important; }
+.v45-pop-hd{ font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; }
+.v45-date{ display:flex; flex-direction:column; gap:1px; padding:6px 0; border-top:1px solid var(--line-2); font-size:12px; }
+.v45-date:first-of-type{ border-top:0; }
+.v45-date span{ font-size:10.5px; color:var(--muted); }
+.v45-pop-ft{ margin-top:8px; font-size:10.5px; color:var(--muted); line-height:1.45; }
+label:has(+ *), .field > label{ cursor:default; }
+
+/* ---- 6. THE RATE BOARD UNDER THE EDITOR ---------------------------- */
+.v45-board-host{ margin:10px 0 4px; }
+.v45-board{ width:100%; border-collapse:collapse; font-size:12px; }
+.v45-board td{ padding:5px 4px; border-top:1px solid var(--line-2); }
+.v45-board td.n{ text-align:right; font-family:var(--v24-font-num, ui-monospace, monospace); font-weight:700; }
+.v45-use{ padding:3px 10px; border-radius:6px; border:1px solid color-mix(in srgb,var(--accent) 45%,transparent); background:color-mix(in srgb,var(--accent) 12%,transparent); color:var(--accent); font-size:11px; font-weight:700; cursor:pointer; }
+.v45-board-ft, .v45-board-empty{ font-size:10.5px; color:var(--muted); margin-top:6px; }
+
+/* ---- 7. THE RATES PAGE ART ---------------------------------------- */
+#panel-rates svg.icon-lg, #panel-rates .v45-icon{ width:26px !important; height:26px !important; max-width:26px !important; color:var(--accent) !important; fill:currentColor; }
+#panel-rates svg[style*="height:150px"]{ height:150px !important; }
+
+/* ---- 8. ADDRESS LINKS --------------------------------------------- */
+.v45-links{ display:flex; gap:6px; margin-top:5px; flex-wrap:wrap; }
+.v45-links a{ font-size:10.5px; font-weight:700; text-decoration:none; padding:2px 8px; border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--accent) 40%,transparent); color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,transparent); }
+.v45-links a:hover{ background:color-mix(in srgb,var(--accent) 16%,transparent); }
+
+/* ---- 9. MOVABLE SECTIONS ------------------------------------------- */
+#suite-root .v45-flex{ display:flex; flex-direction:column; }
+.v45-grip{ cursor:grab; }
+.v45-grip:active{ cursor:grabbing; }
+.v45-dragging{ opacity:.55; }
+.v45-over{ outline:2px dashed var(--accent); outline-offset:4px; border-radius:12px; }
+.v45-reset{ align-self:flex-end; order:9999; margin:10px 0 0; padding:5px 11px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;
+  border:1px solid var(--line); background:transparent; color:var(--muted); }
+.v45-reset:hover{ color:var(--accent); border-color:var(--accent); }
+
+/* ---- 10. the calculator's mirrored suite actions ------------------ */
+.v45-calc-action{ font-size:11.5px !important; }
