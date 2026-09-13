@@ -4,7 +4,7 @@
 var $=function(id){return document.getElementById(id);};
 var $$=function(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));};
 var V=window.V24={version:'24.0'};
-var THEMES=['ledger','slate','bank','graphite','terminal','github','github-dark','lightgray','cloudgrey','nord','dracula','solarized','linear'];/* github pair added in release 39 */
+var THEMES=['classic','ledger','slate','bank','graphite','terminal','github','github-dark','lightgray','cloudgrey','nord','dracula','solarized','linear'];/* classic = the release-16 blue/white/green, default since 47 *//* github pair added in release 39 */
 var THEME_LABEL={ledger:'Navy ledger',slate:'Slate and teal',bank:'Bank paper',graphite:'Graphite mono',terminal:'Midnight terminal',federal:'Federal blue',clay:'Clay and sand',violet:'Violet fintech',evergreen:'Evergreen ledger',steel:'Steel and amber'};
 var INPUTS=['paper','mist','mint','sand','ink'];
 var INPUT_LABEL={paper:'Paper',mist:'Mist',mint:'Mint',sand:'Sand',ink:'Ink'};

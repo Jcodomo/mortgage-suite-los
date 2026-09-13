@@ -1,0 +1,84 @@
+/* =====================================================================
+   Release 48 — the grouped nav, the context row, the presets, the
+   state and value tests
+   ===================================================================== */
+
+/* ---- the two nav rows, in the calculator's quiet band -------------- */
+#suite-root .v23-primary-nav.v48-nav{
+  display:flex !important; align-items:center; justify-content:flex-start; gap:4px;
+  max-width:1560px !important; margin:0 auto !important; width:calc(100% - 32px) !important;
+  padding:6px 16px !important; box-sizing:border-box;
+  background:var(--major-1, #12263f) !important; border:0 !important; border-radius:0 !important;
+}
+#suite-root .v23-primary-nav.v48-nav button{
+  display:inline-flex !important; align-items:center; gap:8px;
+  height:38px !important; padding:0 14px !important; border-radius:9px !important;
+  background:transparent !important; border:1px solid transparent !important;
+  color:color-mix(in srgb, var(--v24-header-text,#e9f0fa) 78%, transparent) !important;
+  font:600 13px/36px var(--v24-font-ui, inherit) !important; letter-spacing:0 !important; text-transform:none !important;
+  cursor:pointer; transition:background-color .12s ease, color .12s ease;
+}
+#suite-root .v23-primary-nav.v48-nav button:hover{ background:rgba(255,255,255,.07) !important; color:#fff !important; }
+#suite-root .v23-primary-nav.v48-nav button.active{
+  background:color-mix(in srgb, var(--accent,#1d4ed8) 26%, transparent) !important;
+  border-color:color-mix(in srgb, var(--accent,#1d4ed8) 55%, transparent) !important; color:#fff !important;
+}
+#suite-root .v23-primary-nav.v48-nav .v23-nav-icon{ width:16px; height:16px; display:inline-flex; }
+#suite-root .v23-primary-nav.v48-nav .v23-nav-icon svg{ width:16px; height:16px; fill:currentColor; opacity:.9; }
+#suite-root .v23-primary-nav.v48-nav .v23-nav-icon::before,
+#suite-root .v23-primary-nav.v48-nav .v23-nav-icon::after{ display:none !important; content:none !important; }
+
+/* the rounded row: the group's pages, or all of them under Full */
+#suite-root .tabs.v48-context{
+  display:flex !important; flex-wrap:wrap !important; gap:7px !important;
+  max-width:1560px !important; margin:0 auto !important; width:calc(100% - 32px) !important;
+  padding:9px 16px !important; box-sizing:border-box; position:static !important;
+  background:color-mix(in srgb, var(--major-1,#12263f) 88%, #000 12%) !important;
+  border:0 !important; border-radius:0 0 12px 12px !important; justify-content:flex-start !important;
+}
+#suite-root .tabs.v48-context .tab{
+  display:inline-flex !important; height:32px !important; padding:0 16px !important; border-radius:999px !important;
+  background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.14) !important;
+  color:color-mix(in srgb, var(--v24-header-text,#e9f0fa) 82%, transparent) !important;
+  font:700 11.5px/30px var(--v24-font-ui, inherit) !important; letter-spacing:.05em !important; text-transform:uppercase !important; opacity:1 !important;
+}
+#suite-root .tabs.v48-context .tab:hover{ background:rgba(255,255,255,.12) !important; color:#fff !important; }
+#suite-root .tabs.v48-context .tab.active{
+  background:color-mix(in srgb, var(--accent,#1d4ed8) 30%, transparent) !important;
+  border-color:color-mix(in srgb, var(--accent,#1d4ed8) 70%, transparent) !important; color:#fff !important;
+}
+#suite-root .tabs.v48-context .tab.v48-hide, #suite-root .tabs .tab[data-v23-visible="0"]{ display:none !important; }
+/* release 47's flat treatment stands down */
+#suite-root .tabs.v47-flat{ background:revert !important; border:0 !important; }
+
+/* ---- the four presets ---------------------------------------------- */
+#suite-root .v44-punch-actions{ display:flex !important; flex-wrap:wrap; gap:8px !important; align-items:stretch; }
+#suite-root .v48-preset{
+  display:flex; flex-direction:column; gap:1px; align-items:flex-start; text-align:left; cursor:pointer;
+  padding:7px 13px; border-radius:9px; border:1px solid var(--line); background:var(--panel-2, var(--panel)); color:inherit;
+  transition:border-color .12s ease, background-color .12s ease;
+}
+#suite-root .v48-preset:hover{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 7%, var(--panel)); }
+#suite-root .v48-preset b{ font:700 12.5px/1.2 var(--v24-font-ui, inherit); }
+#suite-root .v48-preset small{ font:500 10px/1.2 var(--v24-font-ui, inherit); color:var(--muted); }
+
+/* ---- the value test and the state notes ---------------------------- */
+.v48-test{
+  padding:10px 12px; border-radius:10px; margin:2px 0 6px;
+  font:600 12.5px/1.45 var(--v24-font-ui, inherit);
+}
+.v48-test.ok{ background:var(--pass-bg,#eaf7ee); border:1px solid var(--pass-line,#b7e2c4); color:var(--pass-ink,#136b34); }
+.v48-test.bad{ background:var(--warn-bg,#fdeeee); border:1px solid var(--warn-line,#f1b8b8); color:var(--warn-ink,#a11b1b); }
+.v48-test.wait{ background:var(--calc-bg,#eef4fd); border:1px solid var(--calc-line,#cfe0f5); color:var(--ink); }
+#suite-root .rail .v48-note{ align-items:start !important; }
+#suite-root .rail .v48-note .l small{ display:block; font:400 10.5px/1.4 var(--v24-font-ui, inherit); color:var(--muted); margin-top:2px; }
+#suite-root .rail .v48-note .v{ font-weight:700 !important; color:var(--accent) !important; white-space:nowrap; }
+
+/* ---- every screen --------------------------------------------------- */
+@media (min-width:2200px){ #suite-root .v23-primary-nav.v48-nav, #suite-root .tabs.v48-context{ max-width:1760px !important; } }
+@media (max-width:760px){
+  #suite-root .v23-primary-nav.v48-nav, #suite-root .tabs.v48-context{ width:calc(100% - 16px) !important; padding-left:10px !important; padding-right:10px !important; overflow-x:auto; flex-wrap:nowrap !important; scrollbar-width:none; }
+  #suite-root .v23-primary-nav.v48-nav::-webkit-scrollbar, #suite-root .tabs.v48-context::-webkit-scrollbar{ display:none; }
+  #suite-root .v23-primary-nav.v48-nav button{ flex:0 0 auto; padding:0 11px !important; }
+  #suite-root .tabs.v48-context .tab{ flex:0 0 auto; }
+}

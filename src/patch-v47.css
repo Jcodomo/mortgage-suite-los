@@ -1,0 +1,99 @@
+/* =====================================================================
+   Release 47 — the release-16 look: classic theme, flat pill tabs,
+   inline actions, the parked page that replaces the worksheet
+   ===================================================================== */
+
+/* ---- 1. CLASSIC — release 16's blue, white and green ---------------
+   Every value here is release 16's own light palette, read from its
+   file rather than approximated.                                       */
+html[data-v24-theme="classic"]{
+  --v24-header:#12263f; --v24-header-text:#e9f0fa; --v24-page:#f4f6fa; --v24-card:#ffffff;
+  --v24-text:#101828; --v24-muted:#667085; --v24-border:#dde3ec; --v24-accent:#1d4ed8;
+  --v24-font-ui:Inter,"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif; --v24-font-num:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+html[data-v24-theme="classic"] #suite-root, html[data-v24-theme="classic"] #calc-root, html[data-v24-theme="classic"]{
+  --bg:#f4f6fa; --bg-2:#eaeef6; --panel:#ffffff; --panel-2:#f8fafd; --surface:#f4f6fa; --surface-2:#f8fafd; --surface-3:#eaeef6;
+  --ink:#101828; --text:#101828; --text-strong:#0b1220; --muted:#667085; --line:#dde3ec; --line-2:#eaeef5;
+  --accent:#1d4ed8; --accent-soft:#e8effc;
+  --input-bg:#fffbea; --input-line:#e3d6a8; --input-ink:#1c2536; --input-focus:#c99a1e; --input-focus-bg:#fff7d6;
+  --calc-bg:#eef4fd; --calc-line:#cfe0f5; --calc-ink:#101828;
+  --pass-bg:#eaf7ee; --pass-line:#b7e2c4; --pass-ink:#136b34;
+  --final-bg:#0e5136; --final-bg-2:#146a46; --final-ink:#e9fbf1; --final-sub:#bfe9d0;
+  --warn-bg:#fdeeee; --warn-line:#f1b8b8; --warn-ink:#a11b1b;
+  --amber-bg:#fff6e6; --amber-line:#f2d39a; --amber-ink:#8a5a00;
+  --off-bg:#f3f5f9; --off-line:#e2e7ef; --off-ink:#8a94a6;
+  --major-1:#12263f; --major-2:#1d3d63; --major-ink:#eaf1fb; --major-sub:#b9c8dd;
+  --brand-1:#12263f; --brand-2:#1b3a5f; --subhead-bg:#e4eefb; --subhead-line:#cfdff5; --subhead-ink:#1d3d63;
+}
+/* the light-surface input lift release 26 derives is replaced by the
+   original cream on classic */
+html[data-v24-theme="classic"] #suite-root .cell-input,
+html[data-v24-theme="classic"] #suite-root input:not([type=checkbox]):not([type=radio]),
+html[data-v24-theme="classic"] #suite-root select, html[data-v24-theme="classic"] #suite-root textarea{
+  background:#fffbea !important; border-color:#e3d6a8 !important; color:#1c2536 !important;
+}
+html[data-v24-theme="classic"] #suite-root input:focus, html[data-v24-theme="classic"] #suite-root select:focus, html[data-v24-theme="classic"] #suite-root textarea:focus{
+  background:#fff7d6 !important; border-color:#c99a1e !important; outline:2px solid rgba(201,154,30,.35);
+}
+html[data-v24-theme="classic"] #suite-root .topbar, html[data-v24-theme="classic"] #suite-root .v34-bar{ background:#12263f !important; }
+
+/* ---- 2. RELEASE 16'S RHYTHM ----------------------------------------
+   Masthead, scenario row, pill tabs — inside the same 1560px card the
+   content uses, so on a 4K or ultrawide screen the whole suite sits
+   centred as one block rather than the bands stretching edge to edge. */
+#suite-root .topbar, #suite-root .v34-bar, #suite-root .tabs.v47-flat{
+  max-width:1560px !important; margin-left:auto !important; margin-right:auto !important; width:calc(100% - 32px) !important;
+  padding-left:16px !important; padding-right:16px !important; box-sizing:border-box;
+}
+#suite-root .topbar{ border-radius:12px 12px 0 0 !important; margin-top:12px !important; min-height:56px !important; flex-wrap:wrap !important; row-gap:8px; }
+#suite-root .v34-bar.v47-readings{ border-radius:0 !important; background:var(--panel) !important; border:1px solid var(--line) !important; border-top:0 !important; min-height:0 !important; padding:8px 16px !important; }
+#suite-root .v34-bar.v47-readings .v33-chip, #suite-root .v34-bar.v47-readings .v34-left button{
+  background:var(--calc-bg) !important; border-color:var(--calc-line) !important; color:var(--ink) !important;
+}
+#suite-root .v34-bar.v47-readings .v33-chip > span{ color:var(--muted) !important; opacity:1 !important; }
+#suite-root .tabs.v47-flat{
+  display:flex !important; flex-wrap:wrap !important; gap:6px !important; padding:8px 16px !important;
+  background:var(--panel) !important; border:1px solid var(--line) !important; border-top:0 !important; border-radius:0 0 12px 12px !important;
+  position:static !important; justify-content:flex-start !important;
+}
+#suite-root .tabs.v47-flat .tab, #suite-root .tabs.v47-flat .tab[data-v23-visible]{
+  display:inline-flex !important; height:30px !important; padding:0 14px !important; border-radius:999px !important;
+  background:var(--bg-2) !important; border:1px solid transparent !important; color:var(--muted) !important;
+  font:700 11px/28px var(--v24-font-ui, inherit) !important; letter-spacing:.06em !important; text-transform:uppercase !important; opacity:1 !important;
+}
+#suite-root .tabs.v47-flat .tab:hover{ background:var(--accent-soft) !important; color:var(--accent) !important; }
+#suite-root .tabs.v47-flat .tab.active{ background:var(--major-1) !important; color:#fff !important; }
+.v47-stowed{ position:absolute !important; width:1px !important; height:1px !important; margin:-1px !important; padding:0 !important; overflow:hidden !important; clip:rect(0 0 0 0) !important; clip-path:inset(50%) !important; border:0 !important; }
+#suite-root .v23-context-tabs.v47-flat{ top:auto !important; }
+/* the cluster, inline on the scenario row */
+#suite-root .v42-row.v47-inline{ margin-left:0 !important; flex:1 1 auto !important; justify-content:flex-start !important; flex-wrap:wrap !important; gap:6px !important; }
+#suite-root .v42-row.v47-inline .v42-b{ height:32px !important; font-size:12px !important; padding:0 12px !important; }
+#suite-root .v34-right{ display:none !important; }
+/* the content card and the rail line up under the bands */
+#suite-root .cols-main{ margin-top:14px !important; }
+
+/* ---- 3. THE PARKED PAGE REPLACES THE WORKSHEET --------------------- */
+#suite-root.v47-parked .cols-main{ display:none !important; }
+#suite-root.v47-parked #v8Stage{ display:block !important; max-width:1560px; margin:14px auto 0; width:calc(100% - 32px); }
+#suite-root #v8Stage .panel{ display:none; } #suite-root #v8Stage .panel.active{ display:block; }
+#panel-rates svg.icon-lg, #panel-property svg.icon-lg{ width:26px !important; height:26px !important; color:var(--accent) !important; }
+
+/* ---- 4. THE QUOTE RATE BUTTON -------------------------------------- */
+.v47-ratehost{ position:relative; }
+.v47-ratebtn{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%); display:inline-flex; align-items:center; gap:5px;
+  height:26px; padding:0 9px; border-radius:999px; cursor:pointer; font:700 10.5px/1 var(--v24-font-ui, inherit);
+  border:1px solid color-mix(in srgb, var(--accent) 45%, transparent); background:color-mix(in srgb, var(--accent) 10%, var(--panel)); color:var(--accent);
+}
+.v47-ratebtn:hover{ background:color-mix(in srgb, var(--accent) 18%, var(--panel)); }
+.v47-ratehost input{ padding-right:84px !important; }
+
+/* ---- 5. EVERY SCREEN ------------------------------------------------ */
+@media (min-width:2200px){ #suite-root .topbar, #suite-root .v34-bar, #suite-root .tabs.v47-flat, #suite-root .cols-main, #suite-root #v8Stage{ max-width:1760px !important; } }
+@media (max-width:1180px){ #suite-root .cols-main{ grid-template-columns:minmax(0,1fr) !important; } #suite-root .cols-main > .rail{ width:auto !important; justify-self:stretch !important; } }
+@media (max-width:760px){
+  #suite-root .topbar, #suite-root .v34-bar, #suite-root .tabs.v47-flat{ width:calc(100% - 16px) !important; padding-left:10px !important; padding-right:10px !important; }
+  #suite-root .tabs.v47-flat .tab{ height:28px !important; padding:0 11px !important; font-size:10px !important; }
+  #suite-root .v42-row.v47-inline .v42-b span{ display:none; }
+  #suite-root .v42-row.v47-inline .v42-b{ padding:0 10px !important; }
+}

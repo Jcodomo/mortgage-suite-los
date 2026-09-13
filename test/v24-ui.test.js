@@ -5,7 +5,7 @@ const css=fs.readFileSync(path.join(root,'src','patch-v24.css'),'utf8');
 const inject=fs.readFileSync(path.join(root,'build','inject.py'),'utf8');
 const checks=[
   ['release 24 stamp',/dataset\.losRelease='24'/.test(js)],
-  ['five curated themes retained',/THEMES=\['ledger','slate','bank','graphite','terminal'/.test(js)],
+  ['classic plus five curated themes retained',/THEMES=\['classic','ledger','slate','bank','graphite','terminal'/.test(js)],
   ['github pair added (release 39)',/'github','github-dark'/.test(js)],
   ['six colourways added (release 41)',/'lightgray','cloudgrey','nord','dracula','solarized','linear'\]/.test(js)],
   ['five independent input presets',/INPUTS=\['paper','mist','mint','sand','ink'\]/.test(js)],
