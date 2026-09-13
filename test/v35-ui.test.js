@@ -26,7 +26,7 @@ const checks = [
   ['Advanced view includes borrower planning ranges', /v35BorrowerRange/.test(js) && /Borrower planning range/.test(js)],
   ['fresh Release 35 sessions default to light mode', /los\.v35\.appearanceSeeded/.test(js) && /setSurface\('light'\)/.test(js)],
   ['Documents is its own primary workspace after Full', /v35-documents-nav/.test(js) && /<span>Documents<\/span>/.test(js)],
-  ['landing is a minimal two-route chooser with shared appearance', /class="routes"/.test(landing) && /id="modeToggle"/.test(landing) && /los\.v25\.surface/.test(landing) && /loan-suite\.html/.test(landing) && /income-calculator\.html/.test(landing)],
+  ['landing is a minimal two-route chooser with shared appearance', /class="routes"/.test(landing) && /id="modeToggle"/.test(landing) && /los\.v25\.surface/.test(landing) && /app=suite(?:&|&amp;)tab=quote/.test(landing) && /app=income(?:&|&amp;)tab=w2/.test(landing)],
   ['Both workspaces share a centered 1320px working width', /#calc-root main \.wrap,#suite-root \.app,#suite-root \.cols-main\{width:100% !important;max-width:1320px/.test(css)],
   ['Documents uses the full canvas without Live Summary', /v35-documents-active/.test(js) && /v35-documents-active \.cols-main>\.rail\.v31-rail\{display:none/.test(css)],
   ['Page scrolling is owned by the browser instead of work columns', /#suite-root \.v31-main\{overflow:visible/.test(css) && /max-height:none !important;overflow:visible/.test(css)],

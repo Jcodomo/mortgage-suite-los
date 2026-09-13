@@ -16,9 +16,9 @@ const checks=[
   ['metric cards remain responsive',/@media\(max-width:520px\)/.test(css)],
   // reads package.json so this stops failing on every release bump
   ['landing identifies current release',new RegExp('Release '+String(JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version).split('.')[0]).test(landing)],
-  ['landing links loan entry page',/loan-suite\.html/.test(landing)],
-  ['landing links income entry page',/income-calculator\.html/.test(landing)],
+  ['landing links Loan Suite directly to Quote',/app=suite(?:&|&amp;)tab=quote/.test(landing)],
+  ['landing links Income Calculator directly to W-2',/app=income(?:&|&amp;)tab=w2/.test(landing)],
   ['loan entry routes to quote',/app=suite(?:&|&amp;)tab=quote/.test(loan)],
-  ['income entry routes to calculator',/app=income/.test(income)]
+  ['income entry routes to W-2',/app=income(?:&|&amp;)tab=w2/.test(income)]
 ];
 let failed=0;for(const [name,ok] of checks){console.log((ok?'PASS  ':'FAIL  ')+name);if(!ok)failed++;}assert.equal(failed,0);console.log(`\nv22 UI: ${checks.length} passed, 0 failed`);
