@@ -371,3 +371,139 @@ html[data-v50] body #v50CreditOverview .v50-credit-metrics b{ display:block; mar
 html[data-v50] body #v50CreditOverview .v50-planning-range{ display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
 html[data-v50] body #v50CreditOverview .v50-planning-range span{ padding:5px 8px; border-radius:7px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); font:600 10.5px "Plus Jakarta Sans",sans-serif; }
 @media (max-width:740px){ html[data-v50] body #v50CreditOverview .v50-credit-metrics{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+/* ---- quieter Income Calculator chrome ---------------------------------
+   All controls remain visible and use the existing Calculator events. This
+   only reduces repeated fills, shadows and border weight so worksheet data
+   is the first thing the eye sees. */
+html[data-v50] body #calc-root .toolbar{
+  min-height:42px !important; border-bottom-color:color-mix(in srgb,var(--line) 78%,transparent) !important;
+}
+html[data-v50] body #calc-root .toolbar-inner{ gap:5px !important; padding-block:5px !important; }
+html[data-v50] body #calc-root .toolbar .btn:not(.btn-primary){ box-shadow:none !important; }
+html[data-v50] body #calc-root .appbar .kpi{
+  box-shadow:none !important; border-color:color-mix(in srgb,var(--line) 74%,transparent) !important;
+}
+html[data-v50] body #calc-root nav.tabbar{
+  box-shadow:none !important; border-bottom-color:color-mix(in srgb,var(--line) 82%,transparent) !important;
+}
+html[data-v50] body #calc-root nav.tabbar .tab{
+  box-shadow:none !important; border-color:transparent !important; background:transparent !important;
+}
+html[data-v50] body #calc-root nav.tabbar .tab:not(.on):not(.active){ color:var(--text-muted) !important; opacity:.82; }
+html[data-v50] body #calc-root nav.tabbar .tab:hover{ background:color-mix(in srgb,var(--accent) 7%,transparent) !important; opacity:1; }
+html[data-v50] body #calc-root .subtabs{ gap:2px !important; margin-bottom:10px !important; border-bottom-color:color-mix(in srgb,var(--line) 82%,transparent) !important; }
+html[data-v50] body #calc-root .subtab{ padding:6px 10px !important; border-radius:7px 7px 0 0; }
+html[data-v50] body #calc-root .subtab:not(.on){ opacity:.78; }
+html[data-v50] body #calc-root .subtab:hover{ background:color-mix(in srgb,var(--accent) 6%,transparent) !important; opacity:1; }
+html[data-v50] body #calc-root .card:not(.major),
+html[data-v50] body #calc-root .panel:not(.major){ box-shadow:0 2px 10px rgba(10,31,55,.04) !important; }
+html[data-v50] body #calc-root .card:not(.major) .card-top{
+  background:color-mix(in srgb,var(--surface) 92%,var(--accent) 2%) !important;
+  border-bottom-color:color-mix(in srgb,var(--line) 82%,transparent) !important;
+}
+html[data-v50] body #calc-root .card-top .tag{ opacity:.88; }
+html[data-v50] body #calc-root .notice,
+html[data-v50] body #calc-root .note{ box-shadow:none !important; }
+html[data-v50] body #calc-root .stats .stat{ box-shadow:none !important; }
+
+/* ---- calmer Loan Suite hierarchy --------------------------------------
+   Match the quieter calculator treatment: keep every navigation and status
+   control, but let the document content carry more of the visual weight. */
+html[data-v50] body #suite-root #v34Bar{
+  border-bottom-color:color-mix(in srgb,var(--v50-line) 82%,transparent) !important;
+}
+html[data-v50] body #suite-root #v251HeaderStats .v33-chip:not(:first-child){
+  background:color-mix(in srgb,var(--v50-card) 94%,var(--v50-blue-soft)) !important;
+  border-color:color-mix(in srgb,var(--v50-line) 78%,transparent) !important;
+  box-shadow:none !important;
+}
+html[data-v50] body #suite-root #v44Header .v44-action:not(.primary):not(#v44File){
+  background:transparent !important; border-color:color-mix(in srgb,var(--v50-line) 72%,transparent) !important;
+}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button:not(.active),
+html[data-v50] body #suite-root .tabs.v48-context .tab:not(.active){ opacity:.82; }
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button:hover,
+html[data-v50] body #suite-root .tabs.v48-context .tab:hover{ opacity:1; }
+html[data-v50] body #suite-root #v50Top .v50-card{
+  background:color-mix(in srgb,var(--v50-card) 96%,var(--v50-blue-soft)) !important;
+  border-color:color-mix(in srgb,var(--v50-line) 84%,transparent) !important;
+  border-left-color:color-mix(in srgb,var(--v50-blue) 52%,var(--v50-line)) !important;
+}
+html[data-v50] body #suite-root #v50Top .v50-card i{ opacity:.88; }
+html[data-v50] body #suite-root #screen-body .card.lvl-major,
+html[data-v50] body #suite-root .rail .card.v39-rail,
+html[data-v50] body #suite-root #v50CreditOverview{ box-shadow:0 2px 10px rgba(10,31,55,.04) !important; }
+html[data-v50] body #suite-root #screen-body .card.lvl-major,
+html[data-v50] body #suite-root .rail .card.v39-rail{ border-color:color-mix(in srgb,var(--v50-line) 82%,transparent) !important; }
+html[data-v50] body #suite-root #v44LiveSummary .v44-live-row:not(.pass):not(.bad):not(.na){
+  background:color-mix(in srgb,var(--v50-soft) 84%,transparent) !important;
+  border-left-color:color-mix(in srgb,var(--v50-edge) 72%,transparent) !important;
+}
+html[data-v50] body #suite-root #v44LiveSummary h4{ opacity:.86; }
+
+/* ---- Universal Prompt -------------------------------------------------
+   Shared launcher cards and one focused dialog for document work in the
+   Income Calculator, Loan Suite Documents & OCR, and Contract & LE. */
+html[data-v50] body .v50-universal-entry{
+  display:flex; align-items:center; gap:10px; width:100%; min-height:54px; padding:10px 12px; margin:0 0 12px;
+  border:1px solid var(--v50-edge); border-radius:10px; background:var(--v50-blue-soft); color:var(--v50-ink);
+  box-shadow:none; text-align:left; cursor:pointer; font-family:"Plus Jakarta Sans",Inter,sans-serif;
+}
+html[data-v50] body .v15-hub-grid .v50-universal-entry,
+html[data-v50] body .v16-loan-docs-grid .v50-universal-entry{ grid-column:1 / -1; margin:0; }
+html[data-v50] body .v50-universal-entry:hover{ border-color:var(--v50-blue); background:color-mix(in srgb,var(--v50-blue-soft) 76%,var(--v50-card)); }
+html[data-v50] body .v50-universal-entry-icon{
+  display:grid; place-items:center; flex:0 0 28px; height:28px; border-radius:8px; background:var(--v50-blue); color:#fff;
+  font:800 9px Inter,sans-serif; letter-spacing:.45px;
+}
+html[data-v50] body .v50-universal-entry > span:nth-child(2){ min-width:0; flex:1; }
+html[data-v50] body .v50-universal-entry b{ display:block; font:800 12px "Plus Jakarta Sans",Inter,sans-serif; color:var(--v50-blue-ink); }
+html[data-v50] body .v50-universal-entry small{ display:block; margin-top:2px; color:var(--v50-mute); font:500 10.5px/1.3 Inter,sans-serif; }
+html[data-v50] body .v50-universal-entry > i{ color:var(--v50-blue-ink); font-style:normal; font-size:17px; }
+html[data-v50] body .v50-universal-menu{ margin:8px 0 0; padding-top:10px; border-top:1px solid var(--v50-line); }
+html[data-v50] body .v50-universal-menu h3{ margin:0 0 7px; color:var(--v50-mute); font:800 9.5px Inter,sans-serif; letter-spacing:.7px; text-transform:uppercase; }
+html[data-v50] body #v44Menu .v50-universal-entry{ margin:0; min-height:46px; border-radius:8px; }
+
+html[data-v50] body .v50-universal-modal{ position:fixed; inset:0; z-index:12000; display:none; align-items:center; justify-content:center; padding:16px; }
+html[data-v50] body .v50-universal-modal.open{ display:flex; }
+html[data-v50] body .v50-universal-backdrop{ position:absolute; inset:0; border:0; background:rgba(10,25,46,.5); cursor:default; }
+html[data-v50] body .v50-universal-dialog{
+  position:relative; z-index:1; width:min(760px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); overflow:auto;
+  border:1px solid var(--v50-line); border-radius:15px; background:var(--v50-card); color:var(--v50-ink); box-shadow:0 24px 70px rgba(10,25,46,.28);
+}
+html[data-v50] body .v50-universal-dialog > header{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:18px 20px 14px; border-bottom:1px solid var(--v50-line); }
+html[data-v50] body .v50-universal-dialog header span{ display:block; color:var(--v50-blue-ink); font:800 9.5px Inter,sans-serif; text-transform:uppercase; letter-spacing:.75px; }
+html[data-v50] body .v50-universal-dialog h2{ margin:3px 0 2px; font:800 20px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-universal-dialog p{ margin:0; color:var(--v50-mute); font:500 12px/1.4 Inter,sans-serif; }
+html[data-v50] body .v50-universal-close{ display:grid; place-items:center; width:30px; height:30px; border:1px solid var(--v50-line); border-radius:8px; background:var(--v50-soft); color:var(--v50-mute); font-size:21px; cursor:pointer; }
+html[data-v50] body .v50-universal-controls{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; padding:16px 20px 10px; }
+html[data-v50] body .v50-universal-dialog label{ display:flex; flex-direction:column; gap:5px; color:var(--v50-label); font:800 10px Inter,sans-serif; letter-spacing:.45px; text-transform:uppercase; }
+html[data-v50] body .v50-universal-dialog label em{ color:var(--v50-mute); font-style:normal; font-weight:500; letter-spacing:0; text-transform:none; }
+html[data-v50] body .v50-universal-dialog select,
+html[data-v50] body .v50-universal-dialog textarea{ width:100%; box-sizing:border-box; border:1px solid var(--v50-line2); border-radius:8px; background:var(--v50-soft); color:var(--v50-ink); font:500 12.5px/1.45 "Plus Jakarta Sans",Inter,sans-serif; padding:9px 10px; }
+html[data-v50] body .v50-universal-dialog select{ height:36px; cursor:pointer; }
+html[data-v50] body .v50-universal-dialog textarea{ resize:vertical; min-height:52px; text-transform:none; letter-spacing:0; }
+html[data-v50] body .v50-universal-dialog select:focus,
+html[data-v50] body .v50-universal-dialog textarea:focus{ outline:2px solid color-mix(in srgb,var(--v50-blue) 38%,transparent); outline-offset:1px; border-color:var(--v50-blue); }
+html[data-v50] body .v50-universal-context{ flex-direction:row !important; align-items:center; align-self:end; min-height:36px; padding:0 10px; border:1px solid var(--v50-line); border-radius:8px; background:var(--v50-head); cursor:pointer; text-transform:none !important; letter-spacing:0 !important; font:600 11px "Plus Jakarta Sans",Inter,sans-serif !important; }
+html[data-v50] body .v50-universal-context input{ accent-color:var(--v50-blue); }
+html[data-v50] body .v50-universal-extra,
+html[data-v50] body .v50-universal-output,
+html[data-v50] body .v50-universal-return{ margin:0 20px 12px; }
+html[data-v50] body .v50-universal-output textarea{ min-height:230px; background:color-mix(in srgb,var(--v50-soft) 75%,var(--v50-card)); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11.5px; }
+html[data-v50] body .v50-universal-return{ padding-top:12px; border-top:1px solid var(--v50-line); }
+html[data-v50] body .v50-universal-dialog footer{ display:flex; justify-content:space-between; gap:10px; padding:0 20px 14px; }
+html[data-v50] body .v50-universal-dialog footer > div{ display:flex; flex-wrap:wrap; gap:7px; }
+html[data-v50] body .v50-universal-dialog footer button{ height:32px; padding:0 10px; border:1px solid var(--v50-line2); border-radius:8px; background:var(--v50-card); color:var(--v50-blue-ink); font:700 11px "Plus Jakarta Sans",Inter,sans-serif; cursor:pointer; }
+html[data-v50] body .v50-universal-dialog footer button.primary{ border-color:var(--v50-blue); background:var(--v50-blue); color:#fff; }
+html[data-v50][data-v25-surface="dark"] body .v50-universal-backdrop{ background:rgba(0,0,0,.62); }
+@media (max-width:620px){
+  html[data-v50] body .v50-universal-modal{ padding:8px; }
+  html[data-v50] body .v50-universal-dialog{ width:calc(100vw - 16px); max-height:calc(100dvh - 16px); }
+  html[data-v50] body .v50-universal-controls{ grid-template-columns:1fr; gap:9px; padding:14px 14px 8px; }
+  html[data-v50] body .v50-universal-extra,
+  html[data-v50] body .v50-universal-output,
+  html[data-v50] body .v50-universal-return{ margin-left:14px; margin-right:14px; }
+  html[data-v50] body .v50-universal-dialog footer{ flex-direction:column; padding:0 14px 12px; }
+}

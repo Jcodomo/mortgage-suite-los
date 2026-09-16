@@ -263,7 +263,10 @@ function paintIncome(){
     };
     lnk.addEventListener('click', toggle);
     lnk.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(e); } });
-    document.addEventListener('click', function(e){ if (!e.target.closest('#v50IncMenu')) m.classList.remove('open'); });
+    /* The launcher is outside of the portaled menu; keep it in the inside
+       boundary so its own click can open the menu instead of immediately
+       closing it again. */
+    document.addEventListener('click', function(e){ if (!e.target.closest('#v50IncMenu, #shellbar .lnk.v50-inc')) m.classList.remove('open'); });
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape') m.classList.remove('open'); });
     m.addEventListener('click', function(e){
       var b = e.target.closest('[data-a]'); if (!b) return;
@@ -373,6 +376,201 @@ function paintFreeformValues(){
     var pretty=(Math.round(v*1000)/1000).toFixed(3).replace(/\.?0+$/,'');
     if(input.value!==pretty)input.value=pretty;
   });
+}
+
+/* ------------------------------------------------------------------ 5c
+   DEFAULT INCOME HANDOFF
+   The manual "Send income" action remains available, but entering the Loan
+   Suite now brings across the current Income Calculator result by default.
+   It deliberately uses the Suite's public importer (rather than touching
+   scenario state directly), so the existing borrower/liability mapping,
+   recalculation, audit trail and no-overwrite rules stay in one place.
+
+   A signature and a value comparison prevent a scheduler tick from writing
+   the same figures repeatedly. A Loan Suite-only edit remains in place until
+   the Income Calculator result itself changes.
+   ------------------------------------------------------------------ */
+var incomeSignature = '';
+function sameIncomeInputs(i, borrowers){
+  var rows=(i&&i.borrowers)||[];
+  return borrowers.every(function(src,index){
+    var current=rows[index]||{};
+    var sourceName=norm(src.name), currentName=norm(current.name);
+    var nameMatches=/^Borrower\s+\d+$/i.test(sourceName) || sourceName===currentName;
+    return nameMatches &&
+      Math.abs(N(current.grossMonthlyIncome)-N(src.grossMonthlyIncome))<0.005 &&
+      Math.abs(N(current.otherMonthlyIncome)-N(src.otherMonthlyIncome))<0.005 &&
+      Math.abs(N(current.monthlyDebts)-N(src.monthlyDebts))<0.005;
+  });
+}
+function syncCalculatorIncome(force){
+  var shell=window.SHELL, s=store();
+  if(!s || !shell || (!force && shell.mode!=='suite')) return false;
+  var totals, patch;
+  try {
+    if(typeof window.calcTotals!=='function' || typeof window.renoPatch!=='function') return false;
+    totals=window.calcTotals(); patch=window.renoPatch();
+  } catch(e){ return false; }
+  if(!patch || !Array.isArray(patch.borrowers) || !(N(totals.income)>0 || N(totals.debts)>0)) return false;
+  var signature=JSON.stringify(patch.borrowers.map(function(b){ return [norm(b.name),N(b.grossMonthlyIncome),N(b.otherMonthlyIncome),N(b.monthlyDebts)]; }));
+  if(signature===incomeSignature) return false;
+  /* A fresh page may already contain the same imported figures. Remember
+     that state without producing a redundant audit entry. */
+  if(sameIncomeInputs(s.activeInputs,patch.borrowers)){
+    incomeSignature=signature;
+    return false;
+  }
+  try {
+    s.importIncomeText(JSON.stringify(patch),'Income Calculator default handoff');
+    incomeSignature=signature;
+    return true;
+  } catch(e){ return false; }
+}
+function installIncomeHandoff(){
+  var shell=window.SHELL;
+  if(!shell || typeof shell.go!=='function' || shell.__v50IncomeHandoff) return false;
+  var originalGo=shell.go;
+  shell.go=function(next){
+    if(next==='suite') syncCalculatorIncome(true);
+    var result=originalGo.apply(this,arguments);
+    /* The Loan Suite is no longer painted while the calculator is active.
+       Refresh it immediately on the way back instead of waiting for the
+       scheduler's next idle pass. */
+    if(next==='suite') setTimeout(soon,0);
+    return result;
+  };
+  shell.__v50IncomeHandoff=true;
+  return true;
+}
+V50.syncCalculatorIncome=syncCalculatorIncome;
+
+/* ------------------------------------------------------------------ 5d
+   POPUP DISMISSAL
+   Every menu remains keyboard accessible, but a click/tap in the page
+   background now closes the action popovers consistently in both products.
+   Native <details> menus use their existing markup; this only closes an
+   already-open surface and never removes its controls or handlers.
+   ------------------------------------------------------------------ */
+function installPopupDismissal(){
+  if(document.__v50PopupDismiss) return;
+  document.__v50PopupDismiss=true;
+  document.addEventListener('pointerdown',function(e){
+    var target=e.target;
+    if(target&&target.closest&&target.closest('#v50IncMenu, #shellbar .lnk.v50-inc, #v44Menu, #v44Header, .v23-action-menu, .v23-sync-menu')) return;
+    $$('#calc-root .v23-action-menu[open], #calc-root .v23-sync-menu[open], #suite-root .v23-action-menu[open], #suite-root .v23-sync-menu[open]').forEach(function(menu){ menu.open=false; });
+    try { if(window.V44&&V44.closeMenu) V44.closeMenu(); } catch(err){}
+    var incomeMenu=$('v50IncMenu'); if(incomeMenu) incomeMenu.classList.remove('open');
+  },true);
+}
+
+/* ------------------------------------------------------------------ 5e
+   UNIVERSAL DOCUMENT PROMPT
+   A shared, browser-only prompt builder for both applications.  The
+   existing file-specific OCR prompts remain where they are; this is an
+   additional freeform way to create one consistent prompt for any
+   document.  It never calls an external service, and it deliberately
+   leaves document import/review in the existing Documents & OCR flow. */
+var UNIVERSAL_PROMPT_TYPES = {
+  general:{label:'Any mortgage document',focus:'Identify the document and extract only figures, dates, names, identifiers and terms printed on it.'},
+  income:{label:'Income and employment',focus:'Extract borrower, employer or business, dates, pay frequency, earnings, deductions, income history and source labels.'},
+  assets:{label:'Assets and bank statements',focus:'Extract institution, account, owners, statement dates, balances and every deposit or withdrawal exactly as printed.'},
+  credit:{label:'Credit report',focus:'Extract scores, tradelines, balances, payments, months remaining, status, responsibility, inquiries and real-estate-owned details.'},
+  property:{label:'Property and valuation',focus:'Extract address, property facts, dates, as-is value, after-repair value, appraisal facts, taxes, insurance and rent when printed.'},
+  contract:{label:'Contract, Loan Estimate or Closing Disclosure',focus:'Extract parties, property, transaction dates, price, loan terms, credits, deposits, fees, cash to close and all material conditions.'},
+  legal:{label:'Lease, addendum or other agreement',focus:'Extract parties, property, dates, rent or financial terms, deposits, obligations, amendments and signature information.'},
+  renovation:{label:'Contractor estimate or renovation document',focus:'Extract contractor details, property, dates, scope, line items, labor, materials, permits, contingencies, draws and totals.'}
+};
+function universalContext(){
+  var i=inputs()||{}, o=outputs()||{}, loan=o.loan||{};
+  var borrower=norm(i.borrowerName || ((i.borrowers||[])[0]||{}).name);
+  var address=[i.propertyAddress,i.city,i.state,i.zipCode].filter(Boolean).join(', ');
+  var rows=[];
+  if(borrower) rows.push('Borrower: '+borrower);
+  if(address) rows.push('Property: '+address);
+  if(i.loanProgram) rows.push('Program: '+i.loanProgram);
+  if(N(i.basePurchasePrice)) rows.push('Purchase price: '+usd2(i.basePurchasePrice));
+  if(N(loan.totalLoan)) rows.push('Current total loan: '+usd2(loan.totalLoan));
+  return rows.length ? '\n\nCurrent file context (reference only; never use it to fill a missing document value):\n- '+rows.join('\n- ') : '';
+}
+function universalPromptText(type, extra, useContext){
+  var spec=UNIVERSAL_PROMPT_TYPES[type]||UNIVERSAL_PROMPT_TYPES.general;
+  return 'You are reviewing a mortgage-loan document for a human reviewer. '+spec.focus+'\n\n'
+    + 'Requirements:\n'
+    + '- Return ONLY one valid JSON object. Do not add prose or markdown fences.\n'
+    + '- Include "documentType" and "sourceName" when they are printed or known.\n'
+    + '- Use descriptive camelCase keys that match the printed labels.\n'
+    + '- Numbers must be plain numbers without currency symbols, commas or percent signs.\n'
+    + '- Keep rates as printed, for example 6.875, never 0.06875.\n'
+    + '- Use YYYY-MM-DD for complete dates; preserve partial or ambiguous dates as sourceText.\n'
+    + '- Never guess, calculate, annualize, reconcile or replace a missing value. Omit an uncertain field instead.\n'
+    + '- Add "review": [{"field":"","value":"","status":"Auto-matched|Needs Review","sourceText":""}] only for fields that need human review.\n'
+    + '- Add "notes": [] for relevant caveats found in the document.\n'
+    + (useContext ? universalContext() : '')
+    + (norm(extra) ? '\n\nAdditional reviewer instructions:\n'+norm(extra) : '')
+    + '\n\nDocument text or file follows:';
+}
+function copyText(value,done){
+  if(!value) return;
+  var fallback=function(){
+    var ta=document.createElement('textarea'); ta.value=value; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(x){} ta.remove(); if(done)done();
+  };
+  try { if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(done,fallback);return;} } catch(e){}
+  fallback();
+}
+function universalModal(){
+  var modal=$('v50UniversalPrompt');
+  if(modal) return modal;
+  modal=document.createElement('div'); modal.id='v50UniversalPrompt'; modal.className='v50-universal-modal no-print';
+  modal.innerHTML='<button type="button" class="v50-universal-backdrop" aria-label="Close Universal Prompt"></button>'
+    + '<section class="v50-universal-dialog" role="dialog" aria-modal="true" aria-labelledby="v50UniversalTitle">'
+    + '<header><div><span>Documentation workspace</span><h2 id="v50UniversalTitle">Universal Prompt</h2><p>Build a reusable extraction prompt without changing the current file.</p></div><button type="button" class="v50-universal-close" aria-label="Close">&#215;</button></header>'
+    + '<div class="v50-universal-controls"><label><span>Document focus</span><select id="v50UniversalType">'+Object.keys(UNIVERSAL_PROMPT_TYPES).map(function(k){return '<option value="'+k+'">'+esc(UNIVERSAL_PROMPT_TYPES[k].label)+'</option>';}).join('')+'</select></label>'
+    + '<label class="v50-universal-context"><input id="v50UniversalContext" type="checkbox" checked> Include current file context as reference only</label>'
+    + '<label class="v50-universal-extra"><span>Additional instructions <em>Optional and freeform</em></span><textarea id="v50UniversalExtra" rows="2" placeholder="For example: prioritize rental income, flag handwritten edits, or preserve payer names."></textarea></label></div>'
+    + '<label class="v50-universal-output"><span>Prompt <em>Editable before copying</em></span><textarea id="v50UniversalOutput" rows="15"></textarea></label>'
+    + '<footer><div><button type="button" class="primary" data-v50-up-copy>Copy prompt</button><button type="button" data-v50-up-download>Download .txt</button></div><div><button type="button" data-v50-up-docs>Open Documents & OCR</button><button type="button" data-v50-up-review>Send returned JSON to review</button></div></footer>'
+    + '<label class="v50-universal-return"><span>Returned JSON <em>Optional; it is placed into the existing review box, never auto-applied</em></span><textarea id="v50UniversalJson" rows="4" placeholder="Paste the assistant JSON here when ready."></textarea></label>'
+    + '</section>';
+  document.body.appendChild(modal);
+  var update=function(){ $('v50UniversalOutput').value=universalPromptText($('v50UniversalType').value,$('v50UniversalExtra').value,$('v50UniversalContext').checked); };
+  $('v50UniversalType').addEventListener('change',update); $('v50UniversalContext').addEventListener('change',update); $('v50UniversalExtra').addEventListener('input',update);
+  modal.querySelector('.v50-universal-backdrop').onclick=V50.closeUniversalPrompt;
+  modal.querySelector('.v50-universal-close').onclick=V50.closeUniversalPrompt;
+  modal.querySelector('[data-v50-up-copy]').onclick=function(){ copyText($('v50UniversalOutput').value,function(){say('Prompt copied','Paste it into your assistant with the document, then return the JSON for review.','good',4500);}); };
+  modal.querySelector('[data-v50-up-download]').onclick=function(){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([$('v50UniversalOutput').value],{type:'text/plain'})); a.download='mortgage-suite-universal-prompt.txt'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},0); };
+  modal.querySelector('[data-v50-up-docs]').onclick=function(){ V50.closeUniversalPrompt(); V50.go('DOCUMENTS & OCR'); setTimeout(function(){window.scrollTo({top:0,behavior:'smooth'});},80); };
+  modal.querySelector('[data-v50-up-review]').onclick=function(){
+    var value=$('v50UniversalJson').value.trim(); if(!value){say('No JSON entered','Paste the returned JSON before sending it to the document review box.','warn',4000);return;}
+    V50.go('DOCUMENTS & OCR'); setTimeout(function(){var target=$('v9JsonBox');if(target){target.value=value;target.dispatchEvent(new Event('input',{bubbles:true}));target.focus();say('JSON ready for review','Review it in Documents & OCR, then choose Apply the JSON if appropriate.','good',5000);}else say('Document review is loading','Open Documents & OCR and paste the JSON into its review field.','info',4000);},180);
+  };
+  return modal;
+}
+V50.closeUniversalPrompt=function(){var modal=$('v50UniversalPrompt');if(modal)modal.classList.remove('open');};
+V50.openUniversalPrompt=function(type){var modal=universalModal();var pick=$('v50UniversalType');if(type&&UNIVERSAL_PROMPT_TYPES[type])pick.value=type;modal.classList.add('open');$('v50UniversalOutput').value=universalPromptText(pick.value,$('v50UniversalExtra').value,$('v50UniversalContext').checked);setTimeout(function(){$('v50UniversalOutput').focus();},0);};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')V50.closeUniversalPrompt();});
+function universalEntry(label,detail,type){
+  var b=document.createElement('button');b.type='button';b.className='v50-universal-entry';b.dataset.v50UniversalPrompt=type||'general';
+  b.innerHTML='<span class="v50-universal-entry-icon">AI</span><span><b>'+esc(label)+'</b><small>'+esc(detail)+'</small></span><i aria-hidden="true">&#8594;</i>';
+  b.onclick=function(){V50.openUniversalPrompt(b.dataset.v50UniversalPrompt);};return b;
+}
+function placeUniversalEntry(host,id,label,detail,type,position){
+  if(!host||$(id))return false;var b=universalEntry(label,detail,type);b.id=id;
+  if(position==='first')host.insertBefore(b,host.firstChild);else host.appendChild(b);return true;
+}
+function installUniversalPromptLaunchers(){
+  /* Calculator Documents & OCR and its generator grid. */
+  var hub=$('v15DocsHub');if(hub){var grid=hub.querySelector('.v15-hub-grid');placeUniversalEntry(grid,'v50UniversalCalcHub','Universal Prompt','Build a reusable documentation prompt','general');}
+  var calcDocs=$('subpanel-docs-import');if(calcDocs)placeUniversalEntry(calcDocs,'v50UniversalCalcDocs','Universal Prompt','One prompt workflow for any document, worksheet or OCR review','general','first');
+  /* Loan Suite Documents & Worksheets grid. */
+  var loanDocs=$('v16LoanDocs');if(loanDocs){var loanGrid=loanDocs.querySelector('.v16-loan-docs-grid');placeUniversalEntry(loanGrid,'v50UniversalLoanHub','Universal Prompt','Build a reusable documentation prompt','general');}
+  var suiteDocs=$('panel-v9docs');if(suiteDocs)placeUniversalEntry(suiteDocs,'v50UniversalLoanDocs','Universal Prompt','One prompt workflow for documents, worksheets and OCR review','general','first');
+  /* Contract & LE is a separate routed stage, so it retains its own entry. */
+  var stage=$('v8Stage');if(stage&&(window.V8&&V8.active==='docparse'||/contract\s*&\s*le/i.test(stage.textContent||'')))placeUniversalEntry(stage,'v50UniversalContract','Universal Prompt','Build a contract, Loan Estimate or closing-document prompt','contract','first');
+}
+function installUniversalMenu(){
+  if(!window.V44||!V44.openMenu||V44.__v50UniversalMenu)return false;
+  var open=V44.openMenu;V44.openMenu=function(kind){var result=open.apply(this,arguments);if(kind==='docs'||kind==='actions')setTimeout(function(){var menu=$('v44Menu');if(!menu||menu.querySelector('[data-v50-universal-menu]'))return;var section=document.createElement('section');section.className='v50-universal-menu';section.innerHTML='<h3>Universal</h3>';var b=universalEntry('Universal Prompt','Build a reusable documentation prompt','general');b.dataset.v50UniversalMenu='1';section.appendChild(b);menu.appendChild(section);},0);return result;};V44.__v50UniversalMenu=true;return true;
 }
 
 /* ------------------------------------------------------------------ 6
@@ -516,10 +714,17 @@ function watchRow(){
 var pending = false;
 function tick(){
   pending = false;
+  try { installIncomeHandoff(); syncCalculatorIncome(false); } catch(e){}
+  /* The Income Calculator has its own renderer. Keep its lighter shell menu
+     current, but skip the heavier Loan Suite DOM pass until that workspace is
+     visible again. */
+  try { paintIncome(); } catch(e){}
+  try { installUniversalPromptLaunchers(); } catch(e){}
+  try { if(window.SHELL && SHELL.mode==='calc') return; } catch(e){}
+  try { installUniversalMenu(); } catch(e){}
   try { paintHeader(); } catch(e){}
   try { paintTop(); } catch(e){}
   try { paintTabs(); } catch(e){}
-  try { paintIncome(); } catch(e){}
   try { paintVerdict(); } catch(e){}
   try { paintLiveExtras(); } catch(e){}
   try { paintCreditOverview(); } catch(e){}
@@ -538,6 +743,10 @@ function hook(){
     try{if(!norm(s.activeInputs.zipCode)){s.setField('zipCode','11530','Release 50 default ZIP');s.applyZipLookup();}}catch(e){}
   }
   if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ setTimeout(soon, 30); }); } catch(e){} }
+  installIncomeHandoff();
+  installPopupDismissal();
+  installUniversalMenu();
+  syncCalculatorIncome(false);
   document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(soon, 40); }, true);
 }
 if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1000); else setInterval(tick, 1000);
