@@ -37513,7 +37513,8 @@ html[data-v50] body #suite-root #v5SyncBadge:hover{ color:var(--v50-blue-ink) !i
 
 /* ---- body: page left, live summary right ------------------------------ */
 html[data-v50] body #suite-root .cols-main{
-  max-width:none !important; margin:0 !important; padding:16px 20px 30px !important;
+  /* Match the Income Calculator working canvas: centered and readable on wide screens. */
+  width:min(1320px,calc(100% - 40px)) !important; max-width:1320px !important; margin:0 auto !important; padding:16px 0 30px !important;
   grid-template-columns:minmax(0,1fr) 300px !important; gap:16px !important; align-items:start !important;
 }
 html[data-v50] body #suite-root .cols-main.v50-norail{ grid-template-columns:minmax(0,1fr) !important; }
@@ -37623,7 +37624,7 @@ html[data-v50] body #v50IncMenu button:hover{ background:#E3EFFA; color:#1B67A6;
 }
 @media (max-width:640px){
   html[data-v50] body #suite-root .tabs.v48-context{ padding:6px 12px !important; }
-  html[data-v50] body #suite-root .cols-main{ padding:12px !important; }
+  html[data-v50] body #suite-root .cols-main{ width:calc(100% - 24px) !important; padding:12px 0 24px !important; }
   html[data-v50] body #suite-root #v24ScenarioBar{ flex:1 1 100% !important; max-width:none !important; }
 }
 @media print{ html[data-v50] body #v50Top, html[data-v50] body #v50IncMenu{ display:none !important; } }
