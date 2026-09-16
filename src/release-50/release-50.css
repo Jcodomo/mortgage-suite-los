@@ -269,6 +269,13 @@ html[data-v50] body #v44LiveSummary .v44-live-row.bad > b,
 html[data-v50] body #v44LiveSummary .v44-live-row.na b{ color:var(--v50-warn) !important; }
 html[data-v50] body #v44LiveSummary .v44-arv-check > span b{ font:700 12px "Plus Jakarta Sans",sans-serif !important; color:var(--v50-ink) !important; }
 html[data-v50] body #v44LiveSummary .v44-live-note{ display:block; margin:8px 2px 0; font-size:11px; color:var(--v50-mute); }
+/* Expanded borrower-funds, credit and value status section. */
+html[data-v50] body #v44LiveSummary .v50-live-extras{ display:block; margin:0; }
+html[data-v50] body #v44LiveSummary .v50-live-extras h4{ margin-top:14px !important; }
+html[data-v50] body #v44LiveSummary .v50-live-extra-row{ min-height:38px !important; margin-bottom:5px !important; padding:8px 10px !important; border:1px solid var(--v50-edge) !important; border-left:3px solid var(--v50-edge) !important; border-radius:10px !important; background:var(--v50-soft) !important; }
+html[data-v50] body #v44LiveSummary .v50-live-extra-row:hover{ border-color:#9CC4E8 !important; border-left-color:var(--v50-blue) !important; }
+html[data-v50] body #v44LiveSummary .v50-live-extra-row.total{ background:var(--v50-blue-soft) !important; border-color:#9CC4E8 !important; }
+html[data-v50] body #v44LiveSummary .v50-live-extra-row.pass{ background:var(--v50-ok-soft) !important; border-color:var(--v50-ok-line) !important; }
 html[data-v50] body .v50-verdict{ margin:10px 0 4px; padding:9px 11px; border-radius:9px; font:500 12px/1.4 "Plus Jakarta Sans",sans-serif; background:var(--v50-ok-soft); color:var(--v50-ok); }
 html[data-v50] body .v50-verdict b{ display:block; font-size:12.5px; }
 html[data-v50] body .v50-verdict.warn{ background:var(--v50-warn-soft); color:var(--v50-warn); }

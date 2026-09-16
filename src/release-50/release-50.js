@@ -303,6 +303,47 @@ function paintVerdict(){
   return true;
 }
 
+/* ------------------------------------------------------------------ 5b
+   EXPANDED LIVE SUMMARY
+   These are views of existing engine outputs only.  Each line stays linked
+   to its source workspace through the same row handler as the base summary. */
+function usd2(v){ var n=N(v); return (n<0?'\u2212':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function liveExtraRow(label,value,mode,cls,sub){
+  return '<button type="button" class="v35-live-row v44-live-row v50-live-extra-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'"><span>'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><b>'+esc(value)+'</b></button>';
+}
+function paintLiveExtras(){
+  var host=$('v44LiveSummary'),o=outputs(),i=inputs(); if(!host||!o||!i)return false;
+  var cash=o.cash||{},closing=o.closing||{},aus=o.aus||{},rules=o.stateRules||{};
+  var arv=null; try{arv=window.V48&&V48.arvTest?V48.arvTest(i,o):null;}catch(e){}
+  var risk=''; try{risk=((aus.riskFactors||[]).filter(function(x){return x.factor==='Credit';})[0]||{}).result||'';}catch(e){}
+  var credit=N(i.creditScore)>0 ? String(Math.round(N(i.creditScore)))+(aus.creditTier?' · '+aus.creditTier:'') : 'Enter score';
+  var arvText='',arvClass='na',arvSub='';
+  if(o.renovationActive&&arv){
+    arvClass=arv.status==='pass'?'pass':arv.status==='fail'?'bad':'na';
+    arvText=arv.status==='pass'?'Passes by '+usd2(Math.abs(N(arv.shortfall||arv.gap))):arv.status==='fail'?'Fails by '+usd2(Math.abs(N(arv.shortfall||arv.gap))):'Pending appraisal';
+    arvSub=arv.status==='na'?'Enter an after-repair value to run the program value test.':('Value ratio '+N(arv.ratio).toFixed(2)+'% · threshold '+N(arv.threshold).toFixed(0)+'%');
+  }
+  var stateName=rules.state||i.state||'State rules',closeMethod=rules.closingMethod||'';
+  var stateText=/attorney/i.test(closeMethod)?'Attorney state':(closeMethod||'State rules applied');
+  var sig=[cash.requiredInvestment,closing.buyerClosingCosts,cash.sellerConcessionApplied,cash.earnestMoneyDeposit,cash.cashToClose,cash.cashToCloseLow,cash.cashToCloseHigh,credit,risk,o.renovationActive,arvText,stateText].join('|');
+  var box=host.querySelector('.v50-live-extras'); if(box&&box.dataset.sig===sig)return true;
+  if(!box){box=document.createElement('section');box.className='v50-live-extras';}
+  var html='<h4>Borrower funds</h4>'+
+    liveExtraRow('Minimum investment',usd2(cash.requiredInvestment),'setup','','Down payment / required investment')+
+    liveExtraRow('Plus closing costs',usd2(closing.buyerClosingCosts),'closing','','Buyer fees and prepaids')+
+    liveExtraRow('Less seller credit','\u2212 '+usd2(cash.sellerConcessionApplied),'closing','','Applied credit only')+
+    liveExtraRow('Less earnest money','\u2212 '+usd2(cash.earnestMoneyDeposit),'closing','','Already paid and credited')+
+    liveExtraRow('Remaining cash to close',usd2(cash.cashToClose),'closing','total')+
+    liveExtraRow('With the cushion',usd2(cash.cashToCloseLow)+' \u2013 '+usd2(cash.cashToCloseHigh),'closing','pass','Planning range');
+  html+='<h4>Credit & status</h4>'+liveExtraRow('Representative score',credit,'credit',risk==='PASS'?'pass':'na',risk||'Credit review');
+  if(o.renovationActive&&arv)html+=liveExtraRow('ARV test',arvText,'maxmortgage',arvClass,arvSub);
+  html+=liveExtraRow(stateName,stateText,'closing',/attorney/i.test(stateText)?'pass':'','Closing rules');
+  box.dataset.sig=sig;box.innerHTML=html;
+  var checks=Array.prototype.filter.call(host.querySelectorAll(':scope > h4'),function(h){return key(h.textContent)==='CHECKS';})[0];
+  if(checks)host.insertBefore(box,checks);else host.appendChild(box);
+  return true;
+}
+
 /* ------------------------------------------------------------------ 6
    RAIL: when the live summary is hidden, the page takes the full width */
 function paintCols(){
@@ -378,8 +419,8 @@ function choose(k){
 }
 V50.choose = choose;
 /* live summary rows open the page that holds their figure */
-var MODE_TAB = { quote:'QUOTE', setup:'QUOTE', renovation:'RENOVATION', maxmortgage:'MAX MORTGAGE', closing:'CLOSING',
-  escrow:'ESCROW', qualify:'QUALIFY', rental:'RENTAL', advanced:'ADVANCED', summary:'SUMMARY', compare:'SCENARIOS' };
+var MODE_TAB = { quote:'QUOTE', setup:'SETUP', renovation:'RENOVATION', maxmortgage:'MAX MORTGAGE', rates:'MORTGAGE RATES', closing:'CLOSING',
+  escrow:'ESCROW', qualify:'QUALIFY', income:'QUALIFY', rental:'RENTAL', credit:'CREDIT', advanced:'ADVANCED', summary:'SUMMARY', compare:'SCENARIOS' };
 document.addEventListener('click', function(e){
   var r = e.target.closest && e.target.closest('#v44LiveSummary .v44-live-row, #v44LiveSummary .v44-arv-check');
   if (!r) return;
@@ -434,6 +475,7 @@ function tick(){
   try { paintTabs(); } catch(e){}
   try { paintIncome(); } catch(e){}
   try { paintVerdict(); } catch(e){}
+  try { paintLiveExtras(); } catch(e){}
   try { paintCols(); } catch(e){}
   try { watchRow(); enforce(); } catch(e){}
 }
