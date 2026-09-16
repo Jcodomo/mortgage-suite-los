@@ -37675,6 +37675,34 @@ html[data-v50] body #suite-root #v35LinkedSubnav button:hover{ background:var(--
 html[data-v50] body #suite-root #v35LinkedSubnav button.active{ background:var(--v50-blue-soft) !important; color:var(--v50-blue-ink) !important; }
 html[data-v50] body #suite-root #v44LiveSummary{ padding:0 !important; }
 
+/* Center the Loan Suite header content like the Income Calculator while the bands stay full bleed. */
+@media (min-width:1181px){
+  html[data-v50] body #suite-root #v25HeaderMain,
+  html[data-v50] body #suite-root #v34Bar,
+  html[data-v50] body #suite-root .v23-primary-nav.v48-nav,
+  html[data-v50] body #suite-root .tabs.v48-context{
+    width:min(1520px,calc(100% - 40px)) !important; max-width:1520px !important; margin-left:auto !important; margin-right:auto !important;
+  }
+  html[data-v50] body #suite-root .chrome{ background:linear-gradient(var(--v50-card),var(--v50-card)) !important; }
+}
+html[data-v50] body #v44LiveSummary .v50-funds-toggle{
+  width:100%; margin:-1px 0 5px; padding:5px 8px; border:1px dashed var(--v50-edge); border-radius:7px; background:transparent; color:var(--v50-blue-ink); font:700 10.5px "Plus Jakarta Sans",sans-serif; cursor:pointer;
+}
+html[data-v50] body #v44LiveSummary .v50-funds-detail{ display:none; }
+html[data-v50] body #v44LiveSummary .v50-live-extras.expanded .v50-funds-detail{ display:block; }
+html[data-v50] body #v50CreditOverview{ margin:0 0 14px; padding:14px; border:1px solid var(--v50-line); border-radius:12px; background:var(--v50-card); box-shadow:var(--v50-shadow); }
+html[data-v50] body #v50CreditOverview header{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+html[data-v50] body #v50CreditOverview header small{ display:block; color:var(--v50-mute); font:700 10px Inter,sans-serif; text-transform:uppercase; letter-spacing:.7px; }
+html[data-v50] body #v50CreditOverview h3{ margin:2px 0 0; color:var(--v50-ink); font:800 17px "Plus Jakarta Sans",sans-serif; }
+html[data-v50] body #v50CreditOverview header button{ height:32px; padding:0 10px; border:1px solid var(--v50-edge); border-radius:8px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); font:700 11.5px "Plus Jakarta Sans",sans-serif; cursor:pointer; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics button{ min-width:0; padding:9px 10px; text-align:left; border:1px solid var(--v50-line); border-radius:8px; background:var(--v50-soft); color:var(--v50-ink); cursor:pointer; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics span{ display:block; color:var(--v50-mute); font:700 9.5px Inter,sans-serif; text-transform:uppercase; letter-spacing:.55px; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics b{ display:block; margin-top:3px; font:800 14px "Plus Jakarta Sans",sans-serif; }
+html[data-v50] body #v50CreditOverview .v50-planning-range{ display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+html[data-v50] body #v50CreditOverview .v50-planning-range span{ padding:5px 8px; border-radius:7px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); font:600 10.5px "Plus Jakarta Sans",sans-serif; }
+@media (max-width:740px){ html[data-v50] body #v50CreditOverview .v50-credit-metrics{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
 </style>
 <script id="los-release-50-js">
 /* =====================================================================
@@ -37792,6 +37820,10 @@ function paintTabs(){
   /* Full is the last group tab */
   if (nav){ var full = nav.querySelector('button[data-group="full"]'); var lastBtn = $$('button', nav).pop(); if (full && lastBtn !== full) nav.appendChild(full); }
   if (nav && cs){ var txt = norm(cs.textContent).replace(/\s·\s/g, ', '); if (nav.getAttribute('data-v50-context') !== txt) nav.setAttribute('data-v50-context', txt); }
+  /* Setup is the first working page inside File, immediately before Quote. */
+  var setup=$$('.tab',row).filter(function(t){return key(t.textContent)==='SETUP';})[0];
+  var quote=$$('.tab',row).filter(function(t){return key(t.textContent)==='QUOTE';})[0];
+  if(setup&&quote&&setup.nextElementSibling!==quote) row.insertBefore(setup,quote);
   return true;
 }
 
@@ -37987,8 +38019,8 @@ function paintVerdict(){
    These are views of existing engine outputs only.  Each line stays linked
    to its source workspace through the same row handler as the base summary. */
 function usd2(v){ var n=N(v); return (n<0?'\u2212':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function liveExtraRow(label,value,mode,cls,sub){
-  return '<button type="button" class="v35-live-row v44-live-row v50-live-extra-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'"><span>'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><b>'+esc(value)+'</b></button>';
+function liveExtraRow(label,value,mode,cls,sub,attrs){
+  return '<button type="button" class="v35-live-row v44-live-row v50-live-extra-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'" '+(attrs||'')+'><span>'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><b>'+esc(value)+'</b></button>';
 }
 function paintLiveExtras(){
   var host=$('v44LiveSummary'),o=outputs(),i=inputs(); if(!host||!o||!i)return false;
@@ -38004,23 +38036,39 @@ function paintLiveExtras(){
   }
   var stateName=rules.state||i.state||'State rules',closeMethod=rules.closingMethod||'';
   var stateText=/attorney/i.test(closeMethod)?'Attorney state':(closeMethod||'State rules applied');
-  var sig=[cash.requiredInvestment,closing.buyerClosingCosts,cash.sellerConcessionApplied,cash.earnestMoneyDeposit,cash.cashToClose,cash.cashToCloseLow,cash.cashToCloseHigh,credit,risk,o.renovationActive,arvText,stateText].join('|');
+  var limitText=o.isFha?usd2(o.loan&&o.loan.fhaLimitApplied)+' · '+((o.loan&&o.loan.fhaTier)||'Auto'):'Not applicable';
+  var limitClass=o.isFha&&N(o.loan&&o.loan.amountOverFhaLimit)>0?'bad':'pass';
+  var sig=[cash.requiredInvestment,closing.buyerClosingCosts,cash.sellerConcessionApplied,cash.earnestMoneyDeposit,cash.cashToClose,cash.cashToCloseLow,cash.cashToCloseHigh,credit,risk,o.renovationActive,arvText,stateText,limitText].join('|');
   var box=host.querySelector('.v50-live-extras'); if(box&&box.dataset.sig===sig)return true;
   if(!box){box=document.createElement('section');box.className='v50-live-extras';}
   var html='<h4>Borrower funds</h4>'+
     liveExtraRow('Minimum investment',usd2(cash.requiredInvestment),'setup','','Down payment / required investment')+
     liveExtraRow('Plus closing costs',usd2(closing.buyerClosingCosts),'closing','','Buyer fees and prepaids')+
-    liveExtraRow('Less seller credit','\u2212 '+usd2(cash.sellerConcessionApplied),'closing','','Applied credit only')+
-    liveExtraRow('Less earnest money','\u2212 '+usd2(cash.earnestMoneyDeposit),'closing','','Already paid and credited')+
     liveExtraRow('Remaining cash to close',usd2(cash.cashToClose),'closing','total')+
-    liveExtraRow('With the cushion',usd2(cash.cashToCloseLow)+' \u2013 '+usd2(cash.cashToCloseHigh),'closing','pass','Planning range');
-  html+='<h4>Credit & status</h4>'+liveExtraRow('Representative score',credit,'credit',risk==='PASS'?'pass':'na',risk||'Credit review');
+    '<button type="button" class="v50-funds-toggle" data-v50-funds-toggle>Show credits & deposits</button>'+
+    '<div class="v50-funds-detail">'+liveExtraRow('Less seller credit','\u2212 '+usd2(cash.sellerConcessionApplied),'closing','','Applied credit only')+liveExtraRow('Less earnest money','\u2212 '+usd2(cash.earnestMoneyDeposit),'closing','','Already paid and credited')+liveExtraRow('With the cushion',usd2(cash.cashToCloseLow)+' \u2013 '+usd2(cash.cashToCloseHigh),'closing','pass','Planning range')+'</div>';
+  html+='<h4>Credit & status</h4>'+liveExtraRow('Representative score',credit,'credit',risk==='PASS'?'pass':'na',risk||'Credit review','data-v50-edit-score');
   if(o.renovationActive&&arv)html+=liveExtraRow('ARV test',arvText,'maxmortgage',arvClass,arvSub);
   html+=liveExtraRow(stateName,stateText,'closing',/attorney/i.test(stateText)?'pass':'','Closing rules');
+  html+='<h4>ZIP & limits</h4>'+liveExtraRow('ZIP '+(i.zipCode||'11530'),limitText,'maxmortgage',limitClass,o.isFha?((o.loan&&o.loan.fhaLimitStatus)||'County-limit planning check'):'Conventional county limit does not apply');
   box.dataset.sig=sig;box.innerHTML=html;
+  var toggle=box.querySelector('[data-v50-funds-toggle]'); if(toggle)toggle.onclick=function(e){e.preventDefault();e.stopPropagation();box.classList.toggle('expanded');toggle.textContent=box.classList.contains('expanded')?'Hide credits & deposits':'Show credits & deposits';};
   var checks=Array.prototype.filter.call(host.querySelectorAll(':scope > h4'),function(h){return key(h.textContent)==='CHECKS';})[0];
   if(checks)host.insertBefore(box,checks);else host.appendChild(box);
   return true;
+}
+
+/* Credit retains its reader and gains a compact planning panel above it. */
+function paintCreditOverview(){
+  var o=outputs(),i=inputs(),body=$('screen-body'); if(!o||!i||!body||engineMode()!=='credit')return false;
+  var cash=o.cash||{},pay=o.payment||{},loan=o.loan||{},aus=o.aus||{},old=$('v50CreditOverview');
+  var sig=[loan.totalLoan,pay.totalMonthlyPayment,cash.cashToClose,aus.backEndDti,cash.cashToCloseLow,cash.cashToCloseHigh].join('|');
+  if(old&&old.dataset.sig===sig)return true; if(!old){old=document.createElement('section');old.id='v50CreditOverview';old.className='v50-credit-overview no-print';}
+  old.dataset.sig=sig;old.innerHTML='<header><div><small>Borrower planning range</small><h3>Credit overview</h3></div><button type="button" data-v50-open-mi>Mortgage insurance worksheet</button></header><div class="v50-credit-metrics">'+
+    '<button data-v35-label="Total loan" data-v35-mode="maxmortgage"><span>Total loan</span><b>'+usd2(loan.totalLoan)+'</b></button><button data-v35-label="Monthly payment" data-v35-mode="quote"><span>Monthly payment</span><b>'+usd2(pay.totalMonthlyPayment)+'</b></button><button data-v35-label="Cash to close" data-v35-mode="closing"><span>Cash to close</span><b>'+usd2(cash.cashToClose)+'</b></button><button data-v35-label="Back-end DTI" data-v35-mode="income"><span>Back-end DTI</span><b>'+(N(aus.totalQualifyingIncome)?pct(aus.backEndDti):'Enter income')+'</b></button></div><div class="v50-planning-range"><span>FHA planning: 46% front / 56% back</span><span>Conventional planning: 50% front / 50% back</span><span>Cash: '+usd2(cash.cashToCloseLow)+' – '+usd2(cash.cashToCloseHigh)+'</span></div>';
+  old.querySelector('[data-v50-open-mi]').onclick=function(){V50.run(['PMI Worksheet','PMI / FHA MIP'],function(){V50.go('QUALIFY');});};
+  old.querySelectorAll('.v50-credit-metrics button').forEach(function(b){b.onclick=function(){if(window.V35&&V35.openRailEditor)V35.openRailEditor(b,b.dataset.v35Label,b.dataset.v35Mode);};});
+  body.insertBefore(old,body.firstChild);return true;
 }
 
 /* ------------------------------------------------------------------ 6
@@ -38103,6 +38151,7 @@ var MODE_TAB = { quote:'QUOTE', setup:'SETUP', renovation:'RENOVATION', maxmortg
 document.addEventListener('click', function(e){
   var r = e.target.closest && e.target.closest('#v44LiveSummary .v44-live-row, #v44LiveSummary .v44-arv-check');
   if (!r) return;
+  if (r.hasAttribute('data-v50-edit-score')) return;
   var k = MODE_TAB[String(r.getAttribute('data-v35-mode')||'').toLowerCase()]; if (!k) return;
   var cur = (row() && row().querySelector('.tab.active')) || null;
   if (cur && tabKey(cur) === k) return;              /* already there: let the row focus its field */
@@ -38111,10 +38160,24 @@ document.addEventListener('click', function(e){
   lastTrusted = 0; t.click();
   setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 120);
 }, true);
-/* the Documents button opens the Documents group on its OCR page */
+document.addEventListener('click', function(e){
+  var r=e.target.closest&&e.target.closest('#v44LiveSummary [data-v50-edit-score]'); if(!r)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  var s=store();if(!s)return; var old=$('v50ScoreEditor');if(old)old.remove();
+  var p=document.createElement('aside');p.id='v50ScoreEditor';p.className='v35-rail-editor no-print';
+  p.innerHTML='<header><div><small>Live summary</small><b>Representative credit score</b></div><button type="button" data-x aria-label="Close">×</button></header><p>Enter a score to refresh mortgage-insurance and credit-tier estimates.</p><div class="v35-rail-fields"><label><span>Credit score</span><input type="text" inputmode="decimal" autocomplete="off" value="'+esc(iNum(s.activeInputs.creditScore))+'"></label></div><footer><button type="button" class="primary" data-save>Apply change</button><button type="button" data-go>Open Credit</button></footer>';
+  document.body.appendChild(p);var b=r.getBoundingClientRect(),w=Math.min(390,innerWidth-24);p.style.width=w+'px';p.style.left=Math.max(12,Math.min(innerWidth-w-12,b.left-w-12))+'px';p.style.top=Math.max(12,Math.min(innerHeight-p.offsetHeight-12,b.top))+'px';
+  p.querySelector('[data-x]').onclick=function(){p.remove();};p.querySelector('[data-go]').onclick=function(){p.remove();V50.go('CREDIT');};p.querySelector('[data-save]').onclick=function(){var v=p.querySelector('input').value;if(window.V20&&V20.setScenario)V20.setScenario('creditScore',v,'num');else s.setField('creditScore',v,'Live summary edit');p.remove();};if(window.V19)V19.enhanceFreeform(p);
+}, true);
+function iNum(v){return N(v)>0?String(Math.round(N(v))):'';}
+/* First Documents click opens its document menu; a quick second click opens OCR. */
+var docsClickedAt=0;
 document.addEventListener('click', function(e){
   if (!(e.target.closest && e.target.closest('#v44Docs'))) return;
+  var now=Date.now();
   e.stopImmediatePropagation(); e.preventDefault();
+  if(now-docsClickedAt>700){ docsClickedAt=now; try{if(window.V44&&V44.openMenu)V44.openMenu('docs');}catch(x){} return; }
+  docsClickedAt=0;
   var t = tabFor('DOCUMENTS & OCR'); if (!t) return;
   lastTrusted = 0; t.click();
   setTimeout(function(){ window.scrollTo(0, 0); }, 150);
@@ -38155,6 +38218,7 @@ function tick(){
   try { paintIncome(); } catch(e){}
   try { paintVerdict(); } catch(e){}
   try { paintLiveExtras(); } catch(e){}
+  try { paintCreditOverview(); } catch(e){}
   try { paintCols(); } catch(e){}
   try { watchRow(); enforce(); } catch(e){}
 }
@@ -38163,6 +38227,11 @@ V50.refresh = tick;
 var subscribed = false;
 function hook(){
   var s = store();
+  /* Start a new file with the suite's Nassau planning ZIP and local lookup. */
+  if(s&&!document.documentElement.dataset.v50ZipStarted){
+    document.documentElement.dataset.v50ZipStarted='1';
+    try{if(!norm(s.activeInputs.zipCode)){s.setField('zipCode','11530','Release 50 default ZIP');s.applyZipLookup();}}catch(e){}
+  }
   if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ setTimeout(soon, 30); }); } catch(e){} }
   document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(soon, 40); }, true);
 }

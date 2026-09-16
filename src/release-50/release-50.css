@@ -343,3 +343,31 @@ html[data-v50] body #suite-root #v35LinkedSubnav button{
 html[data-v50] body #suite-root #v35LinkedSubnav button:hover{ background:var(--v50-soft) !important; color:var(--v50-ink) !important; }
 html[data-v50] body #suite-root #v35LinkedSubnav button.active{ background:var(--v50-blue-soft) !important; color:var(--v50-blue-ink) !important; }
 html[data-v50] body #suite-root #v44LiveSummary{ padding:0 !important; }
+
+/* Center the Loan Suite header content like the Income Calculator while the bands stay full bleed. */
+@media (min-width:1181px){
+  html[data-v50] body #suite-root #v25HeaderMain,
+  html[data-v50] body #suite-root #v34Bar,
+  html[data-v50] body #suite-root .v23-primary-nav.v48-nav,
+  html[data-v50] body #suite-root .tabs.v48-context{
+    width:min(1520px,calc(100% - 40px)) !important; max-width:1520px !important; margin-left:auto !important; margin-right:auto !important;
+  }
+  html[data-v50] body #suite-root .chrome{ background:linear-gradient(var(--v50-card),var(--v50-card)) !important; }
+}
+html[data-v50] body #v44LiveSummary .v50-funds-toggle{
+  width:100%; margin:-1px 0 5px; padding:5px 8px; border:1px dashed var(--v50-edge); border-radius:7px; background:transparent; color:var(--v50-blue-ink); font:700 10.5px "Plus Jakarta Sans",sans-serif; cursor:pointer;
+}
+html[data-v50] body #v44LiveSummary .v50-funds-detail{ display:none; }
+html[data-v50] body #v44LiveSummary .v50-live-extras.expanded .v50-funds-detail{ display:block; }
+html[data-v50] body #v50CreditOverview{ margin:0 0 14px; padding:14px; border:1px solid var(--v50-line); border-radius:12px; background:var(--v50-card); box-shadow:var(--v50-shadow); }
+html[data-v50] body #v50CreditOverview header{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+html[data-v50] body #v50CreditOverview header small{ display:block; color:var(--v50-mute); font:700 10px Inter,sans-serif; text-transform:uppercase; letter-spacing:.7px; }
+html[data-v50] body #v50CreditOverview h3{ margin:2px 0 0; color:var(--v50-ink); font:800 17px "Plus Jakarta Sans",sans-serif; }
+html[data-v50] body #v50CreditOverview header button{ height:32px; padding:0 10px; border:1px solid var(--v50-edge); border-radius:8px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); font:700 11.5px "Plus Jakarta Sans",sans-serif; cursor:pointer; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics button{ min-width:0; padding:9px 10px; text-align:left; border:1px solid var(--v50-line); border-radius:8px; background:var(--v50-soft); color:var(--v50-ink); cursor:pointer; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics span{ display:block; color:var(--v50-mute); font:700 9.5px Inter,sans-serif; text-transform:uppercase; letter-spacing:.55px; }
+html[data-v50] body #v50CreditOverview .v50-credit-metrics b{ display:block; margin-top:3px; font:800 14px "Plus Jakarta Sans",sans-serif; }
+html[data-v50] body #v50CreditOverview .v50-planning-range{ display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+html[data-v50] body #v50CreditOverview .v50-planning-range span{ padding:5px 8px; border-radius:7px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); font:600 10.5px "Plus Jakarta Sans",sans-serif; }
+@media (max-width:740px){ html[data-v50] body #v50CreditOverview .v50-credit-metrics{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
