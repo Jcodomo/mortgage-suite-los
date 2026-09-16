@@ -9,6 +9,7 @@ const checks=[
   ['Expanded Live Summary exposes borrower-funds rows',/Minimum investment[\s\S]*?Plus closing costs[\s\S]*?Less seller credit[\s\S]*?Less earnest money[\s\S]*?Remaining cash to close[\s\S]*?With the cushion/.test(dist)],
   ['Expanded Live Summary includes credit, ARV and state-rule status',/Representative score[\s\S]*?ARV test/.test(dist)&&/Attorney state/.test(dist)],
   ['Live Summary routes credit and rate rows to their workspaces',/credit:'CREDIT'[\s\S]*?rates:'MORTGAGE RATES'/.test(dist)],
+  ['Freeform percentage displays suppress floating-point artifacts',/function paintFreeformValues\(\)[\s\S]*?Math\.round\(v\*1000\)\/1000[\s\S]*?setInterval\(paintFreeformValues, 250\)/.test(dist)],
   ['Release 50 layer is present in the shipped file',/id="los-release-50"/.test(dist)]
 ];
 let failed=0;for(const [name,ok] of checks){console.log((ok?'PASS  ':'FAIL  ')+name);if(!ok)failed++;}

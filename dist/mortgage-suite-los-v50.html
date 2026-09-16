@@ -38248,6 +38248,9 @@ function hook(){
   document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(soon, 40); }, true);
 }
 if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1000); else setInterval(tick, 1000);
+/* V35 repaints quote controls every 800ms. Keep the display layer last so
+   fractional percentages never flash as binary floating-point artifacts. */
+setInterval(paintFreeformValues, 250);
 setTimeout(function(){ tick(); hook(); }, 260);
 setTimeout(tick, 1200);
 })();
