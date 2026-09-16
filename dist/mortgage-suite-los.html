@@ -38071,6 +38071,17 @@ function paintCreditOverview(){
   body.insertBefore(old,body.firstChild);return true;
 }
 
+/* Keep freeform percentage fields readable without changing the stored fraction. */
+function paintFreeformValues(){
+  var s=store();if(!s)return;
+  $$('[data-v35-quote][data-kind="percent"]').forEach(function(input){
+    if(document.activeElement===input)return;
+    var v=N(s.activeInputs.finalDownPaymentPct)*100;
+    var pretty=(Math.round(v*1000)/1000).toFixed(3).replace(/\.?0+$/,'');
+    if(input.value!==pretty)input.value=pretty;
+  });
+}
+
 /* ------------------------------------------------------------------ 6
    RAIL: when the live summary is hidden, the page takes the full width */
 function paintCols(){
@@ -38219,6 +38230,7 @@ function tick(){
   try { paintVerdict(); } catch(e){}
   try { paintLiveExtras(); } catch(e){}
   try { paintCreditOverview(); } catch(e){}
+  try { paintFreeformValues(); } catch(e){}
   try { paintCols(); } catch(e){}
   try { watchRow(); enforce(); } catch(e){}
 }
