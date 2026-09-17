@@ -126,16 +126,24 @@ function paintTabs(){
    the one with the working first-click menu / second-click OCR behavior, so
    keep that control and suppress only the redundant clone. */
 function dedupeDocumentsNavigation(){
-  var nav=$('v23SuitePrimaryNav'), direct=$('v28nav-documents');
-  if(!nav||!direct)return false;
-  var duplicate=nav.querySelector('button[data-group="documents"]');
-  if(duplicate&&duplicate!==direct){
-    duplicate.classList.add('v50-documents-duplicate');
-    duplicate.setAttribute('aria-hidden','true');
-    duplicate.tabIndex=-1;
+  var nav=$('v23SuitePrimaryNav'); if(!nav)return false;
+  var buttons=$$('button',nav).filter(function(b){return key(b.textContent)==='DOCUMENTS';});
+  if(buttons.length<2)return false;
+  var direct=$('v28nav-documents'), keep=buttons.indexOf(direct)>=0?direct:buttons[0];
+  buttons.forEach(function(button){
+    var duplicate=button!==keep;
+    button.classList.toggle('v50-documents-duplicate',duplicate);
+    if(duplicate){
+      button.setAttribute('aria-hidden','true'); button.tabIndex=-1;
+      button.style.setProperty('display','none','important');
+    }else{
+      button.removeAttribute('aria-hidden'); button.style.removeProperty('display');
+    }
+  });
+  if(!nav.__v50DocsObserver){
+    nav.__v50DocsObserver=true;
+    new MutationObserver(function(){ dedupeDocumentsNavigation(); }).observe(nav,{childList:true,subtree:true});
   }
-  direct.classList.remove('v50-documents-duplicate');
-  direct.removeAttribute('aria-hidden');
   return true;
 }
 
