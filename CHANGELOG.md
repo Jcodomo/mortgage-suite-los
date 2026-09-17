@@ -5,6 +5,10 @@
 Additive over Release 48. Neither calculation engine and no earlier layer was edited. The Income Calculator is unchanged (its screen renders pixel-identical to Release 48).
 
 ### Layout
+- Navigation refinement: every retained page is now organized under File, Loan, Costs, Underwriting or Results; document workspaces are consolidated under Results instead of duplicating a primary group.
+- Full now opens the continuous file view with a grouped directory to all 19 retained workspaces.
+- Credit now opens as a standalone Loan Suite workspace using the existing editable credit-report and tradeline engine.
+- Rule tables, Mortgage rates, Taxes & proration, Escrow, Credit and Contract & LE now use distinct matching icons; the Advanced shortcut row uses the same compact card language.
 - Loan Suite rebuilt in the Income Calculator's frame: full-width gradient header, grey figure strip, white group tabs and pill page tabs. All navigation is across the top.
 - Header: **Sync on/off** and **Scenarios** buttons, a labelled File picker, white date fields.
 - Figure strip: Total loan as the green lead pill; Compare, View and Live become icon buttons; new blue **Loan Report** button (prints the scenario summary); **File actions** in black; the all-in-one menu relabelled **All actions**.

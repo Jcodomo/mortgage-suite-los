@@ -82,12 +82,23 @@ document.documentElement.setAttribute('data-los-release','50');
 
 var ICON = {
   loan:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
   dollar:'<path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/>',
   coins:'<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>',
   check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
-  sheet:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>'
+  sheet:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>',
+  file:'<path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  tool:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3 17.7 6.3 21l6.3-6.3a4 4 0 0 0 5.1-5.4l-2.6 2.6-2.3-.7-.7-2.3z"/>',
+  rate:'<path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/>',
+  escrow:'<path d="M4 9h16M6 9v9m4-9v9m4-9v9m4-9v9M3 20h18"/><path d="M12 3l9 4H3z"/>',
+  tax:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  credit:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  rules:'<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  contract:'<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 12h6M9 16h4"/>',
+  chart:'<path d="M3 20h18M5 16l4-5 4 3 6-8"/>',
+  book:'<path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2zM22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/>'
 };
-function svg(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>'; }
+function svg(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(ICON[k]||ICON.file)+'</svg>'; }
 
 /* ------------------------------------------------------------------ actions
    Same lookup the earlier layers use: an action is a button inside the
@@ -124,10 +135,10 @@ V50.go = function(label){
    label is drawn from a data attribute. */
 var LABEL = {
   'QUOTE':['Quote','dollar'],'SETUP':['Setup','file'],'PROPERTY':['Property','home'],
-  'RENOVATION':['Renovation','tool'],'MAX MORTGAGE':['Max mortgage','home'],'MORTGAGE RATES':['Mortgage rates','pulse'],
-  'CLOSING':['Closing costs','coins'],'ESCROW':['Escrow','coins'],'TAXES & PRORATION':['Taxes & proration','sheet'],
-  'QUALIFY':['Qualify','check'],'RENTAL':['Rental','home'],'CREDIT':['Credit','check'],'ADVANCED':['Advanced','tool'],
-  'CONTRACT & LE':['Contract & LE','book'],'SCENARIOS':['Scenarios','chart'],'SUMMARY':['Summary','chart'],
+  'RENOVATION':['Renovation','tool'],'MAX MORTGAGE':['Max mortgage','home'],'MORTGAGE RATES':['Mortgage rates','rate'],
+  'CLOSING':['Closing costs','coins'],'ESCROW':['Escrow','escrow'],'TAXES & PRORATION':['Taxes & proration','tax'],
+  'QUALIFY':['Qualify','check'],'RENTAL':['Rental','home'],'CREDIT':['Credit','credit'],'ADVANCED':['Rule tables','rules'],
+  'CONTRACT & LE':['Contract & LE','contract'],'SCENARIOS':['Scenarios','chart'],'SUMMARY':['Summary','chart'],
   'DOCUMENTS & OCR':['Documents & OCR','book'],'DOCUMENTS & WORKSHEETS':['Worksheets','sheet'],'DRAFT LE':['Draft LE','book']
 };
 var MODULE_TAB = { purchase:'SETUP', loan:'MAX MORTGAGE', value:'PROPERTY', renovation:'RENOVATION', draws:'RENOVATION',
@@ -151,6 +162,11 @@ function paintTabs(){
   $$('.tab', row).forEach(function(t){
     var k = key(t.childNodes.length ? Array.prototype.map.call(t.childNodes,function(n){ return n.nodeType===3 ? n.textContent : ''; }).join('') : t.textContent);
     if (!k) k = key(t.textContent);
+    /* Preserve the engine key before the visible calculator-style label is
+       applied. Several friendly labels intentionally differ (Advanced is
+       Rule tables, Closing is Closing costs, Documents & worksheets is
+       Worksheets), and routing must continue to use the engine key. */
+    if (t.getAttribute('data-v50-key') !== k) t.setAttribute('data-v50-key', k);
     var L = LABEL[k] || [norm(t.textContent).toLowerCase().replace(/^./,function(c){return c.toUpperCase();}), 'file'];
     if (t.getAttribute('data-v50-label') !== L[0]) t.setAttribute('data-v50-label', L[0]);
     if (t.getAttribute('data-v50-ic') !== L[1]) t.setAttribute('data-v50-ic', L[1]);
@@ -172,6 +188,7 @@ function paintTabs(){
   var quote=$$('.tab',row).filter(function(t){return key(t.textContent)==='QUOTE';})[0];
   if(setup&&quote&&setup.nextElementSibling!==quote) row.insertBefore(setup,quote);
   dedupeDocumentsNavigation();
+  paintWorkspaceGroups();
   return true;
 }
 
@@ -198,6 +215,155 @@ function dedupeDocumentsNavigation(){
     nav.__v50DocsObserver=true;
     new MutationObserver(function(){ dedupeDocumentsNavigation(); }).observe(nav,{childList:true,subtree:true});
   }
+  return true;
+}
+
+/* ------------------------------------------------------------------ 1b
+   WORKSPACE ORGANISATION
+
+   Five stable workspaces replace the old ever-growing flat tab strip.
+   Results owns the retained document workspaces, while Full opens the
+   continuous file view and a grouped directory to every page.  The page
+   keys are deliberately unchanged so every retained calculator and route
+   continues to use the same source data and calculations. */
+var WORKSPACE_GROUPS = {
+  file:['SETUP','QUOTE','PROPERTY'],
+  loan:['RENOVATION','MAX MORTGAGE','MORTGAGE RATES'],
+  costs:['CLOSING','ESCROW','TAXES & PRORATION'],
+  underwriting:['QUALIFY','RENTAL','CREDIT','ADVANCED','CONTRACT & LE'],
+  results:['SCENARIOS','SUMMARY','DOCUMENTS & WORKSHEETS','DRAFT LE','DOCUMENTS & OCR']
+};
+var WORKSPACE_ORDER = ['file','loan','costs','underwriting','results'];
+var WORKSPACE_LABELS = {file:'File',loan:'Loan',costs:'Costs',underwriting:'Underwriting',results:'Results'};
+var currentWorkspaceGroup = '';
+function groupForTab(tab){
+  tab=key(tab);
+  for(var n=0;n<WORKSPACE_ORDER.length;n++){
+    var g=WORKSPACE_ORDER[n]; if(WORKSPACE_GROUPS[g].indexOf(tab)>=0)return g;
+  }
+  return 'file';
+}
+function activeTabKey(){
+  var r=row(),a=r&&r.querySelector('.tab.active'); return a?tabKey(a):'';
+}
+function setWorkspaceGroup(group){
+  if(WORKSPACE_ORDER.indexOf(group)<0)group=groupForTab(activeTabKey());
+  currentWorkspaceGroup=group;
+  try{localStorage.setItem('los.v50.workspaceGroup',group);}catch(e){}
+  paintWorkspaceGroups();
+}
+function paintWorkspaceGroups(){
+  var r=row(),nav=$('v23SuitePrimaryNav'); if(!r||!nav)return false;
+  var fullActive=!!(window.V25&&V25.fullActive&&$('suite-root').classList.contains('v25-full-active'));
+  var active=activeTabKey(),group=currentWorkspaceGroup;
+  var activeGroupButton=nav.querySelector('button.active[data-group]');
+  var activeGroup=activeGroupButton&&activeGroupButton.dataset.group;
+  if(activeGroup==='documents')activeGroup='results';
+  if(!fullActive&&WORKSPACE_ORDER.indexOf(activeGroup)>=0&&activeGroup!==group){
+    group=currentWorkspaceGroup=activeGroup;
+  }
+  if(!group){
+    try{group=localStorage.getItem('los.v50.workspaceGroup')||'';}catch(e){}
+    if(WORKSPACE_ORDER.indexOf(group)<0)group=groupForTab(active);
+    currentWorkspaceGroup=group;
+  }
+  $$('.tab',r).forEach(function(t){
+    var k=tabKey(t),show=!fullActive&&WORKSPACE_GROUPS[group]&&WORKSPACE_GROUPS[group].indexOf(k)>=0;
+    t.classList.toggle('v50-nav-hidden',!show);
+    if(show)t.removeAttribute('aria-hidden');else t.setAttribute('aria-hidden','true');
+  });
+  $$('button',nav).forEach(function(b){
+    var g=b.dataset.group||'';
+    if(g==='documents'){
+      b.classList.add('v50-documents-duplicate'); b.setAttribute('aria-hidden','true'); b.tabIndex=-1;
+      b.style.setProperty('display','none','important'); return;
+    }
+    if(WORKSPACE_ORDER.indexOf(g)<0&&g!=='full')return;
+    var on=fullActive?g==='full':g===group;
+    b.classList.toggle('active',on); b.setAttribute('aria-current',on?'page':'false');
+  });
+  return true;
+}
+function fullDirectoryMarkup(){
+  return '<section id="v50FullDirectory" class="v50-full-directory"><header><div><small>Workspace directory</small><h3>Every file workspace</h3><p>Open any page without searching through a flat tab list.</p></div></header><div class="v50-full-directory-grid">'+WORKSPACE_ORDER.map(function(group){
+    return '<article><h4>'+esc(WORKSPACE_LABELS[group])+'</h4><div>'+WORKSPACE_GROUPS[group].map(function(k){
+      var meta=LABEL[k]||[k,'file']; return '<button type="button" data-v50-full-page="'+esc(k)+'" data-v50-ic="'+esc(meta[1])+'"><i>'+svg(meta[1])+'</i><span>'+esc(meta[0])+'<small>Open workspace</small></span></button>';
+    }).join('')+'</div></article>';
+  }).join('')+'</div></section>';
+}
+function decorateFullWorkspace(){
+  var sheet=$('v25FullSheet'); if(!sheet||$('v50FullDirectory'))return false;
+  var header=sheet.querySelector(':scope > header');
+  if(header)header.insertAdjacentHTML('afterend',fullDirectoryMarkup());else sheet.insertAdjacentHTML('afterbegin',fullDirectoryMarkup());
+  $$('[data-v50-full-page]',sheet).forEach(function(b){b.onclick=function(){openWorkspacePage(b.dataset.v50FullPage);};});
+  return true;
+}
+function openWorkspacePage(page){
+  page=key(page); exitCreditWorkspace();
+  if(window.V25)V25.fullActive=false;
+  var root=$('suite-root');if(root)root.classList.remove('v25-full-active');
+  setWorkspaceGroup(groupForTab(page));paintWorkspaceGroups();
+  var t=tabFor(page);if(t){t.click();return;}
+  V50.go(page);
+}
+function openFullWorkspace(){
+  exitCreditWorkspace(); currentWorkspaceGroup='';
+  if(window.V25&&V25.openFull){V25.openFull();setTimeout(function(){decorateFullWorkspace();paintWorkspaceGroups();},0);return;}
+  if(window.V48&&V48.toggleFull)V48.toggleFull();
+}
+function installWorkspaceNavigation(){
+  if(document.documentElement.dataset.v50WorkspaceNav)return;
+  document.documentElement.dataset.v50WorkspaceNav='1';
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('#v23SuitePrimaryNav button'); if(!b)return;
+    var group=b.dataset.group||'';
+    if(group==='full'){
+      e.preventDefault();e.stopImmediatePropagation();openFullWorkspace();return;
+    }
+    if(WORKSPACE_ORDER.indexOf(group)>=0){exitCreditWorkspace();setWorkspaceGroup(group);setTimeout(paintWorkspaceGroups,0);}
+  },true);
+  document.addEventListener('click',function(e){
+    var t=e.target.closest&&e.target.closest('#suite-root .tabs .tab'); if(!t)return;
+    var k=tabKey(t);
+    if(k==='CREDIT'){
+      e.preventDefault();e.stopImmediatePropagation();openCreditWorkspace(t);return;
+    }
+    exitCreditWorkspace(); currentWorkspaceGroup=groupForTab(k); setTimeout(paintWorkspaceGroups,0);
+  },true);
+}
+
+/* Credit keeps the established reader, rules and editable tradeline engine,
+   but mounts it as a real Loan Suite page instead of a detached modal. */
+function exitCreditWorkspace(){
+  var root=$('suite-root'),modal=$('v12Modal'); if(root)root.classList.remove('v50-credit-active');
+  if(!modal||!modal.classList.contains('v50-credit-page'))return;
+  modal.classList.remove('v50-credit-page','on'); modal.setAttribute('aria-hidden','true');
+  document.body.appendChild(modal); document.body.style.overflow='';
+}
+function openCreditWorkspace(tab){
+  if(window.V25){V25.fullActive=false;var root0=$('suite-root');if(root0)root0.classList.remove('v25-full-active');}
+  if(!window.V12||!V12.open)return;
+  V12.open();
+  var modal=$('v12Modal'),body=$('screen-body'),root=$('suite-root'); if(!modal||!body||!root)return;
+  body.insertBefore(modal,body.firstChild); root.classList.add('v50-credit-active');
+  modal.classList.add('v50-credit-page','on'); modal.removeAttribute('aria-hidden'); document.body.style.overflow='';
+  var title=modal.querySelector('.rpt-modal-bar .ttl'); if(title)title.textContent='Credit workspace';
+  var close=$$('.rpt-modal-bar button',modal).pop();
+  if(close&&!close.dataset.v50CreditBack){
+    close.dataset.v50CreditBack='1'; close.removeAttribute('onclick'); close.onclick=null; close.textContent='Back to Qualify';
+    close.addEventListener('click',function(){V50.go('QUALIFY');});
+  }
+  $$('.tab',row()).forEach(function(t){t.classList.toggle('active',tabKey(t)==='CREDIT');});
+  currentWorkspaceGroup='underwriting'; paintWorkspaceGroups(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function decorateAdvancedBar(){
+  var bar=$('advBar');if(!bar)return false;
+  var map={rules:['Rule tables','rules'],rates:['Mortgage rates','rate'],taxes:['Taxes & escrow','tax'],docparse:['Contract & LE','contract']};
+  $$('.advtab',bar).forEach(function(b){
+    var meta=map[b.dataset.adv];if(!meta)return;
+    b.dataset.v50Ic=meta[1];b.setAttribute('aria-label',meta[0]);
+    if(!b.dataset.v50AdvancedDecorated){b.dataset.v50AdvancedDecorated='1';b.innerHTML=svg(meta[1])+'<span>'+esc(meta[0])+'</span>';}
+  });
   return true;
 }
 
@@ -716,7 +882,7 @@ var intended = null, lastTrusted = 0, lastMode = null, guarding = false;
 /* The retained tab renderer keeps an accessible original label and our
    visible label in the same button. Prefer the stable data label so routing
    does not see strings such as "SETUP Setup" as a new, unknown page. */
-function tabKey(t){ return key(t && (t.getAttribute('data-v50-label') || t.getAttribute('data-v23-key') || t.textContent)); }
+function tabKey(t){ return key(t && (t.getAttribute('data-v50-key') || t.getAttribute('data-v23-key') || t.getAttribute('data-v50-label') || t.textContent)); }
 function row(){ return document.querySelector('#suite-root .tabs'); }
 function tabFor(k){ var r = row(); return r ? $$('.tab', r).filter(function(t){ return tabKey(t) === k; })[0] : null; }
 function isEngineTab(t){ return t && !t.classList.contains('v8-tab') && !t.classList.contains('v43-tab') && !t.dataset.v8 && !STAGE[tabKey(t)]; }
@@ -943,6 +1109,8 @@ function decorate(){
   try { installUniversalMenu(); } catch(e){}
   try { paintHeader(); } catch(e){}
   try { paintTabs(); } catch(e){}
+  try { paintWorkspaceGroups(); decorateFullWorkspace(); } catch(e){}
+  try { decorateAdvancedBar(); } catch(e){}
   try { wireFileToSetup(); } catch(e){}
   try { paintCols(); } catch(e){}
   try { watchRow(); enforce(); } catch(e){}
@@ -1011,6 +1179,7 @@ function hook(){
   installIncomeHandoff();
   installPopupDismissal();
   installUniversalMenu();
+  installWorkspaceNavigation();
   deferSuiteInputCommit();
   wireFileToSetup();
   installFileSetupDelegation();

@@ -171,6 +171,12 @@ html[data-v50] #suite-root .tab[data-v50-ic="sheet"]{--v50-ic:url("data:image/sv
 html[data-v50] #suite-root .tab[data-v50-ic="check"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M8 12l3 3 5-6'/%3E%3C/svg%3E")}
 html[data-v50] #suite-root .tab[data-v50-ic="chart"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 20h18M5 16l4-5 4 3 6-8'/%3E%3C/svg%3E")}
 html[data-v50] #suite-root .tab[data-v50-ic="book"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2zM22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z'/%3E%3C/svg%3E")}
+html[data-v50] #suite-root .tab[data-v50-ic="rate"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l6-6 4 4 8-9M15 6h6v6'/%3E%3C/svg%3E")}
+html[data-v50] #suite-root .tab[data-v50-ic="escrow"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M4 9h16M6 9v9m4-9v9m4-9v9m4-9v9M3 20h18M12 3l9 4H3z'/%3E%3C/svg%3E")}
+html[data-v50] #suite-root .tab[data-v50-ic="tax"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3'/%3E%3C/svg%3E")}
+html[data-v50] #suite-root .tab[data-v50-ic="credit"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='M3 10h18M7 15h4'/%3E%3C/svg%3E")}
+html[data-v50] #suite-root .tab[data-v50-ic="rules"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M5 4h14v16H5zM8 8h8M8 12h8M8 16h5'/%3E%3C/svg%3E")}
+html[data-v50] #suite-root .tab[data-v50-ic="contract"]{--v50-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M6 3h9l3 3v15H6zM15 3v4h4M9 12h6M9 16h4'/%3E%3C/svg%3E")}
 
 /* ---- warning line under the tabs -------------------------------------- */
 html[data-v50] body #suite-root #v5SyncBadge{
@@ -581,4 +587,86 @@ html[data-v50][data-v25-surface="dark"] body .v50-universal-backdrop{ background
   html[data-v50] body .v50-universal-output,
   html[data-v50] body .v50-universal-return{ margin-left:14px; margin-right:14px; }
   html[data-v50] body .v50-universal-dialog footer{ flex-direction:column; padding:0 14px 12px; }
+}
+
+/* ---- organized workspaces --------------------------------------------
+   Release 48 toggles v48-hide while its legacy grouping loop runs.  The
+   Release 50 group is the final authority, which prevents a tab from
+   flickering between groups and lets Results own every document page. */
+html[data-v50] body #suite-root .tabs.v48-context .tab.v48-hide:not(.v50-nav-hidden){ display:inline-flex !important; }
+html[data-v50] body #suite-root .tabs.v48-context .tab.v50-nav-hidden,
+html[data-v50] body #suite-root .tabs.v48-context .tab.v48-hide.v50-nav-hidden{ display:none !important; }
+html[data-v50] body #suite-root .v23-primary-nav button[data-group="documents"]{ display:none !important; }
+
+/* Full is a calm, grouped directory followed by the retained continuous
+   file summary.  It stays intentionally long instead of compressing all
+   destinations back into a noisy flat tab row. */
+html[data-v50] body #suite-root .v50-full-directory{
+  margin:0 0 16px; padding:18px; border:1px solid var(--v50-line); border-radius:14px;
+  background:var(--v50-card); color:var(--v50-ink); box-shadow:var(--v50-shadow);
+}
+html[data-v50] body #suite-root .v50-full-directory > header{ display:flex; align-items:flex-start; justify-content:space-between; margin:0 0 14px; }
+html[data-v50] body #suite-root .v50-full-directory > header small{ display:block; color:var(--v50-blue-ink); font:800 9.5px Inter,sans-serif; letter-spacing:.75px; text-transform:uppercase; }
+html[data-v50] body #suite-root .v50-full-directory > header h3{ margin:3px 0 2px; font:800 18px "Plus Jakarta Sans",sans-serif; }
+html[data-v50] body #suite-root .v50-full-directory > header p{ margin:0; color:var(--v50-mute); font:500 12px/1.4 "Plus Jakarta Sans",sans-serif; }
+html[data-v50] body #suite-root .v50-full-directory-grid{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
+html[data-v50] body #suite-root .v50-full-directory-grid article{ min-width:0; padding:11px; border:1px solid var(--v50-line); border-radius:11px; background:var(--v50-soft); }
+html[data-v50] body #suite-root .v50-full-directory-grid h4{ margin:0 0 8px; color:var(--v50-label); font:800 10px Inter,sans-serif; letter-spacing:.65px; text-transform:uppercase; }
+html[data-v50] body #suite-root .v50-full-directory-grid article > div{ display:grid; gap:6px; }
+html[data-v50] body #suite-root .v50-full-directory-grid button{
+  display:flex; align-items:center; gap:8px; min-width:0; min-height:42px; padding:7px 8px; border:1px solid transparent; border-radius:8px;
+  background:var(--v50-card); color:var(--v50-ink); text-align:left; cursor:pointer; font-family:"Plus Jakarta Sans",sans-serif;
+}
+html[data-v50] body #suite-root .v50-full-directory-grid button:hover{ border-color:#9CC4E8; background:var(--v50-blue-soft); color:var(--v50-blue-ink); }
+html[data-v50] body #suite-root .v50-full-directory-grid button > i{ flex:none; display:grid; place-items:center; width:27px; height:27px; border-radius:7px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); }
+html[data-v50] body #suite-root .v50-full-directory-grid button svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+html[data-v50] body #suite-root .v50-full-directory-grid button > span{ min-width:0; font-size:11.5px; font-weight:750; }
+html[data-v50] body #suite-root .v50-full-directory-grid button small{ display:block; margin-top:1px; color:var(--v50-mute); font:500 9.5px Inter,sans-serif; }
+
+/* Standalone Credit workspace: the proven V12 reader is mounted in the
+   normal page column, so imported and manually entered tradelines keep the
+   same rules and calculations without a detached overlay. */
+html[data-v50] body #suite-root.v50-credit-active #screen-body > :not(#v12Modal){ display:none !important; }
+html[data-v50] body #suite-root #screen-body > #v12Modal.v50-credit-page{
+  position:static !important; inset:auto !important; z-index:auto !important; display:block !important;
+  width:100% !important; min-height:0 !important; overflow:visible !important; padding:0 !important;
+  background:transparent !important;
+}
+html[data-v50] body #suite-root #v12Modal.v50-credit-page .rpt-modal-bar{
+  position:static !important; max-width:none !important; margin:0 0 10px !important; padding:13px 15px !important;
+  border:1px solid var(--v50-line) !important; border-radius:12px !important; background:var(--v50-head) !important;
+  box-shadow:none !important;
+}
+html[data-v50] body #suite-root #v12Modal.v50-credit-page .rpt-modal-bar .ttl{ color:var(--v50-ink) !important; font:800 15px "Plus Jakarta Sans",sans-serif !important; }
+html[data-v50] body #suite-root #v12Modal.v50-credit-page .rpt-modal-bar button{ height:30px; border-radius:8px; }
+html[data-v50] body #suite-root #v12Modal.v50-credit-page .rpt-picker{
+  max-width:none !important; margin:0 !important; padding:16px !important; overflow-x:auto !important;
+  border:1px solid var(--v50-line) !important; border-radius:14px !important; background:var(--v50-card) !important;
+  box-shadow:var(--v50-shadow) !important; color:var(--v50-ink) !important;
+}
+html[data-v50] body #suite-root #v12Modal.v50-credit-page .v12-dz{ background:var(--v50-soft) !important; border-color:var(--v50-line2) !important; }
+html[data-v50] body #suite-root #v12Modal.v50-credit-page .v12-sum{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+html[data-v50] body #suite-root #v12Modal.v50-credit-page .v12-sum > div{ padding:10px 12px; border:1px solid var(--v50-line); border-radius:9px; background:var(--v50-soft); }
+
+/* The Advanced page's retained shortcuts use the same icon-card language as
+   the workspace strip instead of the old bordered text rectangles. */
+html[data-v50] body #suite-root #advBar{
+  display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important; gap:8px !important;
+  margin:0 0 14px !important; padding:0 !important; border:0 !important; background:transparent !important;
+}
+html[data-v50] body #suite-root #advBar .advtab{
+  display:flex !important; align-items:center !important; justify-content:flex-start !important; gap:9px !important;
+  min-width:0 !important; min-height:42px !important; padding:8px 11px !important; border:1px solid var(--v50-line) !important;
+  border-radius:9px !important; background:var(--v50-card) !important; color:var(--v50-mute) !important;
+  font:700 11.5px "Plus Jakarta Sans",sans-serif !important; text-align:left !important; box-shadow:none !important;
+}
+html[data-v50] body #suite-root #advBar .advtab svg{ flex:none; width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+html[data-v50] body #suite-root #advBar .advtab:hover{ border-color:#9CC4E8 !important; color:var(--v50-blue-ink) !important; background:var(--v50-blue-soft) !important; }
+html[data-v50] body #suite-root #advBar .advtab.on{ border-color:#9CC4E8 !important; color:var(--v50-blue-ink) !important; background:var(--v50-blue-soft) !important; }
+
+@media (max-width:1180px){ html[data-v50] body #suite-root .v50-full-directory-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:720px){
+  html[data-v50] body #suite-root .v50-full-directory-grid{ grid-template-columns:1fr; }
+  html[data-v50] body #suite-root #v12Modal.v50-credit-page .v12-sum{ grid-template-columns:1fr; }
+  html[data-v50] body #suite-root #advBar{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
 }
