@@ -442,6 +442,29 @@ html[data-v50] body #suite-root #v44LiveSummary .v44-live-row:not(.pass):not(.ba
 }
 html[data-v50] body #suite-root #v44LiveSummary h4{ opacity:.86; }
 
+/* ---- final interaction pass ------------------------------------------
+   The page owns vertical scrolling.  The right rail is allowed to grow with
+   its summary instead of carrying a second, narrow scrollbar. */
+html[data-v50] body #suite-root.v24-summary-open .cols-main > .rail.v31-rail,
+html[data-v50] body #suite-root.v251-full-active .cols-main > .rail.v31-rail,
+html[data-v50] body #suite-root .cols-main > .rail.v31-rail{
+  max-height:none !important; overflow:visible !important; overscroll-behavior:auto !important; scrollbar-width:none !important;
+}
+html[data-v50] body #suite-root .cols-main > .rail.v31-rail::-webkit-scrollbar{ width:0 !important; height:0 !important; display:none !important; }
+html[data-v50] body #suite-root .cols-main > *,
+html[data-v50] body #suite-root .cols-main .v31-main,
+html[data-v50] body #suite-root #screen-body,
+html[data-v50] body #suite-root #v8Stage{ min-width:0 !important; }
+
+/* Live is the compact show/hide control for the summary rail. */
+html[data-v50] body #suite-root #v44Header #v44Live{
+  width:28px !important; min-width:28px !important; height:28px !important; padding:0 !important;
+  border-radius:8px !important; flex:0 0 28px !important;
+}
+html[data-v50] body #suite-root #v44Header #v44Live svg{ width:14px !important; height:14px !important; }
+html[data-v50] body #suite-root #v25HeaderMain > *,
+html[data-v50] body #suite-root #v34Bar > *{ min-width:0; }
+
 /* V48 creates a second Documents primary-nav item in addition to the direct
    Documents launcher.  Keep the direct launcher so its menu/OCR behavior is
    unchanged, but never let the clone take visual space or briefly flicker. */

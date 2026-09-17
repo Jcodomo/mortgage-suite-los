@@ -22,6 +22,53 @@ function store(){ try { return window.mortgageSuite.store; } catch(e){ return nu
 function outputs(){ var s=store(); if (!s) return null; try { var o=s.outputs; return typeof o==='function'?o.call(s):o; } catch(e){ return null; } }
 function inputs(){ var s=store(); try { return s ? s.activeInputs : null; } catch(e){ return null; } }
 
+/* The scenario engine already persists the full file in localStorage.  Keep a
+   small cookie plus a browser-storage resume marker for the active workspace
+   and scenario, so a refresh or a return visit restores the same workbench
+   without attempting to squeeze the full loan file into a browser cookie. */
+var RESUME_KEY='los.v50.resume', WORKSPACE_COOKIE='los.v50.workspace';
+function readCookie(name){
+  try { var hit=document.cookie.match(new RegExp('(?:^|; )'+name.replace(/[.$?*|{}()\[\]\\/+^]/g,'\\$&')+'=([^;]*)')); return hit?decodeURIComponent(hit[1]):''; } catch(e){ return ''; }
+}
+function workspaceName(value){
+  var v=String(value||'').toLowerCase();
+  if(v==='suite'||v==='loan'||v==='loansuite')return 'suite';
+  if(v==='calc'||v==='income'||v==='calculator')return 'calc';
+  return '';
+}
+function explicitWorkspace(){
+  try { return workspaceName((new URLSearchParams(location.search)).get('app')); } catch(e){ return ''; }
+}
+function savedWorkspace(){
+  var saved='';
+  try { saved=workspaceName((JSON.parse(localStorage.getItem(RESUME_KEY)||'{}')||{}).workspace); } catch(e){}
+  return saved||workspaceName(readCookie(WORKSPACE_COOKIE));
+}
+function preferredWorkspace(){ return explicitWorkspace()||savedWorkspace(); }
+function persistWorkspace(next){
+  var workspace=workspaceName(next)||explicitWorkspace();
+  if(!workspace){ try { workspace=workspaceName(window.SHELL&&SHELL.mode); } catch(e){} }
+  if(!workspace)return false;
+  try {
+    var s=store(), snap=s&&s.snapshot||{};
+    localStorage.setItem(RESUME_KEY,JSON.stringify({workspace:workspace,scenarioId:snap.activeScenarioId||'',savedAt:Date.now()}));
+  } catch(e){}
+  try { document.cookie=WORKSPACE_COOKIE+'='+encodeURIComponent(workspace)+'; Path=/; Max-Age=31536000; SameSite=Lax'; } catch(e){}
+  return true;
+}
+function wireWorkspacePersistence(){
+  var shell=window.SHELL;
+  if(!shell||shell.__v50WorkspacePersistence)return false;
+  var go=shell.go;
+  if(typeof go==='function'){
+    shell.go=function(next){ var result=go.apply(this,arguments); persistWorkspace(next); return result; };
+  }
+  shell.__v50WorkspacePersistence=true;
+  window.addEventListener('pagehide',function(){persistWorkspace();},{passive:true});
+  window.addEventListener('beforeunload',function(){persistWorkspace();},{passive:true});
+  return true;
+}
+
 var V50 = window.V50 = { version:'50.0' };
 document.documentElement.setAttribute('data-v50','1');
 document.documentElement.setAttribute('data-los-release','50');
@@ -255,6 +302,8 @@ function paintHeader(){
     r.addEventListener('click', function(){ V50.run(['Print summary','Print / PDF'], function(){ V50.go('SUMMARY'); }); });
     hdr.appendChild(r);
   }
+  var live=$('v44Live');
+  if(live){ live.setAttribute('aria-label','Toggle live summary'); live.title='Toggle live summary'; }
   return !!main;
 }
 function paintSync(){
@@ -403,6 +452,32 @@ function paintFreeformValues(){
     var pretty=(Math.round(v*1000)/1000).toFixed(3).replace(/\.?0+$/,'');
     if(input.value!==pretty)input.value=pretty;
   });
+}
+
+/* Loan Suite figures commit on change/blur.  Earlier retained modules render
+   a few inline oninput handlers, so move those handlers to change once their
+   field is in the Loan Suite.  The Income Calculator is deliberately outside
+   this function and continues to update while the user types. */
+function deferSuiteInputCommit(){
+  var root=$('suite-root'); if(!root||inCalculator())return false;
+  $$('input[oninput],textarea[oninput]',root).forEach(function(el){
+    if(el.__v50DeferredCommit)return;
+    var type=String(el.type||'text').toLowerCase();
+    if(/^(button|submit|reset|file|hidden|checkbox|radio|range)$/.test(type))return;
+    var commit=el.oninput;
+    if(typeof commit!=='function')return;
+    el.__v50DeferredCommit=true;
+    el.__v50InlineCommit=commit;
+    el.oninput=null;
+    el.removeAttribute('oninput');
+    el.addEventListener('change',function(event){
+      try { commit.call(el,event); } catch(e){}
+    });
+    el.addEventListener('keydown',function(event){
+      if(event.key==='Enter'&&el.tagName==='INPUT'&&!event.shiftKey){ event.preventDefault(); el.blur(); }
+    });
+  });
+  return true;
 }
 
 /* ------------------------------------------------------------------ 5c
@@ -631,7 +706,10 @@ function paintCols(){
    goes somewhere else. */
 var STAGE = { 'MORTGAGE RATES':'rates', 'DOCUMENTS & OCR':'docs', 'DOCUMENTS & WORKSHEETS':'docs' };
 var intended = null, lastTrusted = 0, lastMode = null, guarding = false;
-function tabKey(t){ return key(t.textContent); }
+/* The retained tab renderer keeps an accessible original label and our
+   visible label in the same button. Prefer the stable data label so routing
+   does not see strings such as "SETUP Setup" as a new, unknown page. */
+function tabKey(t){ return key(t && (t.getAttribute('data-v50-label') || t.getAttribute('data-v23-key') || t.textContent)); }
 function row(){ return document.querySelector('#suite-root .tabs'); }
 function tabFor(k){ var r = row(); return r ? $$('.tab', r).filter(function(t){ return tabKey(t) === k; })[0] : null; }
 function isEngineTab(t){ return t && !t.classList.contains('v8-tab') && !t.classList.contains('v43-tab') && !t.dataset.v8 && !STAGE[tabKey(t)]; }
@@ -688,6 +766,33 @@ function choose(k){
   [60, 350, 900, 1700].forEach(function(ms){ setTimeout(function(){ if (intended !== mine) return; syncGroup(k); enforce(); }, ms); });
 }
 V50.choose = choose;
+
+/* File is a workspace entry point, not a second quote shortcut.  Sending it
+   to Setup keeps the first editable file page predictable after every use. */
+function wireFileToSetup(){
+  var nav=$('v23SuitePrimaryNav'),button=nav&&nav.querySelector('button[data-group="file"]');
+  if(!button||button.__v50FileToSetup)return false;
+  button.__v50FileToSetup=true;
+  button.addEventListener('click',function(event){
+    if(!event.isTrusted)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    var setup=tabFor('SETUP');
+    if(setup){
+      choose('SETUP');
+      setup.click();
+      /* Legacy group handling runs a short asynchronous selection after
+         its click. Re-assert Setup after that settles, without touching a
+         subsequent user navigation to a different primary group. */
+      [40,180,520].forEach(function(delay){setTimeout(function(){
+        if(!button.classList.contains('active')) return;
+        var current=tabFor('SETUP');
+        if(current && !current.classList.contains('active')) current.click();
+        choose('SETUP');
+      },delay);});
+    }else V50.go('SETUP');
+  },true);
+  return true;
+}
 /* live summary rows open the page that holds their figure */
 var MODE_TAB = { quote:'QUOTE', setup:'SETUP', renovation:'RENOVATION', maxmortgage:'MAX MORTGAGE', rates:'MORTGAGE RATES', closing:'CLOSING',
   escrow:'ESCROW', qualify:'QUALIFY', income:'QUALIFY', rental:'RENTAL', credit:'CREDIT', advanced:'ADVANCED', summary:'SUMMARY', compare:'SCENARIOS' };
@@ -792,9 +897,11 @@ function decorate(){
     lastIncomeSync=Date.now();
     try { syncCalculatorIncome(false); } catch(e){}
   }
+  try { deferSuiteInputCommit(); } catch(e){}
   try { installUniversalMenu(); } catch(e){}
   try { paintHeader(); } catch(e){}
   try { paintTabs(); } catch(e){}
+  try { wireFileToSetup(); } catch(e){}
   try { paintCols(); } catch(e){}
   try { watchRow(); enforce(); } catch(e){}
 }
@@ -826,8 +933,15 @@ var subscribed = false;
    pinned only through startup; a real workspace-button click cancels it. */
 var suiteEntryPinned = false, suiteEntryWired = false;
 function pinSuiteEntry(){
-  var app=''; try { app=(new URLSearchParams(location.search)).get('app')||''; } catch(e){}
+  var app=preferredWorkspace();
   if(app!=='suite') return false;
+  /* A bare return URL is promoted to the direct Loan Suite route before the
+     calculator's delayed start logic can choose its W-2 screen. */
+  try {
+    if(!explicitWorkspace()){
+      var url=new URL(location.href);url.searchParams.set('app','suite');history.replaceState(null,'',url.toString());
+    }
+  } catch(e){}
   suiteEntryPinned=true;
   function apply(){
     if(!suiteEntryPinned) return;
@@ -850,11 +964,15 @@ function hook(){
     document.documentElement.dataset.v50ZipStarted='1';
     try{if(!norm(s.activeInputs.zipCode)){s.setField('zipCode','11530','Release 50 default ZIP');s.applyZipLookup();}}catch(e){}
   }
-  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
+  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ persistWorkspace(); setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
+  wireWorkspacePersistence();
   installIncomeHandoff();
   installPopupDismissal();
   installUniversalMenu();
+  deferSuiteInputCommit();
+  wireFileToSetup();
   pinSuiteEntry();
+  setTimeout(persistWorkspace,0);
   syncCalculatorIncome(false);
   document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(function(){ soon(true); }, 40); }, true);
 }

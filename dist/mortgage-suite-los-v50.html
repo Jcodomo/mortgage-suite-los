@@ -26360,6 +26360,10 @@ function paintThemeButton(){
 function liveUpgrade(e){
   var el = e.target;
   if (!el || el.tagName !== 'INPUT') return;
+  /* The Income Calculator is intentionally live.  Loan Suite fields commit
+     when the borrower leaves the field so a partially typed amount never
+     re-prices the scenario while it is being entered. */
+  if (el.closest && el.closest('#suite-root')) return;
   var t = (el.type || 'text').toLowerCase();
   if (t !== 'text' && t !== 'number') return;
   var oc = el.getAttribute('onchange');
@@ -26638,7 +26642,7 @@ function wireZipAuto(){
   var el = document.querySelector('[data-field="zipCode"] input, [data-path="zipCode"]');
   if (!el || el.__v5zip) return !!el;
   el.__v5zip = true;
-  el.addEventListener('input', function(){
+  el.addEventListener('change', function(){
     var v = (el.value || '').replace(/\D/g,'').slice(0,5);
     if (v.length !== 5) return;
     var st = suite(); if (!st) return;
@@ -30315,7 +30319,7 @@ function enhanceProperty(){var P=window.LOANSUITE&&LOANSUITE.PROP,h=$('propBody'
 /* PMI calculates on every keystroke and writes through to the scenario. */
 V.pmiLive=function(sync){if(window.V13&&V13.pmiCalc)V13.pmiCalc();if(!sync)return;var st=suite();if(!st)return;var h=N($('v13PmiHome')&&$('v13PmiHome').value),down=N($('v13PmiDown')&&$('v13PmiDown').value),score=N($('v13PmiScore')&&$('v13PmiScore').value),rate=N($('v13PmiRate')&&$('v13PmiRate').value)/100,int=N($('v13PmiInterest')&&$('v13PmiInterest').value)/100,term=N($('v13PmiTerm')&&$('v13PmiTerm').value);if(h)st.setField('basePurchasePrice',h,'PMI worksheet');if(isFinite(down))st.setField('finalDownPaymentPct',down/100,'PMI worksheet');if(score)st.setField('creditScore',score,'PMI worksheet');if(rate>=0)st.setField('pmiOverrideRate',rate,'PMI worksheet');if(int)st.setField('interestRate',int,'PMI worksheet');if(term)st.setField('termYears',term,'PMI worksheet');};
 V.loadPmi=function(){var st=suite();if(!st)return;var i=st.activeInputs,o=st.outputs||{};if($('v13PmiHome'))$('v13PmiHome').value=N(i.basePurchasePrice)||'';if($('v13PmiDown'))$('v13PmiDown').value=(N(i.finalDownPaymentPct)*100)||'';if($('v13PmiScore'))$('v13PmiScore').value=N(i.creditScore)||'';if($('v13PmiInterest'))$('v13PmiInterest').value=(N(i.interestRate)*100)||'';if($('v13PmiTerm'))$('v13PmiTerm').value=N(i.termYears)||30;if($('v13PmiRate'))$('v13PmiRate').value=(N(i.pmiOverrideRate||o.payment&&o.payment.pmiRateUsed)*100)||'';V.pmiLive(false);};
-function enhancePmi(){var m=$('v13PmiModal');if(!m||m.__v14)return false;m.__v14=true;$$('input',m).forEach(function(el){el.addEventListener('input',function(){V.pmiLive(true);});});var b=m.querySelector('.v13-actions button');if(b)b.textContent='Synced live';var old=V13.open;V13.open=function(id){old(id);if(id==='v13PmiModal')V14.loadPmi();};return true;}
+function enhancePmi(){var m=$('v13PmiModal');if(!m||m.__v14)return false;m.__v14=true;$$('input',m).forEach(function(el){el.addEventListener('change',function(){V.pmiLive(true);});});var b=m.querySelector('.v13-actions button');if(b)b.textContent='Synced on field change';var old=V13.open;V13.open=function(id){old(id);if(id==='v13PmiModal')V14.loadPmi();};return true;}
 
 /* Editable comparison grid; store recalculates each scenario after edit. */
 V.compareSet=function(id,path,value){var st=suite(),s=st&&st.snapshot.scenarios[id];if(!s)return;var parts=path.split('.'),t=s.inputs;for(var i=0;i<parts.length-1;i++)t=t[parts[i]];var k=parts[parts.length-1];t[k]=path==='finalDownPaymentPct'||path==='interestRate'?N(value)/100:(path==='basePurchasePrice'?N(value):value);s.updatedAt=new Date().toISOString();st.emit();V.renderCompare();};
@@ -30467,7 +30471,7 @@ function enhancePL(){
 
 /* Mortgage insurance: show live conventional PMI table and FHA UFMIP/MIP table. */
 V.renderMI=function(){var st=suite(),h=$('v13PmiResults');if(!st||!h)return;if(window.V13&&V13.pmiCalc)V13.pmiCalc();var old=$('v15MiLive');if(old)old.remove();var i=st.activeInputs,o=st.outputs,fico=N(i.creditScore),down=N(i.finalDownPaymentPct),tier=fico>=760?'Excellent (760+)':fico>=700?'Good (700-759)':fico>=640?'Fair (640-699)':'Below 640',band=down>=.15?'15% - 20% down':down>=.10?'10% - 15% down':'< 10% down';var pmi=[['Excellent (760+)','.450%','.400%','.300%'],['Good (700-759)','.750%','.500%','.400%'],['Fair (640-699)','1.100%','.750%','.600%'],['Below 640','1.350%','1.000%','.800%']];var mip=[['30','<= $726,200','<= 90%','.500%','11 years'],['30','> $726,200','<= 90%','.700%','11 years'],['30','<= $726,200','90.01% - 95%','.500%','Life of loan'],['30','> $726,200','90.01% - 95%','.700%','Life of loan'],['30','<= $726,200','> 95%','.550%','Life of loan'],['30','> $726,200','> 95%','.750%','Life of loan']];var d=document.createElement('div');d.id='v15MiLive';d.innerHTML='<div class="v15-analysis-grid" style="margin-top:12px"><div><span>Program</span><b>'+esc(i.loanProgram)+'</b></div><div><span>Base loan</span><b>'+money(o.loan.maximumBaseLoan)+'</b></div><div><span>UFMIP</span><b>'+money(o.loan.ufmip)+' @ '+(N(i.ufmipRate)*100).toFixed(3)+'%</b></div><div><span>Monthly '+(o.isFha?'MIP':'PMI')+'</span><b>'+money(o.isFha?o.payment.monthlyFhaMip:o.payment.monthlyPmi)+'</b></div></div><h3>Conventional PMI planning table</h3><table class="v13-table v15-mi-table"><thead><tr><th>Credit tier</th><th>&lt; 10% down</th><th>10% - 15% down</th><th>15% - 20% down</th></tr></thead><tbody>'+pmi.map(function(r){return '<tr class="'+(r[0]===tier?'v15-mi-current':'')+'">'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table><div class="muted small">Current planning band: '+esc(tier)+' / '+esc(band)+'. The manually entered PMI rate continues to control the live scenario.</div><h3>FHA annual MIP planning table</h3><table class="v13-table v15-mi-table"><thead><tr><th>Term</th><th>Base loan</th><th>LTV</th><th>Annual MIP</th><th>Duration</th></tr></thead><tbody>'+mip.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table><div class="note"><div>UFMIP and annual MIP are separate. The suite uses the selected FHA annual MIP rate and recalculates the monthly payment immediately. Conventional PMI remains an insurer-quoted estimate; the worksheet models borrower-requested removal at 80% LTV and shows the scheduled timing estimate.</div></div>';h.appendChild(d);};
-function enhanceMI(){if(!window.V14||!window.V13)return false;var m=$('v13PmiModal');if(!m)return false;if(!m.__v15){m.__v15=true;$$('input',m).forEach(function(el){el.addEventListener('input',function(){setTimeout(V.renderMI,0);});});var head=m.querySelector('.v13-head');if(head){var b=document.createElement('button');b.className='btn btn-primary btn-sm';b.textContent='Print worksheet only';b.onclick=function(){V.printNode('v13PmiResults','Mortgage Insurance Estimate Worksheet');};head.insertBefore(b,head.querySelector('button'));}}V.renderMI();return true;}
+function enhanceMI(){if(!window.V14||!window.V13)return false;var m=$('v13PmiModal');if(!m)return false;if(!m.__v15){m.__v15=true;$$('input',m).forEach(function(el){el.addEventListener('change',function(){setTimeout(V.renderMI,0);});});var head=m.querySelector('.v13-head');if(head){var b=document.createElement('button');b.className='btn btn-primary btn-sm';b.textContent='Print worksheet only';b.onclick=function(){V.printNode('v13PmiResults','Mortgage Insurance Estimate Worksheet');};head.insertBefore(b,head.querySelector('button'));}}V.renderMI();return true;}
 
 /* One Documents workbench. Generated items open from here; OCR remains below. */
 V.openPay=function(){if(window.subTab)subTab('docs','paystub');var h=$('subpanel-docs-paystub');if(h&&!$('v15BackDocs')){var b=document.createElement('button');b.id='v15BackDocs';b.className='btn btn-light no-print';b.textContent='Back to Documents and OCR';b.onclick=function(){subTab('docs','import');};h.insertBefore(b,h.firstChild);}};
@@ -34384,10 +34388,8 @@ function onZipCommit(e){
   });
 }
 document.addEventListener('change', onZipCommit, true);
-document.addEventListener('input', function(e){
-  var el = e.target; if (!isZipField(el)) return;
-  if (String(el.value||'').replace(/\D/g,'').length === 5) onZipCommit(e);
-}, true);
+/* ZIP enrichment follows the field change event above.  This keeps city,
+   state and county from changing while a user is still typing the ZIP. */
 
 /* =================================================================== 5
    STATE THAT SURVIVES REFRESH AND BACK
@@ -36018,7 +36020,7 @@ function buildHeader(){
       if (b.dataset.menu) return V.openMenu(b.dataset.menu);
       if (b.dataset.direct==='live') {
         V.closeMenu();
-        if (window.V14 && V14.open) try { V14.open('v14CompareModal'); if (V14.renderCompare) V14.renderCompare(); } catch(x){}
+        V.toggleRail();
         return;
       }
       if (b.dataset.direct==='documents') return V.goPage('DOCUMENTS & OCR');
@@ -36099,7 +36101,7 @@ function bindQuoteInputs(){
       if (window.V20 && V20.setScenario) V20.setScenario(path,raw,kind==='percent'?'pct':kind==='currency'?'num':'text');
       else s.setField(path,raw,'Quick quote live edit');
     };
-    input.addEventListener('input',function(){ clearTimeout(input.__v44QuoteTimer); input.__v44QuoteTimer=setTimeout(apply,70); });
+    /* Loan Suite quote inputs commit when the user leaves the field. */
     input.addEventListener('change',apply);
   });
 }
@@ -36143,7 +36145,7 @@ function punchMarkup(){return'<section id="v44PunchIn" class="v44-punch no-print
 function setupPunchIn(){
   var root=$('suite-root'),s=store(),control=root&&root.querySelector('[data-section="control"]'),body=control&&control.querySelector(':scope > .body');if(!s||!body)return;
   var panel=$('v44PunchIn');if(!panel){body.insertAdjacentHTML('afterbegin',punchMarkup());panel=$('v44PunchIn');
-    $$('[data-v44-field]',panel).forEach(function(input){var apply=function(){applyPunch(input);};input.addEventListener('input',function(){clearTimeout(input.__v44Timer);input.__v44Timer=setTimeout(apply,90);});input.addEventListener('change',apply);});
+    $$('[data-v44-field]',panel).forEach(function(input){var apply=function(){applyPunch(input);};input.addEventListener('change',apply);});
     $$('[data-v44-preset]',panel).forEach(function(button){button.onclick=function(){if(window.V35&&V35.applyQuotePreset)V35.applyQuotePreset(button.dataset.v44Preset);};});
     panel.querySelector('[data-v44-zip]').onclick=function(){try{s.applyZipLookup();}catch(e){say('ZIP lookup','Enter a five-digit ZIP and try again.','warn');}};
     panel.querySelector('[data-v44-sync]').onclick=function(){try{if(s.saveCurrentBorrowerAndProperty)s.saveCurrentBorrowerAndProperty();say('Property synced','The current borrower and property were saved.');}catch(e){V.goPage('PROPERTY');}};
@@ -36352,7 +36354,7 @@ function sellerCredit(){
   $$('#suite-root [data-path="sellerConcessionAmount"], #suite-root [data-path="sellerConcessionPct"]').forEach(function(inp){
     if (inp.disabled) inp.disabled = false;
     if (inp.__v45) return; inp.__v45 = true;
-    inp.addEventListener('input', function(){
+    inp.addEventListener('change', function(){
       var want = inp.dataset.path === 'sellerConcessionAmount' ? 'dollar' : 'percent';
       try { if (s.activeInputs.concessionInputMode !== want) s.setField('concessionInputMode', want, 'Seller credit typed as ' + want); } catch(e){}
     }, true);
@@ -37778,6 +37780,29 @@ html[data-v50] body #suite-root #v44LiveSummary .v44-live-row:not(.pass):not(.ba
 }
 html[data-v50] body #suite-root #v44LiveSummary h4{ opacity:.86; }
 
+/* ---- final interaction pass ------------------------------------------
+   The page owns vertical scrolling.  The right rail is allowed to grow with
+   its summary instead of carrying a second, narrow scrollbar. */
+html[data-v50] body #suite-root.v24-summary-open .cols-main > .rail.v31-rail,
+html[data-v50] body #suite-root.v251-full-active .cols-main > .rail.v31-rail,
+html[data-v50] body #suite-root .cols-main > .rail.v31-rail{
+  max-height:none !important; overflow:visible !important; overscroll-behavior:auto !important; scrollbar-width:none !important;
+}
+html[data-v50] body #suite-root .cols-main > .rail.v31-rail::-webkit-scrollbar{ width:0 !important; height:0 !important; display:none !important; }
+html[data-v50] body #suite-root .cols-main > *,
+html[data-v50] body #suite-root .cols-main .v31-main,
+html[data-v50] body #suite-root #screen-body,
+html[data-v50] body #suite-root #v8Stage{ min-width:0 !important; }
+
+/* Live is the compact show/hide control for the summary rail. */
+html[data-v50] body #suite-root #v44Header #v44Live{
+  width:28px !important; min-width:28px !important; height:28px !important; padding:0 !important;
+  border-radius:8px !important; flex:0 0 28px !important;
+}
+html[data-v50] body #suite-root #v44Header #v44Live svg{ width:14px !important; height:14px !important; }
+html[data-v50] body #suite-root #v25HeaderMain > *,
+html[data-v50] body #suite-root #v34Bar > *{ min-width:0; }
+
 /* V48 creates a second Documents primary-nav item in addition to the direct
    Documents launcher.  Keep the direct launcher so its menu/OCR behavior is
    unchanged, but never let the clone take visual space or briefly flicker. */
@@ -37880,6 +37905,53 @@ function say(t,b,k,ms){ try { if (window.LOS && LOS.say) LOS.say(t,b,k,ms); } ca
 function store(){ try { return window.mortgageSuite.store; } catch(e){ return null; } }
 function outputs(){ var s=store(); if (!s) return null; try { var o=s.outputs; return typeof o==='function'?o.call(s):o; } catch(e){ return null; } }
 function inputs(){ var s=store(); try { return s ? s.activeInputs : null; } catch(e){ return null; } }
+
+/* The scenario engine already persists the full file in localStorage.  Keep a
+   small cookie plus a browser-storage resume marker for the active workspace
+   and scenario, so a refresh or a return visit restores the same workbench
+   without attempting to squeeze the full loan file into a browser cookie. */
+var RESUME_KEY='los.v50.resume', WORKSPACE_COOKIE='los.v50.workspace';
+function readCookie(name){
+  try { var hit=document.cookie.match(new RegExp('(?:^|; )'+name.replace(/[.$?*|{}()\[\]\\/+^]/g,'\\$&')+'=([^;]*)')); return hit?decodeURIComponent(hit[1]):''; } catch(e){ return ''; }
+}
+function workspaceName(value){
+  var v=String(value||'').toLowerCase();
+  if(v==='suite'||v==='loan'||v==='loansuite')return 'suite';
+  if(v==='calc'||v==='income'||v==='calculator')return 'calc';
+  return '';
+}
+function explicitWorkspace(){
+  try { return workspaceName((new URLSearchParams(location.search)).get('app')); } catch(e){ return ''; }
+}
+function savedWorkspace(){
+  var saved='';
+  try { saved=workspaceName((JSON.parse(localStorage.getItem(RESUME_KEY)||'{}')||{}).workspace); } catch(e){}
+  return saved||workspaceName(readCookie(WORKSPACE_COOKIE));
+}
+function preferredWorkspace(){ return explicitWorkspace()||savedWorkspace(); }
+function persistWorkspace(next){
+  var workspace=workspaceName(next)||explicitWorkspace();
+  if(!workspace){ try { workspace=workspaceName(window.SHELL&&SHELL.mode); } catch(e){} }
+  if(!workspace)return false;
+  try {
+    var s=store(), snap=s&&s.snapshot||{};
+    localStorage.setItem(RESUME_KEY,JSON.stringify({workspace:workspace,scenarioId:snap.activeScenarioId||'',savedAt:Date.now()}));
+  } catch(e){}
+  try { document.cookie=WORKSPACE_COOKIE+'='+encodeURIComponent(workspace)+'; Path=/; Max-Age=31536000; SameSite=Lax'; } catch(e){}
+  return true;
+}
+function wireWorkspacePersistence(){
+  var shell=window.SHELL;
+  if(!shell||shell.__v50WorkspacePersistence)return false;
+  var go=shell.go;
+  if(typeof go==='function'){
+    shell.go=function(next){ var result=go.apply(this,arguments); persistWorkspace(next); return result; };
+  }
+  shell.__v50WorkspacePersistence=true;
+  window.addEventListener('pagehide',function(){persistWorkspace();},{passive:true});
+  window.addEventListener('beforeunload',function(){persistWorkspace();},{passive:true});
+  return true;
+}
 
 var V50 = window.V50 = { version:'50.0' };
 document.documentElement.setAttribute('data-v50','1');
@@ -38114,6 +38186,8 @@ function paintHeader(){
     r.addEventListener('click', function(){ V50.run(['Print summary','Print / PDF'], function(){ V50.go('SUMMARY'); }); });
     hdr.appendChild(r);
   }
+  var live=$('v44Live');
+  if(live){ live.setAttribute('aria-label','Toggle live summary'); live.title='Toggle live summary'; }
   return !!main;
 }
 function paintSync(){
@@ -38262,6 +38336,32 @@ function paintFreeformValues(){
     var pretty=(Math.round(v*1000)/1000).toFixed(3).replace(/\.?0+$/,'');
     if(input.value!==pretty)input.value=pretty;
   });
+}
+
+/* Loan Suite figures commit on change/blur.  Earlier retained modules render
+   a few inline oninput handlers, so move those handlers to change once their
+   field is in the Loan Suite.  The Income Calculator is deliberately outside
+   this function and continues to update while the user types. */
+function deferSuiteInputCommit(){
+  var root=$('suite-root'); if(!root||inCalculator())return false;
+  $$('input[oninput],textarea[oninput]',root).forEach(function(el){
+    if(el.__v50DeferredCommit)return;
+    var type=String(el.type||'text').toLowerCase();
+    if(/^(button|submit|reset|file|hidden|checkbox|radio|range)$/.test(type))return;
+    var commit=el.oninput;
+    if(typeof commit!=='function')return;
+    el.__v50DeferredCommit=true;
+    el.__v50InlineCommit=commit;
+    el.oninput=null;
+    el.removeAttribute('oninput');
+    el.addEventListener('change',function(event){
+      try { commit.call(el,event); } catch(e){}
+    });
+    el.addEventListener('keydown',function(event){
+      if(event.key==='Enter'&&el.tagName==='INPUT'&&!event.shiftKey){ event.preventDefault(); el.blur(); }
+    });
+  });
+  return true;
 }
 
 /* ------------------------------------------------------------------ 5c
@@ -38490,7 +38590,10 @@ function paintCols(){
    goes somewhere else. */
 var STAGE = { 'MORTGAGE RATES':'rates', 'DOCUMENTS & OCR':'docs', 'DOCUMENTS & WORKSHEETS':'docs' };
 var intended = null, lastTrusted = 0, lastMode = null, guarding = false;
-function tabKey(t){ return key(t.textContent); }
+/* The retained tab renderer keeps an accessible original label and our
+   visible label in the same button. Prefer the stable data label so routing
+   does not see strings such as "SETUP Setup" as a new, unknown page. */
+function tabKey(t){ return key(t && (t.getAttribute('data-v50-label') || t.getAttribute('data-v23-key') || t.textContent)); }
 function row(){ return document.querySelector('#suite-root .tabs'); }
 function tabFor(k){ var r = row(); return r ? $$('.tab', r).filter(function(t){ return tabKey(t) === k; })[0] : null; }
 function isEngineTab(t){ return t && !t.classList.contains('v8-tab') && !t.classList.contains('v43-tab') && !t.dataset.v8 && !STAGE[tabKey(t)]; }
@@ -38547,6 +38650,33 @@ function choose(k){
   [60, 350, 900, 1700].forEach(function(ms){ setTimeout(function(){ if (intended !== mine) return; syncGroup(k); enforce(); }, ms); });
 }
 V50.choose = choose;
+
+/* File is a workspace entry point, not a second quote shortcut.  Sending it
+   to Setup keeps the first editable file page predictable after every use. */
+function wireFileToSetup(){
+  var nav=$('v23SuitePrimaryNav'),button=nav&&nav.querySelector('button[data-group="file"]');
+  if(!button||button.__v50FileToSetup)return false;
+  button.__v50FileToSetup=true;
+  button.addEventListener('click',function(event){
+    if(!event.isTrusted)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    var setup=tabFor('SETUP');
+    if(setup){
+      choose('SETUP');
+      setup.click();
+      /* Legacy group handling runs a short asynchronous selection after
+         its click. Re-assert Setup after that settles, without touching a
+         subsequent user navigation to a different primary group. */
+      [40,180,520].forEach(function(delay){setTimeout(function(){
+        if(!button.classList.contains('active')) return;
+        var current=tabFor('SETUP');
+        if(current && !current.classList.contains('active')) current.click();
+        choose('SETUP');
+      },delay);});
+    }else V50.go('SETUP');
+  },true);
+  return true;
+}
 /* live summary rows open the page that holds their figure */
 var MODE_TAB = { quote:'QUOTE', setup:'SETUP', renovation:'RENOVATION', maxmortgage:'MAX MORTGAGE', rates:'MORTGAGE RATES', closing:'CLOSING',
   escrow:'ESCROW', qualify:'QUALIFY', income:'QUALIFY', rental:'RENTAL', credit:'CREDIT', advanced:'ADVANCED', summary:'SUMMARY', compare:'SCENARIOS' };
@@ -38651,9 +38781,11 @@ function decorate(){
     lastIncomeSync=Date.now();
     try { syncCalculatorIncome(false); } catch(e){}
   }
+  try { deferSuiteInputCommit(); } catch(e){}
   try { installUniversalMenu(); } catch(e){}
   try { paintHeader(); } catch(e){}
   try { paintTabs(); } catch(e){}
+  try { wireFileToSetup(); } catch(e){}
   try { paintCols(); } catch(e){}
   try { watchRow(); enforce(); } catch(e){}
 }
@@ -38685,8 +38817,15 @@ var subscribed = false;
    pinned only through startup; a real workspace-button click cancels it. */
 var suiteEntryPinned = false, suiteEntryWired = false;
 function pinSuiteEntry(){
-  var app=''; try { app=(new URLSearchParams(location.search)).get('app')||''; } catch(e){}
+  var app=preferredWorkspace();
   if(app!=='suite') return false;
+  /* A bare return URL is promoted to the direct Loan Suite route before the
+     calculator's delayed start logic can choose its W-2 screen. */
+  try {
+    if(!explicitWorkspace()){
+      var url=new URL(location.href);url.searchParams.set('app','suite');history.replaceState(null,'',url.toString());
+    }
+  } catch(e){}
   suiteEntryPinned=true;
   function apply(){
     if(!suiteEntryPinned) return;
@@ -38709,11 +38848,15 @@ function hook(){
     document.documentElement.dataset.v50ZipStarted='1';
     try{if(!norm(s.activeInputs.zipCode)){s.setField('zipCode','11530','Release 50 default ZIP');s.applyZipLookup();}}catch(e){}
   }
-  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
+  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ persistWorkspace(); setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
+  wireWorkspacePersistence();
   installIncomeHandoff();
   installPopupDismissal();
   installUniversalMenu();
+  deferSuiteInputCommit();
+  wireFileToSetup();
   pinSuiteEntry();
+  setTimeout(persistWorkspace,0);
   syncCalculatorIncome(false);
   document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(function(){ soon(true); }, 40); }, true);
 }
