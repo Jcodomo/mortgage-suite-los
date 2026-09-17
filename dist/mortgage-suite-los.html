@@ -38866,6 +38866,11 @@ function hook(){
   installUniversalMenu();
   deferSuiteInputCommit();
   wireFileToSetup();
+  /* The primary workspace strip is mounted by a retained legacy layer and
+     can appear after this first hook on a cold load. Retry only the small
+     File-to-Setup binding so File is consistently the setup entry point
+     without adding a continuous listener or repaint loop. */
+  [420,1300,2600].forEach(function(ms){ setTimeout(wireFileToSetup,ms); });
   pinSuiteEntry();
   setTimeout(persistWorkspace,0);
   syncCalculatorIncome(false);
