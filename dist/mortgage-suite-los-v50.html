@@ -38322,7 +38322,7 @@ function installIncomeHandoff(){
     /* The Loan Suite is no longer painted while the calculator is active.
        Refresh it immediately on the way back instead of waiting for the
        scheduler's next idle pass. */
-    if(next==='suite') setTimeout(soon,0);
+    if(next==='suite') setTimeout(function(){ soon(true); },0);
     return result;
   };
   shell.__v50IncomeHandoff=true;
@@ -38610,33 +38610,73 @@ function watchRow(){
   }).observe(r, { subtree:true, attributes:true, attributeFilter:['class'] });
 }
 
-/* ------------------------------------------------------------------ loop */
-var pending = false;
-function tick(){
-  pending = false;
-  /* The bundle is local-first; rendering while its tab is hidden cannot
-     improve a result.  Resume immediately when the user returns instead. */
-  if(document.hidden) return;
-  try { installIncomeHandoff(); syncCalculatorIncome(false); } catch(e){}
-  /* The Income Calculator has its own renderer. Keep its lighter shell menu
-     current, but skip the heavier Loan Suite DOM pass until that workspace is
-     visible again. */
-  try { paintIncome(); } catch(e){}
-  try { installUniversalPromptLaunchers(); } catch(e){}
-  try { if(window.SHELL && SHELL.mode==='calc') return; } catch(e){}
-  try { installUniversalMenu(); } catch(e){}
-  try { paintHeader(); } catch(e){}
+/* ------------------------------------------------------------------ loop
+   The engines calculate synchronously through their own input handlers.
+   This layer only decorates those engine results, so it is intentionally
+   split in two: the right-side Live Summary (and its matching top figures)
+   paint on the next frame, while navigation chrome and DOM discovery wait
+   for a short idle window.  That keeps typing, tab changes and scrolling
+   responsive without delaying any lending calculation. */
+var livePending = false, decorPending = false, lastDecorated = 0, lastIncomeSync = 0;
+var DECORATE_EVERY = 2200, INCOME_SYNC_EVERY = 3000;
+function inCalculator(){ try { return !!(window.SHELL && SHELL.mode==='calc'); } catch(e){ return false; } }
+function paintLiveNow(){
+  if(document.hidden || inCalculator()) return;
+  /* These figures are deliberately not debounced: they are the visible
+     feedback for a freeform scenario edit. */
   try { paintTop(); } catch(e){}
-  try { paintTabs(); } catch(e){}
   try { paintVerdict(); } catch(e){}
   try { paintLiveExtras(); } catch(e){}
   try { paintCreditOverview(); } catch(e){}
-  try { paintFreeformValues(); } catch(e){}
+}
+function refreshLive(){
+  if(livePending) return;
+  livePending = true;
+  (window.requestAnimationFrame || setTimeout)(function(){ livePending=false; paintLiveNow(); });
+}
+function decorate(){
+  decorPending=false;
+  if(document.hidden) return;
+  lastDecorated=Date.now();
+  try { installIncomeHandoff(); } catch(e){}
+  /* The Income Calculator has its own renderer. Only keep the shared shell
+     menu and document launchers current while its workspace is visible. */
+  try { paintIncome(); } catch(e){}
+  try { installUniversalPromptLaunchers(); } catch(e){}
+  if(inCalculator()) return;
+  /* Calculator-to-suite handoff is useful, but it used to recompute the
+     entire income workbook every renderer pass. Poll it sparingly; switching
+     back to the suite still forces an immediate handoff through shell.go. */
+  if(Date.now()-lastIncomeSync>=INCOME_SYNC_EVERY){
+    lastIncomeSync=Date.now();
+    try { syncCalculatorIncome(false); } catch(e){}
+  }
+  try { installUniversalMenu(); } catch(e){}
+  try { paintHeader(); } catch(e){}
+  try { paintTabs(); } catch(e){}
   try { paintCols(); } catch(e){}
   try { watchRow(); enforce(); } catch(e){}
 }
-function soon(){ if (pending) return; pending = true; (window.requestAnimationFrame || setTimeout)(tick); }
-V50.refresh = tick;
+function scheduleDecor(delay, force){
+  if(document.hidden || decorPending) return;
+  if(!force && Date.now()-lastDecorated<DECORATE_EVERY) return;
+  decorPending=true;
+  var run=function(){ decorate(); };
+  if(typeof window.requestIdleCallback==='function') window.requestIdleCallback(run,{timeout:Math.max(90,delay||0)});
+  else setTimeout(run,Math.max(0,delay||0));
+}
+function tick(){
+  /* The shared scheduler calls this periodically as a fallback for late
+     mounted content. Its noncritical half is throttled above. */
+  if(document.hidden) return;
+  refreshLive();
+  scheduleDecor(160,false);
+}
+function soon(force){
+  refreshLive();
+  scheduleDecor(force ? 0 : 90,!!force);
+}
+V50.refresh=function(){ refreshLive(); scheduleDecor(0,true); };
 var subscribed = false;
 /* A direct Loan Suite URL must win over the calculator's delayed W-2 startup
    routine.  That routine is useful when the calculator is the requested
@@ -38669,20 +38709,22 @@ function hook(){
     document.documentElement.dataset.v50ZipStarted='1';
     try{if(!norm(s.activeInputs.zipCode)){s.setField('zipCode','11530','Release 50 default ZIP');s.applyZipLookup();}}catch(e){}
   }
-  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ setTimeout(soon, 30); }); } catch(e){} }
+  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
   installIncomeHandoff();
   installPopupDismissal();
   installUniversalMenu();
   pinSuiteEntry();
   syncCalculatorIncome(false);
-  document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(soon, 40); }, true);
+  document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(function(){ soon(true); }, 40); }, true);
 }
 if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1000); else setInterval(tick, 1000);
 /* V35 repaints quote controls every 800ms. Keep the display layer last so
-   fractional percentages never flash as binary floating-point artifacts. */
-setInterval(function(){ if(!document.hidden) paintFreeformValues(); }, 250);
-document.addEventListener('visibilitychange',function(){ if(!document.hidden) soon(); },false);
-setTimeout(function(){ tick(); hook(); }, 260);
+   fractional percentages never flash as binary floating-point artifacts.
+   This is presentation only, so a gentler cadence avoids needless layout
+   reads while an input is not active. */
+setInterval(function(){ if(!document.hidden) paintFreeformValues(); }, 600);
+document.addEventListener('visibilitychange',function(){ if(!document.hidden){ refreshLive(); scheduleDecor(0,true); } },false);
+setTimeout(function(){ hook(); tick(); }, 260);
 setTimeout(tick, 1200);
 })();
 
