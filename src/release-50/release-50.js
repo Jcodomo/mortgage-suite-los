@@ -80,6 +80,43 @@ var V50 = window.V50 = { version:'50.0' };
 document.documentElement.setAttribute('data-v50','1');
 document.documentElement.setAttribute('data-los-release','50');
 
+/* Several retained presentation layers still request a top-of-page scroll
+   after delayed navigation work settles.  Keep that behavior for an actual
+   page change, but never let it override a user who has started scrolling. */
+var nativeScrollTo=window.scrollTo.bind(window),lastScrollIntent=0,lastExplicitNavigation=0;
+function noteScrollIntent(){lastScrollIntent=Date.now();}
+function noteExplicitNavigation(){lastExplicitNavigation=Date.now();}
+function installScrollStability(){
+  if(window.__v50StableScroll)return;window.__v50StableScroll=true;
+  ['wheel','touchmove'].forEach(function(name){document.addEventListener(name,noteScrollIntent,{capture:true,passive:true});});
+  document.addEventListener('keydown',function(e){
+    if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].indexOf(e.key)>=0)noteScrollIntent();
+  },true);
+  document.addEventListener('click',function(e){
+    if(!e.isTrusted||!e.target.closest)return;
+    if(e.target.closest('#calc-root .tab, #calc-root .subtab, #suite-root .tab, #v23SuitePrimaryNav button, #v44Header button, [onclick*="switchTab"], [data-v35-mode], [data-v50-full-page]'))noteExplicitNavigation();
+  },true);
+  window.scrollTo=function(a,b){
+    var top=typeof a==='object'&&a!==null?Number(a.top):Number(b),now=Date.now();
+    if(isFinite(top)){
+      if(lastScrollIntent>lastExplicitNavigation&&now-lastScrollIntent<1800)return;
+      if(top<=1&&now-lastExplicitNavigation>900)return;
+    }
+    if(typeof a==='object'&&a!==null&&a.behavior==='smooth')a=Object.assign({},a,{behavior:'auto'});
+    return arguments.length===1?nativeScrollTo(a):nativeScrollTo(a,b);
+  };
+}
+
+/* v22 and v24 both decorate V20.renderSetup on a timer.  Each historical
+   wrapper only stamped its own version flag, so the other timer saw an
+   "unwrapped" function and added another layer forever.  Preserve the two
+   retained wrappers, then mark the composed function as complete for both
+   layers so the background enhancement loops stay idempotent. */
+function stabilizeLegacyRenderers(){
+  var render=window.V20&&V20.renderSetup;if(typeof render!=='function')return false;
+  render.__v22=true;render.__v24=true;return true;
+}
+
 var ICON = {
   loan:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
   home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
@@ -123,6 +160,8 @@ V50.run = function(names, fallback){
   return false;
 };
 V50.go = function(label){
+  var destination=key(label);
+  if((destination==='DOCUMENTS & OCR'||destination==='DOCUMENTS & WORKSHEETS')&&V50.openUnifiedDocuments){V50.openUnifiedDocuments();return;}
   try { if (V50.choose) V50.choose(key(label)); } catch(e){}
   try { if (window.V44 && V44.goPage){ V44.goPage(label); return; } } catch(e){}
   var t = $$('#suite-root .tabs .tab').filter(function(x){ return key(x.textContent) === key(label); })[0];
@@ -141,6 +180,7 @@ var LABEL = {
   'CONTRACT & LE':['Contract & LE','contract'],'SCENARIOS':['Scenarios','chart'],'SUMMARY':['Summary','chart'],
   'DOCUMENTS & OCR':['Documents & OCR','book'],'DOCUMENTS & WORKSHEETS':['Worksheets','sheet'],'DRAFT LE':['Draft LE','book']
 };
+var TAB_ORDER=['SETUP','QUOTE','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGAGE RATES','CLOSING','ESCROW','TAXES & PRORATION','QUALIFY','RENTAL','CREDIT','ADVANCED','CONTRACT & LE','SCENARIOS','SUMMARY','DOCUMENTS & WORKSHEETS','DRAFT LE','DOCUMENTS & OCR'];
 var MODULE_TAB = { purchase:'SETUP', loan:'MAX MORTGAGE', value:'PROPERTY', renovation:'RENOVATION', draws:'RENOVATION',
   payment:'QUOTE', closing:'CLOSING', escrow:'ESCROW', tax:'TAXES & PRORATION', aus:'QUALIFY', qualify:'QUALIFY',
   rental:'RENTAL', credit:'CREDIT', bps:'ADVANCED', mmw:'MAX MORTGAGE' };
@@ -171,6 +211,15 @@ function paintTabs(){
     if (t.getAttribute('data-v50-label') !== L[0]) t.setAttribute('data-v50-label', L[0]);
     if (t.getAttribute('data-v50-ic') !== L[1]) t.setAttribute('data-v50-ic', L[1]);
     if (!t.getAttribute('aria-label')) t.setAttribute('aria-label', L[0]);
+    /* Release 48 still re-appends these nodes in its legacy order.  Flex
+       order is the stable visual contract, so that harmless DOM maintenance
+       can no longer make the menu jump between scheduler passes. */
+    var order=TAB_ORDER.indexOf(k);t.style.setProperty('order',String(order<0?99:order),'important');
+    /* Keep group ownership on the tab itself. Legacy releases still toggle
+       their own visibility classes on a timer; this stable data contract lets
+       CSS render the Release 50 workspace without waiting for another pass. */
+    var tabGroup=groupForTab(k);
+    if(t.getAttribute('data-v50-group')!==tabGroup)t.setAttribute('data-v50-group',tabGroup);
     /* count badge (no text node, so textContent is unchanged) */
     var ct = t.querySelector('.v50-ct'), n = counts[k];
     if (n){ if (!ct){ ct = document.createElement('span'); ct.className='v50-ct'; t.appendChild(ct); } if (ct.getAttribute('data-n') !== String(n)) ct.setAttribute('data-n', n); }
@@ -183,10 +232,6 @@ function paintTabs(){
   /* Full is the last group tab */
   if (nav){ var full = nav.querySelector('button[data-group="full"]'); var lastBtn = $$('button', nav).pop(); if (full && lastBtn !== full) nav.appendChild(full); }
   if (nav && cs){ var txt = norm(cs.textContent).replace(/\s·\s/g, ', '); if (nav.getAttribute('data-v50-context') !== txt) nav.setAttribute('data-v50-context', txt); }
-  /* Setup is the first working page inside File, immediately before Quote. */
-  var setup=$$('.tab',row).filter(function(t){return key(t.textContent)==='SETUP';})[0];
-  var quote=$$('.tab',row).filter(function(t){return key(t.textContent)==='QUOTE';})[0];
-  if(setup&&quote&&setup.nextElementSibling!==quote) row.insertBefore(setup,quote);
   dedupeDocumentsNavigation();
   paintWorkspaceGroups();
   return true;
@@ -254,6 +299,7 @@ function setWorkspaceGroup(group){
 }
 function paintWorkspaceGroups(){
   var r=row(),nav=$('v23SuitePrimaryNav'); if(!r||!nav)return false;
+  var root=$('suite-root');
   var fullActive=!!(window.V25&&V25.fullActive&&$('suite-root').classList.contains('v25-full-active'));
   var active=activeTabKey(),group=currentWorkspaceGroup;
   var activeGroupButton=nav.querySelector('button.active[data-group]');
@@ -267,6 +313,7 @@ function paintWorkspaceGroups(){
     if(WORKSPACE_ORDER.indexOf(group)<0)group=groupForTab(active);
     currentWorkspaceGroup=group;
   }
+  if(root&&root.getAttribute('data-v50-group')!==(fullActive?'full':group))root.setAttribute('data-v50-group',fullActive?'full':group);
   $$('.tab',r).forEach(function(t){
     var k=tabKey(t),show=!fullActive&&WORKSPACE_GROUPS[group]&&WORKSPACE_GROUPS[group].indexOf(k)>=0;
     t.classList.toggle('v50-nav-hidden',!show);
@@ -325,6 +372,9 @@ function installWorkspaceNavigation(){
   document.addEventListener('click',function(e){
     var t=e.target.closest&&e.target.closest('#suite-root .tabs .tab'); if(!t)return;
     var k=tabKey(t);
+    if(k==='DOCUMENTS & OCR'||k==='DOCUMENTS & WORKSHEETS'){
+      e.preventDefault();e.stopImmediatePropagation();V50.openUnifiedDocuments();return;
+    }
     if(k==='CREDIT'){
       e.preventDefault();e.stopImmediatePropagation();openCreditWorkspace(t);return;
     }
@@ -825,10 +875,10 @@ function universalModal(){
   modal.querySelector('.v50-universal-close').onclick=V50.closeUniversalPrompt;
   modal.querySelector('[data-v50-up-copy]').onclick=function(){ copyText($('v50UniversalOutput').value,function(){say('Prompt copied','Paste it into your assistant with the document, then return the JSON for review.','good',4500);}); };
   modal.querySelector('[data-v50-up-download]').onclick=function(){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([$('v50UniversalOutput').value],{type:'text/plain'})); a.download='mortgage-suite-universal-prompt.txt'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},0); };
-  modal.querySelector('[data-v50-up-docs]').onclick=function(){ V50.closeUniversalPrompt(); V50.go('DOCUMENTS & OCR'); setTimeout(function(){window.scrollTo({top:0,behavior:'smooth'});},80); };
+  modal.querySelector('[data-v50-up-docs]').onclick=function(){ V50.closeUniversalPrompt(); V50.openUnifiedDocuments(); };
   modal.querySelector('[data-v50-up-review]').onclick=function(){
     var value=$('v50UniversalJson').value.trim(); if(!value){say('No JSON entered','Paste the returned JSON before sending it to the document review box.','warn',4000);return;}
-    V50.go('DOCUMENTS & OCR'); setTimeout(function(){var target=$('v9JsonBox');if(target){target.value=value;target.dispatchEvent(new Event('input',{bubbles:true}));target.focus();say('JSON ready for review','Review it in Documents & OCR, then choose Apply the JSON if appropriate.','good',5000);}else say('Document review is loading','Open Documents & OCR and paste the JSON into its review field.','info',4000);},180);
+    V50.openUnifiedDocuments(); setTimeout(function(){var target=$('v50LoanJsonBox')||$('v9JsonBox');if(target){target.value=value;target.dispatchEvent(new Event('input',{bubbles:true}));try{target.focus({preventScroll:true});}catch(e){}say('JSON ready for review','Review it in Documents & OCR, then apply it only if the matched fields are correct.','good',5000);}else say('Document review is loading','Open Documents & OCR and paste the JSON into its review field.','info',4000);},80);
   };
   return modal;
 }
@@ -857,6 +907,124 @@ function installUniversalMenu(){
   if(!window.V44||!V44.openMenu||V44.__v50UniversalMenu)return false;
   var open=V44.openMenu;V44.openMenu=function(kind){var result=open.apply(this,arguments);if(kind==='docs'||kind==='actions')setTimeout(function(){var menu=$('v44Menu');if(!menu||menu.querySelector('[data-v50-universal-menu]'))return;var section=document.createElement('section');section.className='v44-menu-section v50-universal-menu';section.innerHTML='<span>Document AI</span><div class="v44-menu-grid"></div>';var b=universalEntry('general');b.classList.add('v44-menu-item');b.dataset.v50UniversalMenu='1';b.innerHTML='<i aria-hidden="true">AI</i><span><b>AI</b><small>Universal documentation prompt</small></span>';section.querySelector('.v44-menu-grid').appendChild(b);menu.appendChild(section);},0);return result;};V44.__v50UniversalMenu=true;return true;
 }
+
+/* ------------------------------------------------------------------ 5f
+   UNIFIED DOCUMENTS & OCR
+
+   The Income Calculator already owns the broad income/AUS extractor and the
+   Loan Suite owns the mortgage-field assignment reader.  A single canonical
+   page now presents both.  Each physical file is read only once: text read by
+   either engine is handed to the other engine, avoiding a second PDF parse or
+   OCR pass while retaining both sets of field mappings and review controls. */
+var DOCUMENT_SYNC={fromIncome:{},fromLoan:{},bridging:false};
+function documentHash(text){
+  text=String(text||'').replace(/\s+/g,' ').trim();
+  var hash=2166136261;for(var n=0;n<text.length;n+=Math.max(1,Math.floor(text.length/240))){hash^=text.charCodeAt(n);hash=Math.imul(hash,16777619);}
+  return String(text.length)+':'+String(hash>>>0);
+}
+function incomeDocumentList(){try{return typeof DOCS!=='undefined'?DOCS:null;}catch(e){return null;}}
+function ensureLoanDocumentBackend(){
+  if($('v9DocBody')&&$('v9PromptBox')&&$('v9JsonBox'))return true;
+  if(!window.V9)return false;
+  var backend=$('v50LoanDocsBackend');
+  if(!backend){backend=document.createElement('div');backend.id='v50LoanDocsBackend';backend.hidden=true;backend.setAttribute('aria-hidden','true');backend.innerHTML='<div id="v9DocBody"></div><textarea id="v9PromptBox"></textarea><textarea id="v9JsonBox"></textarea>';document.body.appendChild(backend);}
+  try{V9.renderDocs();}catch(e){}
+  return !!$('v9DocBody');
+}
+function ingestIncomeDocumentText(name,size,text){
+  var docs=incomeDocumentList(),hash=documentHash(text);if(!docs||!text||docs.some(function(d){return documentHash(d.text)===hash;}))return false;
+  try{
+    if(typeof classify!=='function'||typeof extractFields!=='function'||typeof renderDocs!=='function')return false;
+    var type=classify(text),segments=type==='wvoe'&&typeof wvoeSegments==='function'?wvoeSegments(text):[{label:'',text:text}],made=[];
+    segments.forEach(function(segment,index){
+      var rec={id:'v50i'+Date.now().toString(36)+index+Math.random().toString(36).slice(2,5),name:segment.label?name+' — '+segment.label:name,size:Number(size)||0,status:'done',note:'Shared OCR text · '+(extractFields(type,segment.text)||[]).length+' field(s) detected',text:segment.text,type:type,fields:extractFields(type,segment.text)||[],target:'',yearCol:'y1',prog:1,open:false};
+      try{if(typeof defaultTarget==='function')rec.target=defaultTarget(type);}catch(e){}
+      docs.push(rec);made.push(rec);
+    });
+    renderDocs();
+    if(type==='aus'&&typeof applyAUS==='function')try{applyAUS(text,name);}catch(e){}
+    var auto=false;try{auto=typeof AUTO_APPLY!=='undefined'&&AUTO_APPLY;}catch(e){}
+    if(auto&&typeof applyDoc==='function')made.forEach(function(rec){
+      try{var kind=typeof docType==='function'?docType(rec.type).kind:'';if(typeof REC_KIND!=='undefined'&&REC_KIND[kind])applyDoc(rec.id,true);}catch(e){}
+    });
+    return true;
+  }catch(e){return false;}
+}
+function sendIncomeTextToLoan(records){
+  if(!window.V9||!V9.addDocs)return;
+  records.forEach(function(rec){
+    if(!rec||rec.status!=='done'||!rec.text)return;var hash=documentHash(rec.text);if(DOCUMENT_SYNC.fromIncome[hash])return;
+    DOCUMENT_SYNC.fromIncome[hash]=true;
+    try{var clean=String(rec.name||'document').replace(/\.[^.]+$/,'').replace(/[\\/:*?"<>|]/g,'_');V9.addDocs([new File([rec.text],clean+' — shared OCR.txt',{type:'text/plain'})]);}catch(e){}
+  });
+}
+function syncUnifiedDocumentMirrors(){
+  var income=incomeDocumentList(),incomeCount=$('v50IncomeDocCount'),loanCount=$('v50LoanDocCount');
+  if(incomeCount)incomeCount.textContent=String(income?income.length:0);
+  var loanFiles=window.V9&&V9.DOCS&&V9.DOCS.files||[];if(loanCount)loanCount.textContent=String(loanFiles.length);
+  var source=$('v9DocBody'),mirror=$('v50LoanDocMirror');
+  if(source&&mirror&&mirror.__v50Html!==source.innerHTML){mirror.__v50Html=source.innerHTML;mirror.innerHTML=source.innerHTML;}
+}
+function installDocumentEngineBridge(){
+  ensureLoanDocumentBackend();
+  if(typeof window.handleFiles==='function'&&!window.handleFiles.__v50Shared){
+    var incomeReader=window.handleFiles;
+    var sharedReader=async function(files){
+      var docs=incomeDocumentList(),before=docs?docs.map(function(d){return d.id;}):[];
+      var result=await incomeReader.apply(this,arguments);docs=incomeDocumentList();
+      if(docs)sendIncomeTextToLoan(docs.filter(function(d){return before.indexOf(d.id)<0;}));
+      syncUnifiedDocumentMirrors();return result;
+    };
+    sharedReader.__v50Shared=true;sharedReader.__v50Original=incomeReader;window.handleFiles=sharedReader;
+  }
+  if(typeof window.renderDocs==='function'&&!window.renderDocs.__v50Shared){
+    var incomeRender=window.renderDocs;var sharedIncomeRender=function(){var result=incomeRender.apply(this,arguments);syncUnifiedDocumentMirrors();return result;};
+    sharedIncomeRender.__v50Shared=true;window.renderDocs=sharedIncomeRender;
+  }
+  if(window.V9&&V9.renderDocs&&!V9.renderDocs.__v50Shared){
+    var loanRender=V9.renderDocs;V9.renderDocs=function(){
+      var result=loanRender.apply(this,arguments),files=V9.DOCS&&V9.DOCS.files||[];
+      files.forEach(function(rec){
+        if(!rec||rec.status!=='done'||!rec.text)return;var hash=documentHash(rec.text);if(DOCUMENT_SYNC.fromIncome[hash]||DOCUMENT_SYNC.fromLoan[hash])return;
+        DOCUMENT_SYNC.fromLoan[hash]=true;ingestIncomeDocumentText(rec.name,0,rec.text);
+      });
+      syncUnifiedDocumentMirrors();return result;
+    };V9.renderDocs.__v50Shared=true;
+  }
+  if(window.V9&&V9.aiPrompt&&!V9.aiPrompt.__v50Shared){
+    var loanPrompt=V9.aiPrompt;V9.aiPrompt=function(){var result=loanPrompt.apply(this,arguments),from=$('v9PromptBox'),to=$('v50LoanPromptBox');if(from&&to){to.value=from.value;try{to.focus({preventScroll:true});to.select();}catch(e){}}return result;};V9.aiPrompt.__v50Shared=true;
+  }
+  return true;
+}
+function unifiedDocumentMarkup(){
+  return '<section id="v50UnifiedDocuments" class="v50-unified-docs">'
+    +'<header><div><small>Shared workspace</small><h2>Documents & OCR</h2><p>One local file read feeds both the Income Calculator and the Loan Suite. Nothing is uploaded.</p></div><div class="v50-doc-sync"><span>Income <b id="v50IncomeDocCount">0</b></span><i aria-hidden="true">↔</i><span>Loan <b id="v50LoanDocCount">0</b></span></div></header>'
+    +'<div id="v50SharedDocDrop" class="v50-shared-drop" role="button" tabindex="0" aria-label="Choose documents for shared OCR"><i>'+svg('book')+'</i><span><b>Drop documents here, or browse</b><small>PDF, PNG, JPG or WebP · read once · reviewed in both workspaces</small></span><button type="button">Choose files</button><input id="v50SharedDocFile" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple hidden></div>'
+    +'<div class="v50-doc-flow"><span><b>Income assignments</b>Paystubs, W-2s, VOE, tax returns, Schedule C/E, K-1, assets and AUS</span><i>→</i><span><b>Loan assignments</b>Purchase, value, rate, tax, insurance, credit, deposits, concessions and renovation</span></div>'
+    +'</section>';
+}
+function mountUnifiedDocuments(){
+  var host=$('subpanel-docs-import');if(!host)return false;installDocumentEngineBridge();
+  host.classList.add('v50-unified-mounted');var hub=$('v50UnifiedDocuments');
+  if(!hub){
+    var head=host.querySelector('.section-head');(head||host).insertAdjacentHTML(head?'afterend':'afterbegin',unifiedDocumentMarkup());hub=$('v50UnifiedDocuments');
+    var drop=$('v50SharedDocDrop'),file=$('v50SharedDocFile'),choose=drop&&drop.querySelector('button');
+    function pick(){if(file)file.click();}
+    function read(files){if(!files||!files.length)return;installDocumentEngineBridge();try{var p=window.handleFiles(files);if(p&&p.catch)p.catch(function(err){say('Document could not be read',String(err&&err.message||err),'warn',5000);});}catch(err){say('Document could not be read',String(err&&err.message||err),'warn',5000);}}
+    if(choose)choose.onclick=function(e){e.stopPropagation();pick();};
+    if(drop){drop.onclick=pick;drop.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};['dragenter','dragover'].forEach(function(name){drop.addEventListener(name,function(e){e.preventDefault();e.stopPropagation();drop.classList.add('drag');});});['dragleave','drop'].forEach(function(name){drop.addEventListener(name,function(e){e.preventDefault();e.stopPropagation();drop.classList.remove('drag');});});drop.addEventListener('drop',function(e){if(e.dataTransfer)read(e.dataTransfer.files);});}
+    if(file)file.onchange=function(){read(file.files);file.value='';};
+  }
+  var list=$('docList');if(list&&!$('v50LoanReview'))list.insertAdjacentHTML('afterend','<section id="v50LoanReview" class="v50-loan-doc-review"><header><div><small>Loan Suite review</small><h3>Loan, property and closing assignments</h3><p>These matches use the same extracted text and never overwrite an edited loan field silently.</p></div></header><div id="v50LoanDocMirror"></div><details><summary>Loan extraction prompt & JSON review</summary><label><span>Prompt</span><textarea id="v50LoanPromptBox" rows="5" placeholder="Choose Build an AI prompt on a loan document above."></textarea></label><label><span>Returned JSON</span><textarea id="v50LoanJsonBox" rows="5" placeholder="Paste loan-field JSON for review."></textarea></label><button type="button" data-v50-loan-json>Review loan JSON</button></details></section>');
+  var apply=$('[data-v50-loan-json]');if(apply&&!apply.__v50){apply.__v50=true;apply.onclick=function(){var from=$('v50LoanJsonBox'),to=$('v9JsonBox');if(!from||!to||!window.V9)return;to.value=from.value;V9.applyAiJson();};}
+  try{if(window.V9&&V9.renderDocs)V9.renderDocs();}catch(e){}syncUnifiedDocumentMirrors();return true;
+}
+V50.openUnifiedDocuments=function(){
+  noteExplicitNavigation();
+  try{if(window.SHELL&&SHELL.go)SHELL.go('calc');if(typeof switchTab==='function')switchTab('docs');}catch(e){}
+  mountUnifiedDocuments();
+};
+V50.mountUnifiedDocuments=mountUnifiedDocuments;
 
 /* ------------------------------------------------------------------ 6
    RAIL: when the live summary is hidden, the page takes the full width */
@@ -1026,17 +1194,11 @@ document.addEventListener('click', function(e){
   p.querySelector('[data-x]').onclick=function(){p.remove();};p.querySelector('[data-go]').onclick=function(){p.remove();V50.go('CREDIT');};p.querySelector('[data-save]').onclick=function(){var v=p.querySelector('input').value;if(window.V20&&V20.setScenario)V20.setScenario('creditScore',v,'num');else s.setField('creditScore',v,'Live summary edit');p.remove();};if(window.V19)V19.enhanceFreeform(p);
 }, true);
 function iNum(v){return N(v)>0?String(Math.round(N(v))):'';}
-/* First Documents click opens its document menu; a quick second click opens OCR. */
-var docsClickedAt=0;
+/* Documents is now one shared page for both products. */
 document.addEventListener('click', function(e){
   if (!(e.target.closest && e.target.closest('#v44Docs'))) return;
-  var now=Date.now();
   e.stopImmediatePropagation(); e.preventDefault();
-  if(now-docsClickedAt>700){ docsClickedAt=now; try{if(window.V44&&V44.openMenu)V44.openMenu('docs');}catch(x){} return; }
-  docsClickedAt=0;
-  var t = tabFor('DOCUMENTS & OCR'); if (!t) return;
-  lastTrusted = 0; t.click();
-  setTimeout(function(){ window.scrollTo(0, 0); }, 150);
+  V50.openUnifiedDocuments();
 }, true);
 document.addEventListener('click', function(e){
   var t = e.target.closest && e.target.closest('#suite-root .tabs .tab'); if (!t) return;
@@ -1097,6 +1259,7 @@ function decorate(){
      menu and document launchers current while its workspace is visible. */
   try { paintIncome(); } catch(e){}
   try { installUniversalPromptLaunchers(); } catch(e){}
+  try { installDocumentEngineBridge(); mountUnifiedDocuments(); } catch(e){}
   if(inCalculator()) return;
   /* Calculator-to-suite handoff is useful, but it used to recompute the
      entire income workbook every renderer pass. Poll it sparingly; switching
@@ -1168,6 +1331,8 @@ function pinSuiteEntry(){
   return true;
 }
 function hook(){
+  installScrollStability();
+  stabilizeLegacyRenderers();
   var s = store();
   /* Start a new file with the suite's Nassau planning ZIP and local lookup. */
   if(s&&!document.documentElement.dataset.v50ZipStarted){
@@ -1179,6 +1344,8 @@ function hook(){
   installIncomeHandoff();
   installPopupDismissal();
   installUniversalMenu();
+  installDocumentEngineBridge();
+  mountUnifiedDocuments();
   installWorkspaceNavigation();
   deferSuiteInputCommit();
   wireFileToSetup();

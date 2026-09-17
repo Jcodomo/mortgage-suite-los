@@ -596,7 +596,78 @@ html[data-v50][data-v25-surface="dark"] body .v50-universal-backdrop{ background
 html[data-v50] body #suite-root .tabs.v48-context .tab.v48-hide:not(.v50-nav-hidden){ display:inline-flex !important; }
 html[data-v50] body #suite-root .tabs.v48-context .tab.v50-nav-hidden,
 html[data-v50] body #suite-root .tabs.v48-context .tab.v48-hide.v50-nav-hidden{ display:none !important; }
+/* Group data, unlike legacy classes, is not rewritten by older schedulers.
+   These selectors are the immediate and flicker-free visibility authority. */
+html[data-v50] body #suite-root[data-v50-group] .tabs.v48-context .tab[data-v50-group]{ display:none !important; }
+html[data-v50] body #suite-root[data-v50-group="file"] .tabs.v48-context .tab[data-v50-group="file"],
+html[data-v50] body #suite-root[data-v50-group="loan"] .tabs.v48-context .tab[data-v50-group="loan"],
+html[data-v50] body #suite-root[data-v50-group="costs"] .tabs.v48-context .tab[data-v50-group="costs"],
+html[data-v50] body #suite-root[data-v50-group="underwriting"] .tabs.v48-context .tab[data-v50-group="underwriting"],
+html[data-v50] body #suite-root[data-v50-group="results"] .tabs.v48-context .tab[data-v50-group="results"]{ display:inline-flex !important; }
 html[data-v50] body #suite-root .v23-primary-nav button[data-group="documents"]{ display:none !important; }
+html[data-v50]{ scroll-behavior:auto !important; scrollbar-gutter:stable; }
+html[data-v50] body #suite-root .v23-primary-nav button[data-group="file"]{ order:1; }
+html[data-v50] body #suite-root .v23-primary-nav button[data-group="loan"]{ order:2; }
+html[data-v50] body #suite-root .v23-primary-nav button[data-group="costs"]{ order:3; }
+html[data-v50] body #suite-root .v23-primary-nav button[data-group="underwriting"]{ order:4; }
+html[data-v50] body #suite-root .v23-primary-nav button[data-group="results"]{ order:5; }
+html[data-v50] body #suite-root .v23-primary-nav button[data-group="full"]{ order:6; }
+
+/* ---- one shared Documents & OCR page ---------------------------------
+   The native Income document controls remain the source of truth.  The
+   duplicated drop target is replaced by one shared reader and the retained
+   Loan Suite assignment cards are mirrored directly below the income review. */
+html[data-v50] body #subpanel-docs-import.v50-unified-mounted > #dropZone{ display:none !important; }
+html[data-v50] body #v50LoanDocsBackend{ display:none !important; }
+html[data-v50] body .v50-unified-docs,
+html[data-v50] body .v50-loan-doc-review{
+  margin:14px 0; border:1px solid var(--v50-line); border-radius:14px; background:var(--v50-card); color:var(--v50-ink); overflow:hidden; box-shadow:none;
+}
+html[data-v50] body .v50-unified-docs > header,
+html[data-v50] body .v50-loan-doc-review > header{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:15px 17px; border-bottom:1px solid var(--v50-line); background:var(--v50-head);
+}
+html[data-v50] body .v50-unified-docs header small,
+html[data-v50] body .v50-loan-doc-review header small{ display:block; color:var(--v50-blue-ink); font:800 9.5px Inter,sans-serif; letter-spacing:.7px; text-transform:uppercase; }
+html[data-v50] body .v50-unified-docs h2,
+html[data-v50] body .v50-loan-doc-review h3{ margin:3px 0 2px; color:var(--v50-ink); font:800 17px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-unified-docs header p,
+html[data-v50] body .v50-loan-doc-review header p{ margin:0; color:var(--v50-mute); font:500 11.5px/1.45 "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-doc-sync{ display:flex; align-items:center; gap:7px; flex:none; }
+html[data-v50] body .v50-doc-sync span{ display:inline-flex; align-items:center; gap:5px; min-height:27px; padding:0 9px; border:1px solid var(--v50-line); border-radius:999px; background:var(--v50-card); color:var(--v50-mute); font:700 10.5px Inter,sans-serif; }
+html[data-v50] body .v50-doc-sync b{ color:var(--v50-blue-ink); }
+html[data-v50] body .v50-doc-sync i{ color:var(--v50-blue-ink); font-style:normal; }
+html[data-v50] body .v50-shared-drop{
+  display:grid; grid-template-columns:38px minmax(0,1fr) auto; align-items:center; gap:12px; margin:14px; padding:17px;
+  border:1.5px dashed var(--v50-line2); border-radius:12px; background:var(--v50-soft); cursor:pointer; transition:border-color .14s ease,background .14s ease;
+}
+html[data-v50] body .v50-shared-drop:hover,
+html[data-v50] body .v50-shared-drop.drag{ border-color:var(--v50-blue); background:var(--v50-blue-soft); }
+html[data-v50] body .v50-shared-drop > i{ display:grid; place-items:center; width:38px; height:38px; border-radius:10px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); }
+html[data-v50] body .v50-shared-drop svg{ width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+html[data-v50] body .v50-shared-drop span{ min-width:0; }
+html[data-v50] body .v50-shared-drop span b{ display:block; color:var(--v50-ink); font:750 12.5px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-shared-drop span small{ display:block; margin-top:2px; color:var(--v50-mute); font:500 10.5px/1.4 Inter,sans-serif; }
+html[data-v50] body .v50-shared-drop button,
+html[data-v50] body .v50-loan-doc-review details > button{ height:32px; padding:0 11px; border:1px solid var(--v50-blue); border-radius:8px; background:var(--v50-blue); color:#fff; font:750 11px "Plus Jakarta Sans",Inter,sans-serif; cursor:pointer; }
+html[data-v50] body .v50-doc-flow{ display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:10px; margin:0 14px 14px; }
+html[data-v50] body .v50-doc-flow span{ min-height:48px; padding:9px 11px; border:1px solid var(--v50-line); border-radius:9px; background:var(--v50-card); color:var(--v50-mute); font:500 10px/1.35 Inter,sans-serif; }
+html[data-v50] body .v50-doc-flow span b{ display:block; margin-bottom:2px; color:var(--v50-ink); font-size:11px; }
+html[data-v50] body .v50-doc-flow > i{ color:var(--v50-blue-ink); font-style:normal; }
+html[data-v50] body #v50LoanDocMirror{ padding:14px; }
+html[data-v50] body #v50LoanDocMirror > .card{ margin:0 0 10px; }
+html[data-v50] body .v50-loan-doc-review details{ margin:0 14px 14px; padding:10px 12px; border:1px solid var(--v50-line); border-radius:10px; background:var(--v50-soft); }
+html[data-v50] body .v50-loan-doc-review summary{ cursor:pointer; color:var(--v50-ink); font:750 11.5px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-loan-doc-review label{ display:block; margin-top:10px; color:var(--v50-label); font:800 9.5px Inter,sans-serif; letter-spacing:.45px; text-transform:uppercase; }
+html[data-v50] body .v50-loan-doc-review textarea{ width:100%; box-sizing:border-box; margin-top:5px; padding:9px 10px; resize:vertical; border:1px solid var(--v50-line2); border-radius:8px; background:var(--v50-card); color:var(--v50-ink); font:500 11.5px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace; text-transform:none; letter-spacing:0; }
+html[data-v50] body .v50-loan-doc-review details > button{ margin-top:9px; }
+@media (max-width:720px){
+  html[data-v50] body .v50-unified-docs > header{ flex-direction:column; }
+  html[data-v50] body .v50-shared-drop{ grid-template-columns:34px minmax(0,1fr); }
+  html[data-v50] body .v50-shared-drop button{ grid-column:1/-1; width:100%; }
+  html[data-v50] body .v50-doc-flow{ grid-template-columns:1fr; }
+  html[data-v50] body .v50-doc-flow > i{ transform:rotate(90deg); justify-self:center; }
+}
 
 /* Full is a calm, grouped directory followed by the retained continuous
    file summary.  It stays intentionally long instead of compressing all
