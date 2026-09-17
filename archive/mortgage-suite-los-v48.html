@@ -37089,7 +37089,9 @@ var V48 = window.V48 = { version:'48.0' };
    pressing it again returns to the group you were on.
    =================================================================== */
 var GROUPS = {
-  file:         ['QUOTE','SETUP','PROPERTY'],
+  /* Setup is the File workspace landing page; Quote remains immediately
+     available beside it for a quick borrower-facing view. */
+  file:         ['SETUP','QUOTE','PROPERTY'],
   loan:         ['RENOVATION','MAX MORTGAGE','MORTGAGE RATES'],
   costs:        ['CLOSING','ESCROW','TAXES & PRORATION'],
   underwriting: ['QUALIFY','RENTAL','CREDIT','ADVANCED','CONTRACT & LE'],

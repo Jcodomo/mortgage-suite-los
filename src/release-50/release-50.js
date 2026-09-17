@@ -26,7 +26,7 @@ function inputs(){ var s=store(); try { return s ? s.activeInputs : null; } catc
    small cookie plus a browser-storage resume marker for the active workspace
    and scenario, so a refresh or a return visit restores the same workbench
    without attempting to squeeze the full loan file into a browser cookie. */
-var RESUME_KEY='los.v50.resume', WORKSPACE_COOKIE='los.v50.workspace';
+var RESUME_KEY='los.v50.resume', WORKSPACE_COOKIE='los.v50.workspace', REQUESTED_WORKSPACE_KEY='los.v50.requestedWorkspace';
 function readCookie(name){
   try { var hit=document.cookie.match(new RegExp('(?:^|; )'+name.replace(/[.$?*|{}()\[\]\\/+^]/g,'\\$&')+'=([^;]*)')); return hit?decodeURIComponent(hit[1]):''; } catch(e){ return ''; }
 }
@@ -39,12 +39,18 @@ function workspaceName(value){
 function explicitWorkspace(){
   try { return workspaceName((new URLSearchParams(location.search)).get('app')); } catch(e){ return ''; }
 }
+function requestedWorkspace(){
+  try { return workspaceName(sessionStorage.getItem(REQUESTED_WORKSPACE_KEY)); } catch(e){ return ''; }
+}
 function savedWorkspace(){
   var saved='';
   try { saved=workspaceName((JSON.parse(localStorage.getItem(RESUME_KEY)||'{}')||{}).workspace); } catch(e){}
   return saved||workspaceName(readCookie(WORKSPACE_COOKIE));
 }
-function preferredWorkspace(){ return explicitWorkspace()||savedWorkspace(); }
+/* The tiny head bootstrap records the requested app before the legacy
+   calculator startup can rewrite the URL.  Prefer that marker so a refresh
+   from Loan Suite cannot drift into Income while the old startup settles. */
+function preferredWorkspace(){ return requestedWorkspace()||explicitWorkspace()||savedWorkspace(); }
 function persistWorkspace(next){
   var workspace=workspaceName(next)||explicitWorkspace();
   if(!workspace){ try { workspace=workspaceName(window.SHELL&&SHELL.mode); } catch(e){} }
@@ -53,6 +59,7 @@ function persistWorkspace(next){
     var s=store(), snap=s&&s.snapshot||{};
     localStorage.setItem(RESUME_KEY,JSON.stringify({workspace:workspace,scenarioId:snap.activeScenarioId||'',savedAt:Date.now()}));
   } catch(e){}
+  try { sessionStorage.setItem(REQUESTED_WORKSPACE_KEY,workspace); } catch(e){}
   try { document.cookie=WORKSPACE_COOKIE+'='+encodeURIComponent(workspace)+'; Path=/; Max-Age=31536000; SameSite=Lax'; } catch(e){}
   return true;
 }
