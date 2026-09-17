@@ -800,6 +800,28 @@ function wireFileToSetup(){
   },true);
   return true;
 }
+/* The legacy workspace strip may replace its File button after our first
+   enhancement pass. A single delegated capture handler covers that replacement
+   without polling or retaining duplicate listeners. */
+var fileSetupDelegated=false;
+function installFileSetupDelegation(){
+  if(fileSetupDelegated)return;
+  fileSetupDelegated=true;
+  document.addEventListener('click',function(event){
+    if(!event.isTrusted||!event.target.closest)return;
+    var button=event.target.closest('#v23SuitePrimaryNav button[data-group="file"]');
+    if(!button)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    var setup=tabFor('SETUP');
+    if(!setup){V50.go('SETUP');return;}
+    choose('SETUP');setup.click();
+    [40,180,520,1200].forEach(function(delay){setTimeout(function(){
+      if(!button.classList.contains('active'))return;
+      var current=tabFor('SETUP');if(current&&!current.classList.contains('active'))current.click();
+      choose('SETUP');
+    },delay);});
+  },true);
+}
 /* live summary rows open the page that holds their figure */
 var MODE_TAB = { quote:'QUOTE', setup:'SETUP', renovation:'RENOVATION', maxmortgage:'MAX MORTGAGE', rates:'MORTGAGE RATES', closing:'CLOSING',
   escrow:'ESCROW', qualify:'QUALIFY', income:'QUALIFY', rental:'RENTAL', credit:'CREDIT', advanced:'ADVANCED', summary:'SUMMARY', compare:'SCENARIOS' };
@@ -978,6 +1000,7 @@ function hook(){
   installUniversalMenu();
   deferSuiteInputCommit();
   wireFileToSetup();
+  installFileSetupDelegation();
   /* The primary workspace strip is mounted by a retained legacy layer and
      can appear after this first hook on a cold load. Retry only the small
      File-to-Setup binding so File is consistently the setup entry point
