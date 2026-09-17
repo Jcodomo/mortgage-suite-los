@@ -442,6 +442,14 @@ html[data-v50] body #suite-root #v44LiveSummary .v44-live-row:not(.pass):not(.ba
 }
 html[data-v50] body #suite-root #v44LiveSummary h4{ opacity:.86; }
 
+/* V48 creates a second Documents primary-nav item in addition to the direct
+   Documents launcher.  Keep the direct launcher so its menu/OCR behavior is
+   unchanged, but never let the clone take visual space or briefly flicker. */
+html[data-v50] body #suite-root #v23SuitePrimaryNav button[data-group="documents"],
+html[data-v50] body #suite-root #v23SuitePrimaryNav .v50-documents-duplicate{
+  display:none !important;
+}
+
 /* ---- Universal Prompt -------------------------------------------------
    Shared launcher cards and one focused dialog for document work in the
    Income Calculator, Loan Suite Documents & OCR, and Contract & LE. */

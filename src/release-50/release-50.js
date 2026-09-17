@@ -117,6 +117,25 @@ function paintTabs(){
   var setup=$$('.tab',row).filter(function(t){return key(t.textContent)==='SETUP';})[0];
   var quote=$$('.tab',row).filter(function(t){return key(t.textContent)==='QUOTE';})[0];
   if(setup&&quote&&setup.nextElementSibling!==quote) row.insertBefore(setup,quote);
+  dedupeDocumentsNavigation();
+  return true;
+}
+
+/* Release 48 owns the Documents page twice: once as the direct document
+   launcher and once as a cloned primary-nav group.  The direct launcher is
+   the one with the working first-click menu / second-click OCR behavior, so
+   keep that control and suppress only the redundant clone. */
+function dedupeDocumentsNavigation(){
+  var nav=$('v23SuitePrimaryNav'), direct=$('v28nav-documents');
+  if(!nav||!direct)return false;
+  var duplicate=nav.querySelector('button[data-group="documents"]');
+  if(duplicate&&duplicate!==direct){
+    duplicate.classList.add('v50-documents-duplicate');
+    duplicate.setAttribute('aria-hidden','true');
+    duplicate.tabIndex=-1;
+  }
+  direct.classList.remove('v50-documents-duplicate');
+  direct.removeAttribute('aria-hidden');
   return true;
 }
 
@@ -647,6 +666,10 @@ function syncGroup(k){
   try { if (localStorage.getItem('los.v23.suiteGroup') !== g) localStorage.setItem('los.v23.suiteGroup', g); } catch(e){}
   var nav = $('v23SuitePrimaryNav');
   if (nav) $$('button[data-group]', nav).forEach(function(b){ var on = b.dataset.group === g; if (b.classList.contains('active') !== on) b.classList.toggle('active', on); });
+  /* The visible Documents button is the direct launcher, not the hidden
+     compatibility group clone. Preserve its active state for orientation. */
+  var docsDirect=$('v28nav-documents');
+  if(docsDirect) docsDirect.classList.toggle('active',g==='documents');
   var r = row();
   if (r) $$('.tab', r).forEach(function(t){ var on = GROUP_OF[tabKey(t)] === g; if (t.classList.contains('v48-hide') === on) t.classList.toggle('v48-hide', !on); });
   try { if (window.LOS_SCHEDULER) LOS_SCHEDULER.request(0); } catch(e){}
@@ -724,6 +747,9 @@ function watchRow(){
 var pending = false;
 function tick(){
   pending = false;
+  /* The bundle is local-first; rendering while its tab is hidden cannot
+     improve a result.  Resume immediately when the user returns instead. */
+  if(document.hidden) return;
   try { installIncomeHandoff(); syncCalculatorIncome(false); } catch(e){}
   /* The Income Calculator has its own renderer. Keep its lighter shell menu
      current, but skip the heavier Loan Suite DOM pass until that workspace is
@@ -762,7 +788,8 @@ function hook(){
 if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1000); else setInterval(tick, 1000);
 /* V35 repaints quote controls every 800ms. Keep the display layer last so
    fractional percentages never flash as binary floating-point artifacts. */
-setInterval(paintFreeformValues, 250);
+setInterval(function(){ if(!document.hidden) paintFreeformValues(); }, 250);
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) soon(); },false);
 setTimeout(function(){ tick(); hook(); }, 260);
 setTimeout(tick, 1200);
 })();
