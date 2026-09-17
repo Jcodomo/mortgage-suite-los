@@ -38710,6 +38710,19 @@ function installFileSetupDelegation(){
     },delay);});
   },true);
 }
+/* A few retained builds mount the primary strip after the first enhancement
+   pass. Watch only that brief startup window and disconnect as soon as the
+   actual File button accepts its direct binding. */
+var fileSetupObserver=null;
+function observeFileSetupMount(){
+  if(wireFileToSetup())return;
+  if(fileSetupObserver||!window.MutationObserver)return;
+  fileSetupObserver=new MutationObserver(function(){
+    if(wireFileToSetup()&&fileSetupObserver){fileSetupObserver.disconnect();fileSetupObserver=null;}
+  });
+  fileSetupObserver.observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(function(){if(fileSetupObserver){fileSetupObserver.disconnect();fileSetupObserver=null;}},10000);
+}
 /* live summary rows open the page that holds their figure */
 var MODE_TAB = { quote:'QUOTE', setup:'SETUP', renovation:'RENOVATION', maxmortgage:'MAX MORTGAGE', rates:'MORTGAGE RATES', closing:'CLOSING',
   escrow:'ESCROW', qualify:'QUALIFY', income:'QUALIFY', rental:'RENTAL', credit:'CREDIT', advanced:'ADVANCED', summary:'SUMMARY', compare:'SCENARIOS' };
@@ -38889,6 +38902,7 @@ function hook(){
   deferSuiteInputCommit();
   wireFileToSetup();
   installFileSetupDelegation();
+  observeFileSetupMount();
   /* The primary workspace strip is mounted by a retained legacy layer and
      can appear after this first hook on a cold load. Retry only the small
      File-to-Setup binding so File is consistently the setup entry point
