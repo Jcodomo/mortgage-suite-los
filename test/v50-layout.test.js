@@ -14,7 +14,7 @@ const checks=[
   ['Loan Suite renderer idles while the Income Calculator is active',/function tick\(\)[\s\S]*?paintIncome\(\)[\s\S]*?SHELL\.mode==='calc'\) return;/.test(dist)],
   ['Duplicate Documents navigation is suppressed while the working direct launcher remains',/function dedupeDocumentsNavigation\(\)[\s\S]*?buttons\.length<2[\s\S]*?v28nav-documents[\s\S]*?style\.setProperty\('display','none','important'\)/.test(dist)&&/\.v50-documents-duplicate[\s\S]*?display:none !important/.test(css)],
   ['Release rendering pauses while a browser tab is hidden and resumes on return',/if\(document\.hidden\) return;[\s\S]*?visibilitychange[\s\S]*?if\(!document\.hidden\) soon\(\)/.test(dist)],
-  ['A direct Loan Suite entry remains in Loan Suite through delayed calculator startup',/function pinSuiteEntry\(\)/.test(dist)&&/app!=='suite'/.test(dist)&&/suiteEntryPinned=true/.test(dist)&&/0,520,1450,2600,4300/.test(dist)&&/shell\.go\('suite'\)/.test(dist)],
+  ['A direct Loan Suite entry remains in Loan Suite through delayed calculator startup',/function calcStart\(\)[\s\S]*?URLSearchParams\(location\.search\)[\s\S]*?get\('app'\) === 'suite'[\s\S]*?return;[\s\S]*?switchTab\('w2'\)/.test(dist)&&/function pinSuiteEntry\(\)/.test(dist)],
   ['Income Calculator keeps its controls but uses a quieter visual hierarchy',/#calc-root \.toolbar[\s\S]*?#calc-root nav\.tabbar[\s\S]*?#calc-root \.subtabs[\s\S]*?#calc-root \.card:not\(\.major\)/.test(css)],
   ['Income menu keeps its launcher inside the outside-click boundary',/#v50IncMenu, #shellbar \.lnk\.v50-inc/.test(dist)],
   ['Action menus and Loan Suite popovers close on a background click',/function installPopupDismissal\(\)[\s\S]*?pointerdown[\s\S]*?\.v23-action-menu\[open\][\s\S]*?V44\.closeMenu/.test(dist)],

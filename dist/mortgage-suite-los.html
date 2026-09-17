@@ -37012,7 +37012,12 @@ document.addEventListener('click', function(e){
    THE CALCULATOR OPENS ON W-2
    =================================================================== */
 function calcStart(){
-  if (V47.__calc) return; V47.__calc = true;
+  if (V47.__calc) return;
+  /* Preserve an explicit Loan Suite entry.  The calculator's W-2 default
+     should run only when the calculator was requested, not after a direct
+     /loan-suite.html visit has already selected the Suite. */
+  try { if ((new URLSearchParams(location.search)).get('app') === 'suite'){ V47.__calc = true; return; } } catch(e){}
+  V47.__calc = true;
   setTimeout(function(){ try { if (window.switchTab) switchTab('w2'); } catch(e){} }, 900);
 }
 
