@@ -37777,24 +37777,28 @@ html[data-v50] body #suite-root #v44LiveSummary h4{ opacity:.86; }
    Shared launcher cards and one focused dialog for document work in the
    Income Calculator, Loan Suite Documents & OCR, and Contract & LE. */
 html[data-v50] body .v50-universal-entry{
-  display:flex; align-items:center; gap:10px; width:100%; min-height:54px; padding:10px 12px; margin:0 0 12px;
-  border:1px solid var(--v50-edge); border-radius:10px; background:var(--v50-blue-soft); color:var(--v50-ink);
-  box-shadow:none; text-align:left; cursor:pointer; font-family:"Plus Jakarta Sans",Inter,sans-serif;
+  display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:30px; padding:0 9px; margin:0;
+  border:1px solid var(--v50-line); border-radius:7px; background:var(--v50-card); color:var(--v50-blue-ink);
+  box-shadow:none; text-align:center; cursor:pointer; font:800 10px Inter,"Plus Jakarta Sans",sans-serif; letter-spacing:.45px;
 }
-html[data-v50] body .v15-hub-grid .v50-universal-entry,
-html[data-v50] body .v16-loan-docs-grid .v50-universal-entry{ grid-column:1 / -1; margin:0; }
-html[data-v50] body .v50-universal-entry:hover{ border-color:var(--v50-blue); background:color-mix(in srgb,var(--v50-blue-soft) 76%,var(--v50-card)); }
-html[data-v50] body .v50-universal-entry-icon{
-  display:grid; place-items:center; flex:0 0 28px; height:28px; border-radius:8px; background:var(--v50-blue); color:#fff;
-  font:800 9px Inter,sans-serif; letter-spacing:.45px;
+html[data-v50] body .v50-universal-entry:hover{ border-color:var(--v50-blue); background:var(--v50-blue-soft); color:var(--v50-blue-ink); }
+html[data-v50] body #calc-root .v15-hub-head,
+html[data-v50] body #suite-root #v16LoanDocs .card-top{ position:relative; padding-right:62px; }
+html[data-v50] body #calc-root .v15-hub-head .v50-universal-entry,
+html[data-v50] body #suite-root #v16LoanDocs .card-top .v50-universal-entry{ position:absolute; right:14px; top:50%; transform:translateY(-50%); }
+html[data-v50] body #calc-root .v15-hub-head .v50-universal-entry{ border-color:rgba(255,255,255,.34); background:rgba(255,255,255,.1); color:#fff; }
+html[data-v50] body #calc-root .v15-hub-head .v50-universal-entry:hover{ border-color:#fff; background:rgba(255,255,255,.18); color:#fff; }
+html[data-v50] body #suite-root #v16LoanDocs .card-top .v50-universal-entry{ background:var(--v50-soft); }
+html[data-v50] body #v8Stage > .v50-universal-entry{ margin:0 0 10px; }
+html[data-v50] body .v50-universal-menu{ margin:0; }
+html[data-v50] body #suite-root.v44-final #v44Menu .v50-universal-entry.v44-menu-item{
+  display:grid; width:100%; min-width:0; height:auto; min-height:44px; margin:0; padding:8px 10px;
+  border-color:var(--line); border-radius:9px; background:var(--panel-2); color:var(--ink); text-align:left; letter-spacing:0;
 }
-html[data-v50] body .v50-universal-entry > span:nth-child(2){ min-width:0; flex:1; }
-html[data-v50] body .v50-universal-entry b{ display:block; font:800 12px "Plus Jakarta Sans",Inter,sans-serif; color:var(--v50-blue-ink); }
-html[data-v50] body .v50-universal-entry small{ display:block; margin-top:2px; color:var(--v50-mute); font:500 10.5px/1.3 Inter,sans-serif; }
-html[data-v50] body .v50-universal-entry > i{ color:var(--v50-blue-ink); font-style:normal; font-size:17px; }
-html[data-v50] body .v50-universal-menu{ margin:8px 0 0; padding-top:10px; border-top:1px solid var(--v50-line); }
-html[data-v50] body .v50-universal-menu h3{ margin:0 0 7px; color:var(--v50-mute); font:800 9.5px Inter,sans-serif; letter-spacing:.7px; text-transform:uppercase; }
-html[data-v50] body #v44Menu .v50-universal-entry{ margin:0; min-height:46px; border-radius:8px; }
+html[data-v50] body #suite-root.v44-final #v44Menu .v50-universal-entry.v44-menu-item:hover{ border-color:var(--v44-accent); background:color-mix(in srgb,var(--v44-accent) 8%,var(--panel)); }
+html[data-v50] body #suite-root.v44-final #v44Menu .v50-universal-entry.v44-menu-item i{ width:28px; height:28px; display:grid; place-items:center; border-radius:7px; background:color-mix(in srgb,var(--v44-accent) 12%,transparent); color:var(--v44-accent); font:800 9px Inter,sans-serif; font-style:normal; letter-spacing:.45px; }
+html[data-v50] body #suite-root.v44-final #v44Menu .v50-universal-entry.v44-menu-item b{ display:block; font-size:11.5px; color:inherit; }
+html[data-v50] body #suite-root.v44-final #v44Menu .v50-universal-entry.v44-menu-item small{ display:block; margin-top:1px; color:var(--muted); font-size:9.5px; line-height:1.25; }
 
 html[data-v50] body .v50-universal-modal{ position:fixed; inset:0; z-index:12000; display:none; align-items:center; justify-content:center; padding:16px; }
 html[data-v50] body .v50-universal-modal.open{ display:flex; }
@@ -38314,14 +38318,24 @@ function installPopupDismissal(){
    document.  It never calls an external service, and it deliberately
    leaves document import/review in the existing Documents & OCR flow. */
 var UNIVERSAL_PROMPT_TYPES = {
-  general:{label:'Any mortgage document',focus:'Identify the document and extract only figures, dates, names, identifiers and terms printed on it.'},
-  income:{label:'Income and employment',focus:'Extract borrower, employer or business, dates, pay frequency, earnings, deductions, income history and source labels.'},
-  assets:{label:'Assets and bank statements',focus:'Extract institution, account, owners, statement dates, balances and every deposit or withdrawal exactly as printed.'},
-  credit:{label:'Credit report',focus:'Extract scores, tradelines, balances, payments, months remaining, status, responsibility, inquiries and real-estate-owned details.'},
-  property:{label:'Property and valuation',focus:'Extract address, property facts, dates, as-is value, after-repair value, appraisal facts, taxes, insurance and rent when printed.'},
-  contract:{label:'Contract, Loan Estimate or Closing Disclosure',focus:'Extract parties, property, transaction dates, price, loan terms, credits, deposits, fees, cash to close and all material conditions.'},
-  legal:{label:'Lease, addendum or other agreement',focus:'Extract parties, property, dates, rent or financial terms, deposits, obligations, amendments and signature information.'},
-  renovation:{label:'Contractor estimate or renovation document',focus:'Extract contractor details, property, dates, scope, line items, labor, materials, permits, contingencies, draws and totals.'}
+  general:{label:'Any mortgage document',focus:'Identify the document and extract only figures, dates, names, identifiers and terms printed on it.',fields:'documentType, sourceName, borrowerName, propertyAddress, dates, amounts, rates, identifiers'},
+  paystub:{label:'Income - paystub / earnings statement',focus:'Extract employee, employer, pay frequency, pay-period dates, hourly or salary rate, hours, current earnings, YTD earnings, taxes, deductions and net pay.',fields:'documentType:"paystub", employeeName, employer, payDate, periodStart, periodEnd, payFrequency, hourlyRate, salaryRate, regularHours, overtimeHours, grossThisPeriod, grossYtd, baseYtd, overtimeYtd, bonusYtd, commissionYtd, taxes, deductions, netPay'},
+  w2:{label:'Income - W-2',focus:'Extract employee, employer, EIN, tax year, wages, Social Security wages, Medicare wages, withholding and all printed Box 12 codes.',fields:'documentType:"w2", employeeName, employer, employerEin, taxYear, box1Wages, box2FederalWithheld, box3SocialSecurityWages, box5MedicareWages, box12Codes:[{code,amount}]'},
+  voe:{label:'Income - written VOE / Work Number',focus:'Extract employee, employer, position, employment status, hire date, base pay, pay frequency, current and prior-year overtime, bonus, commission and other income.',fields:'documentType:"voe", employeeName, employer, position, employmentStatus, hireDate, payFrequency, baseRate, currentYearBase, currentYearOvertime, currentYearBonus, currentYearCommission, priorYearTotal, twoYearsPriorTotal, verifiedOn'},
+  tax1040:{label:'Income - 1040 / tax return',focus:'Extract the tax year, filers, wages, interest, dividends, capital gains, other income, adjusted gross income, taxable income and all attached schedules that are present.',fields:'documentType:"1040", taxYear, filers, line1Wages, taxableInterest, ordinaryDividends, capitalGainOrLoss, otherIncome, adjustedGrossIncome, taxableIncome, schedulesPresent'},
+  scheduleC:{label:'Income - Schedule C / sole proprietor',focus:'Extract business name, owner, tax year, gross receipts, cost of goods sold, total expenses, net profit or loss, depreciation, business use of home, meals and vehicle expenses.',fields:'documentType:"scheduleC", businessName, ownerName, taxYear, grossReceipts, costOfGoodsSold, totalExpenses, line31NetProfit, depreciation, homeOffice, mealsDeducted, carExpenses'},
+  scheduleE:{label:'Income - Schedule E / rental',focus:'Extract each property, rents received, royalties, mortgage interest, taxes, insurance, repairs, HOA, depreciation, total expenses and net rental income or loss.',fields:'documentType:"scheduleE", taxYear, properties:[{propertyAddress,rentsReceived,royalties,mortgageInterest,taxes,insurance,repairs,hoa,depreciation,totalExpenses,netRentalIncome}]'},
+  k1:{label:'Income - K-1 / 1065 / 1120-S',focus:'Extract entity name, EIN, taxpayer, ownership percentage, ordinary business income or loss, rental income, guaranteed payments, distributions, depreciation and tax year.',fields:'documentType:"k1", entityName, entityEin, taxpayerName, taxYear, ownershipPct, ordinaryBusinessIncome, rentalIncome, guaranteedPayments, distributions, depreciation'},
+  business:{label:'Income - business return / P&L',focus:'Extract business name, ownership, tax year or period, revenue, cost of goods sold, operating expenses, depreciation, officer compensation, net income and recurring versus one-time items.',fields:'documentType:"businessReturn", businessName, entityType, taxYear, periodStart, periodEnd, grossRevenue, costOfGoodsSold, operatingExpenses, depreciation, officerCompensation, netIncome, oneTimeItems'},
+  income1099:{label:'Income - 1099 / independent contractor',focus:'Extract recipient, payer, tax year, 1099 form type, nonemployee compensation, interest, dividends, retirement distributions or other printed income.',fields:'documentType:"1099", formType, recipientName, payerName, payerTin, taxYear, nonemployeeCompensation, interestIncome, dividends, retirementDistribution, otherIncome'},
+  benefits:{label:'Income - retirement, pension, Social Security or VA',focus:'Extract beneficiary, agency or payer, benefit type, monthly or periodic gross benefit, effective date, continuation evidence, withholding and any Medicare deduction.',fields:'documentType:"benefitAward", beneficiary, agencyOrPayer, benefitType, grossMonthlyBenefit, grossPeriodicBenefit, payFrequency, effectiveDate, continuationDate, federalWithholding, medicareDeduction'},
+  support:{label:'Income - support, maintenance or other award',focus:'Extract recipient, payer, court or agency, award type, monthly amount, start and end dates, received-payment history and continuance terms when printed.',fields:'documentType:"supportAward", recipient, payer, awardType, monthlyAmount, startDate, endDate, paymentHistory, continuanceTerms'},
+  assets:{label:'Assets - bank or investment statement',focus:'Extract institution, account, owners, statement dates, balances, transaction rows and every deposit or withdrawal exactly as printed.',fields:'documentType:"assetStatement", institution, accountLast4, accountType, owners, statementStart, statementEnd, beginningBalance, endingBalance, deposits:[{date,amount,description}], withdrawals:[{date,amount,description}]'},
+  credit:{label:'Credit report',focus:'Extract scores, tradelines, balances, payments, months remaining, status, responsibility, inquiries and real-estate-owned details.',fields:'documentType:"creditReport", scores, tradelines:[{creditor,type,balance,monthlyPayment,monthsRemaining,status,responsibility}], inquiries, reo'},
+  property:{label:'Property / appraisal / rent',focus:'Extract address, property facts, dates, as-is value, after-repair value, appraisal facts, taxes, insurance and market or contract rent when printed.',fields:'documentType:"property", propertyAddress, effectiveDate, asIsValue, afterRepairValue, propertyType, units, yearBuilt, annualTaxes, annualInsurance, marketRent'},
+  contract:{label:'Contract / Loan Estimate / Closing Disclosure',focus:'Extract parties, property, transaction dates, price, loan terms, credits, deposits, fees, cash to close and all material conditions.',fields:'documentType:"contract|loanEstimate|closingDisclosure", buyer, seller, propertyAddress, purchasePrice, loanAmount, interestRate, closingDate, earnestMoney, sellerCredits, fees, cashToClose'},
+  legal:{label:'Lease / addendum / agreement',focus:'Extract parties, property, dates, rent or financial terms, deposits, obligations, amendments and signature information.',fields:'documentType:"lease|addendum", landlord, tenants, propertyAddress, leaseStart, leaseEnd, monthlyRent, securityDeposit, amendments, signatureDates'},
+  renovation:{label:'Contractor estimate / renovation',focus:'Extract contractor details, property, dates, scope, line items, labor, materials, permits, contingencies, draws and totals.',fields:'documentType:"contractorEstimate", contractor, licenseNumber, propertyAddress, estimateDate, lineItems:[{item,description,labor,materials,total}], permits, contingency, drawSchedule, total'}
 };
 function universalContext(){
   var i=inputs()||{}, o=outputs()||{}, loan=o.loan||{};
@@ -38348,6 +38362,7 @@ function universalPromptText(type, extra, useContext){
     + '- Never guess, calculate, annualize, reconcile or replace a missing value. Omit an uncertain field instead.\n'
     + '- Add "review": [{"field":"","value":"","status":"Auto-matched|Needs Review","sourceText":""}] only for fields that need human review.\n'
     + '- Add "notes": [] for relevant caveats found in the document.\n'
+    + (spec.fields ? '\nPreferred JSON keys when printed:\n'+spec.fields+'\n' : '')
     + (useContext ? universalContext() : '')
     + (norm(extra) ? '\n\nAdditional reviewer instructions:\n'+norm(extra) : '')
     + '\n\nDocument text or file follows:';
@@ -38392,28 +38407,27 @@ function universalModal(){
 V50.closeUniversalPrompt=function(){var modal=$('v50UniversalPrompt');if(modal)modal.classList.remove('open');};
 V50.openUniversalPrompt=function(type){var modal=universalModal();var pick=$('v50UniversalType');if(type&&UNIVERSAL_PROMPT_TYPES[type])pick.value=type;modal.classList.add('open');$('v50UniversalOutput').value=universalPromptText(pick.value,$('v50UniversalExtra').value,$('v50UniversalContext').checked);setTimeout(function(){$('v50UniversalOutput').focus();},0);};
 document.addEventListener('keydown',function(e){if(e.key==='Escape')V50.closeUniversalPrompt();});
-function universalEntry(label,detail,type){
+function universalEntry(type){
   var b=document.createElement('button');b.type='button';b.className='v50-universal-entry';b.dataset.v50UniversalPrompt=type||'general';
-  b.innerHTML='<span class="v50-universal-entry-icon">AI</span><span><b>'+esc(label)+'</b><small>'+esc(detail)+'</small></span><i aria-hidden="true">&#8594;</i>';
+  b.setAttribute('aria-label','Open Universal Prompt');b.title='Universal documentation prompt';b.textContent='AI';
   b.onclick=function(){V50.openUniversalPrompt(b.dataset.v50UniversalPrompt);};return b;
 }
-function placeUniversalEntry(host,id,label,detail,type,position){
-  if(!host||$(id))return false;var b=universalEntry(label,detail,type);b.id=id;
+function placeUniversalEntry(host,id,type,position){
+  if(!host||$(id))return false;var b=universalEntry(type);b.id=id;
   if(position==='first')host.insertBefore(b,host.firstChild);else host.appendChild(b);return true;
 }
 function installUniversalPromptLaunchers(){
-  /* Calculator Documents & OCR and its generator grid. */
-  var hub=$('v15DocsHub');if(hub){var grid=hub.querySelector('.v15-hub-grid');placeUniversalEntry(grid,'v50UniversalCalcHub','Universal Prompt','Build a reusable documentation prompt','general');}
-  var calcDocs=$('subpanel-docs-import');if(calcDocs)placeUniversalEntry(calcDocs,'v50UniversalCalcDocs','Universal Prompt','One prompt workflow for any document, worksheet or OCR review','general','first');
-  /* Loan Suite Documents & Worksheets grid. */
-  var loanDocs=$('v16LoanDocs');if(loanDocs){var loanGrid=loanDocs.querySelector('.v16-loan-docs-grid');placeUniversalEntry(loanGrid,'v50UniversalLoanHub','Universal Prompt','Build a reusable documentation prompt','general');}
-  var suiteDocs=$('panel-v9docs');if(suiteDocs)placeUniversalEntry(suiteDocs,'v50UniversalLoanDocs','Universal Prompt','One prompt workflow for documents, worksheets and OCR review','general','first');
-  /* Contract & LE is a separate routed stage, so it retains its own entry. */
-  var stage=$('v8Stage');if(stage&&(window.V8&&V8.active==='docparse'||/contract\s*&\s*le/i.test(stage.textContent||'')))placeUniversalEntry(stage,'v50UniversalContract','Universal Prompt','Build a contract, Loan Estimate or closing-document prompt','contract','first');
+  /* Keep the launcher in each existing document header instead of adding a new card. */
+  var hub=$('v15DocsHub');if(hub)placeUniversalEntry(hub.querySelector('.v15-hub-head'),'v50UniversalCalcHub','general');
+  var loanDocs=$('v16LoanDocs');if(loanDocs)placeUniversalEntry(loanDocs.querySelector('.card-top'),'v50UniversalLoanHub','general');
+  /* Remove the first-pass standalone cards if this build was open during an update. */
+  ['v50UniversalCalcDocs','v50UniversalLoanDocs'].forEach(function(id){var old=$(id);if(old)old.remove();});
+  /* Contract & LE is a separate routed stage, so it retains its own compact AI action. */
+  var stage=$('v8Stage');if(stage&&(window.V8&&V8.active==='docparse'||/contract\s*&\s*le/i.test(stage.textContent||'')))placeUniversalEntry(stage,'v50UniversalContract','contract','first');
 }
 function installUniversalMenu(){
   if(!window.V44||!V44.openMenu||V44.__v50UniversalMenu)return false;
-  var open=V44.openMenu;V44.openMenu=function(kind){var result=open.apply(this,arguments);if(kind==='docs'||kind==='actions')setTimeout(function(){var menu=$('v44Menu');if(!menu||menu.querySelector('[data-v50-universal-menu]'))return;var section=document.createElement('section');section.className='v50-universal-menu';section.innerHTML='<h3>Universal</h3>';var b=universalEntry('Universal Prompt','Build a reusable documentation prompt','general');b.dataset.v50UniversalMenu='1';section.appendChild(b);menu.appendChild(section);},0);return result;};V44.__v50UniversalMenu=true;return true;
+  var open=V44.openMenu;V44.openMenu=function(kind){var result=open.apply(this,arguments);if(kind==='docs'||kind==='actions')setTimeout(function(){var menu=$('v44Menu');if(!menu||menu.querySelector('[data-v50-universal-menu]'))return;var section=document.createElement('section');section.className='v44-menu-section v50-universal-menu';section.innerHTML='<span>Document AI</span><div class="v44-menu-grid"></div>';var b=universalEntry('general');b.classList.add('v44-menu-item');b.dataset.v50UniversalMenu='1';b.innerHTML='<i aria-hidden="true">AI</i><span><b>AI</b><small>Universal documentation prompt</small></span>';section.querySelector('.v44-menu-grid').appendChild(b);menu.appendChild(section);},0);return result;};V44.__v50UniversalMenu=true;return true;
 }
 
 /* ------------------------------------------------------------------ 6
