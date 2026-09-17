@@ -779,6 +779,30 @@ function tick(){
 function soon(){ if (pending) return; pending = true; (window.requestAnimationFrame || setTimeout)(tick); }
 V50.refresh = tick;
 var subscribed = false;
+/* A direct Loan Suite URL must win over the calculator's delayed W-2 startup
+   routine.  That routine is useful when the calculator is the requested
+   workspace, but it used to pull a fresh /loan-suite.html visit back to
+   Income a couple seconds after first paint.  Keep the explicit suite entry
+   pinned only through startup; a real workspace-button click cancels it. */
+var suiteEntryPinned = false, suiteEntryWired = false;
+function pinSuiteEntry(){
+  var app=''; try { app=(new URLSearchParams(location.search)).get('app')||''; } catch(e){}
+  if(app!=='suite') return false;
+  suiteEntryPinned=true;
+  function apply(){
+    if(!suiteEntryPinned) return;
+    var shell=window.SHELL;
+    try { if(shell&&shell.mode!=='suite'&&shell.go) shell.go('suite'); } catch(e){}
+  }
+  [0,520,1450,2600,4300].forEach(function(ms){ setTimeout(apply,ms); });
+  if(!suiteEntryWired){
+    suiteEntryWired=true;
+    document.addEventListener('click',function(e){
+      if(e.isTrusted&&e.target.closest&&e.target.closest('#mode-calc,#mode-suite')) suiteEntryPinned=false;
+    },true);
+  }
+  return true;
+}
 function hook(){
   var s = store();
   /* Start a new file with the suite's Nassau planning ZIP and local lookup. */
@@ -790,6 +814,7 @@ function hook(){
   installIncomeHandoff();
   installPopupDismissal();
   installUniversalMenu();
+  pinSuiteEntry();
   syncCalculatorIncome(false);
   document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(soon, 40); }, true);
 }
