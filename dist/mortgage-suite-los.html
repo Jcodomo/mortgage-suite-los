@@ -38260,7 +38260,14 @@ function wireWorkspacePersistence(){
   if(!shell||shell.__v50WorkspacePersistence)return false;
   var go=shell.go;
   if(typeof go==='function'){
-    shell.go=function(next){ var result=go.apply(this,arguments); persistWorkspace(next); return result; };
+    shell.go=function(next){
+      /* A retained calculator initializer can fire several seconds after a
+         direct Loan Suite load. Ignore that untrusted startup handoff while
+         the suite entry is pinned. A real Income button click clears the pin
+         in capture phase before it reaches this wrapper. */
+      if(suiteEntryPinned&&workspaceName(next)==='calc'&&preferredWorkspace()==='suite')return false;
+      var result=go.apply(this,arguments);persistWorkspace(next);return result;
+    };
   }
   shell.__v50WorkspacePersistence=true;
   window.addEventListener('pagehide',function(){persistWorkspace();},{passive:true});
