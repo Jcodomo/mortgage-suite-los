@@ -52,6 +52,11 @@ const checks=[
   ['Shared prompt output remains editable, copyable and downloadable',/id="v50SharedPromptOutput"[\s\S]*?data-v50-shared-prompt-copy[\s\S]*?data-v50-shared-prompt-download/.test(dist)&&/function wireSharedPromptLibrary\(hub\)[\s\S]*?setSharedPrompt[\s\S]*?copyText/.test(dist)&&/\.v50-shared-prompt-output textarea/.test(css)],
   ['Release 50 grouping, not the legacy hide loop, controls tab visibility',/\.tab\.v48-hide:not\(\.v50-nav-hidden\)[\s\S]*?\.tab\.v50-nav-hidden/.test(css)],
   ['Stable group data prevents legacy redraws from changing visible tabs',/data-v50-group/.test(dist)&&/#suite-root\[data-v50-group="file"\][\s\S]*?data-v50-group="results"/.test(css)],
+  ['Primary navigation icons use fixed data-group masks instead of mutable legacy icon markup',/button\[data-group\] > \.v23-nav-icon\{ display:none !important; \}/.test(css)&&['file','loan','costs','underwriting','results','full'].every(x=>css.includes('button[data-group="'+x+'"]{--v50-group-icon'))],
+  ['Legacy Documents group is hidden before its first script decoration',/#v23SuitePrimaryNav #v28nav-documents[\s\S]*?button\[data-group="documents"\]\{ display:none !important; \}/.test(css)],
+  ['Setup calculation cards keep a full-width four-column grid with responsive fallbacks',/#screen-body > #v24StatStrip[\s\S]*?#v44PunchIn #v44MetricStrip[\s\S]*?grid-column:1 \/ -1[\s\S]*?grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/.test(css)&&/@media \(max-width:800px\)[\s\S]*?repeat\(2,minmax\(0,1fr\)\)/.test(css)],
+  ['Mid-width Loan Suite headers wrap deliberately instead of compressing controls',/@media \(min-width:1181px\) and \(max-width:1500px\)[\s\S]*?#v25HeaderMain[\s\S]*?#v34Bar[\s\S]*?flex-wrap:wrap/.test(css)],
+  ['Landing workspace cards use non-overflowing columns and stable inline icons',/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/.test(fs.readFileSync(path.join(root,'index.html'),'utf8'))&&!/\.route:hover\{transform:/.test(fs.readFileSync(path.join(root,'index.html'),'utf8'))&&/class="route-icon"[^>]*>[\s\S]*?<svg/.test(fs.readFileSync(path.join(root,'index.html'),'utf8'))],
   ['Release 50 layer is present in the shipped file',/id="los-release-50"/.test(dist)]
 ];
 let failed=0;for(const [name,ok] of checks){console.log((ok?'PASS  ':'FAIL  ')+name);if(!ok)failed++;}

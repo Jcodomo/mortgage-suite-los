@@ -37467,6 +37467,24 @@ html[data-v50] body #suite-root .v23-primary-nav.v48-nav button.active{
   background:var(--v50-card) !important; border-color:var(--v50-line) !important; color:var(--v50-ink) !important; box-shadow:0 2px 6px rgba(15,42,74,.08) !important;
 }
 html[data-v50] body #suite-root .v23-primary-nav.v48-nav button.active .v23-nav-icon{ color:var(--v50-blue) !important; }
+/* The retained releases redraw the group icon DOM at different points during
+   startup.  Render the final icon from the stable data-group contract instead,
+   so a late SVG rewrite cannot change a button's width or make the row flash. */
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group]{
+  position:relative !important; display:inline-flex !important; align-items:center !important; gap:8px !important;
+  flex:0 0 auto !important; contain:layout paint; transition:background-color .12s ease,color .12s ease,border-color .12s ease !important;
+}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group] > .v23-nav-icon{ display:none !important; }
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group]::before{
+  content:""; display:block; width:16px; height:16px; flex:0 0 16px; background:currentColor;
+  -webkit-mask:var(--v50-group-icon) center/16px 16px no-repeat; mask:var(--v50-group-icon) center/16px 16px no-repeat;
+}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group="file"]{--v50-group-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3C/svg%3E")}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group="loan"]{--v50-group-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M3 11l9-7 9 7M5 10v10h14V10M9 20v-6h6v6'/%3E%3C/svg%3E")}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group="costs"]{--v50-group-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'%3E%3Cellipse cx='12' cy='6' rx='8' ry='3'/%3E%3Cpath d='M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3'/%3E%3C/svg%3E")}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group="underwriting"]{--v50-group-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M8 12l3 3 5-6'/%3E%3C/svg%3E")}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group="results"]{--v50-group-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 20h18M5 16l4-5 4 3 6-8M15 6h4v4'/%3E%3C/svg%3E")}
+html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group="full"]{--v50-group-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='M8 8h8M8 12h8M8 16h5'/%3E%3C/svg%3E")}
 /* Full sits after Documents, as the last group tab */
 html[data-v50] body #suite-root .v23-primary-nav.v48-nav button[data-group="full"]{ order:9; }
 html[data-v50] body #suite-root .v23-primary-nav.v48-nav::after{
@@ -37860,6 +37878,11 @@ html[data-v50] body #suite-root #v34Bar > *{ min-width:0; }
 html[data-v50] body #suite-root #v23SuitePrimaryNav .v50-documents-duplicate{
   display:none !important;
 }
+/* Hide both legacy Documents launchers before the first JS decoration pass.
+   Results owns the organized document pages; the header Documents action
+   remains the direct launcher. */
+html[data-v50] body #suite-root #v23SuitePrimaryNav #v28nav-documents,
+html[data-v50] body #suite-root #v23SuitePrimaryNav button[data-group="documents"]{ display:none !important; }
 
 /* ---- Universal Prompt -------------------------------------------------
    Shared launcher cards and one focused dialog for document work in the
@@ -38058,6 +38081,40 @@ html[data-v50] body #suite-root .v50-full-directory-grid button > i{ flex:none; 
 html[data-v50] body #suite-root .v50-full-directory-grid button svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 html[data-v50] body #suite-root .v50-full-directory-grid button > span{ min-width:0; font-size:11.5px; font-weight:750; }
 html[data-v50] body #suite-root .v50-full-directory-grid button small{ display:block; margin-top:1px; color:var(--v50-mute); font:500 9.5px Inter,sans-serif; }
+
+/* Setup/Quote calculation strips always begin at the left edge of the working
+   column.  The explicit grid contract prevents a transient legacy layout from
+   placing the four cards in the last half of a wide screen. */
+html[data-v50] body #suite-root #screen-body > #v24StatStrip,
+html[data-v50] body #suite-root #v44PunchIn #v44MetricStrip{
+  width:100% !important; max-width:100% !important; min-width:0 !important; margin-left:0 !important; margin-right:0 !important;
+  justify-self:stretch !important; grid-column:1 / -1 !important; float:none !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+}
+html[data-v50] body #suite-root #v24StatStrip > button,
+html[data-v50] body #suite-root #v44MetricStrip > button{ min-width:0 !important; width:100% !important; }
+
+/* Between laptop and desktop widths the two header bands get a deliberate
+   second row instead of compressing labels, dates and actions into each other. */
+@media (min-width:1181px) and (max-width:1500px){
+  html[data-v50] body #suite-root #v25HeaderMain{
+    display:grid !important; grid-template-columns:auto auto minmax(300px,1fr) auto auto !important; gap:8px 10px !important;
+  }
+  html[data-v50] body #suite-root #v251SuiteBrand{ margin-right:0 !important; }
+  html[data-v50] body #suite-root #v50AppBtns{ margin-left:auto !important; }
+  html[data-v50] body #suite-root #v24ScenarioBar{ min-width:0 !important; width:100% !important; max-width:none !important; }
+  html[data-v50] body #suite-root #v34Bar{ flex-wrap:wrap !important; row-gap:6px !important; }
+  html[data-v50] body #suite-root #v34Bar .v34-left{ flex:1 1 100% !important; overflow:visible !important; }
+  html[data-v50] body #suite-root #v44Header{ width:100% !important; justify-content:flex-start !important; flex-wrap:wrap !important; }
+}
+@media (max-width:800px){
+  html[data-v50] body #suite-root #screen-body > #v24StatStrip,
+  html[data-v50] body #suite-root #v44PunchIn #v44MetricStrip{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+}
+@media (max-width:480px){
+  html[data-v50] body #suite-root #screen-body > #v24StatStrip,
+  html[data-v50] body #suite-root #v44PunchIn #v44MetricStrip{ grid-template-columns:1fr !important; }
+}
 
 /* Standalone Credit workspace: the proven V12 reader is mounted in the
    normal page column, so imported and manually entered tradelines keep the

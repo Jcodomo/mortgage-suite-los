@@ -1,5 +1,13 @@
 # Changelog
 
+## Release 50.1 — stable navigation and landing layout
+
+- Replaced mutable Loan Suite group-icon markup with fixed, theme-aware icons keyed to each navigation group, preventing late legacy redraws from changing button widths.
+- Hid the retired duplicate Documents group from the first paint while retaining the organized Documents pages under Results and the direct Documents launcher.
+- Pinned Setup and Quote metric strips to a full-width, equal-column grid with responsive two- and one-column fallbacks.
+- Added a deliberate mid-width header wrap so scenario, date, and action controls no longer compress into one another.
+- Hardened the landing-page card grid against overflow and removed hover translation so both workspace cards remain aligned when opened or hovered.
+
 ## Release 50 — Workbench layout
 
 Additive over Release 48. Neither calculation engine and no earlier layer was edited. The Income Calculator is unchanged (its screen renders pixel-identical to Release 48).
