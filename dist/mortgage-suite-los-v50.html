@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="los-release" content="50.2">
+<meta name="los-release" content="50.3">
 <script id="los-release-50-bootstrap">(function(){try{var a=(new URLSearchParams(location.search)).get('app'),w=/^(suite|loan|loansuite)$/i.test(a)?'suite':/^(calc|income|calculator)$/i.test(a)?'calc':'';if(w){sessionStorage.setItem('los.v50.requestedWorkspace',w);document.cookie='los.v50.workspace='+encodeURIComponent(w)+'; Path=/; Max-Age=31536000; SameSite=Lax';}}catch(e){}})();</script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mortgage Suite v50.2 &mdash; Income Calculator &amp; Loan Suite</title>
+<title>Mortgage Suite v50.3 &mdash; Income Calculator &amp; Loan Suite</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -38268,7 +38268,7 @@ function wireWorkspacePersistence(){
   return true;
 }
 
-var V50 = window.V50 = { version:'50.2' };
+var V50 = window.V50 = { version:'50.3' };
 document.documentElement.setAttribute('data-v50','1');
 document.documentElement.setAttribute('data-los-release','50');
 
@@ -38941,7 +38941,104 @@ function streetOnly(value){
   return first;
 }
 V50.streetOnly=streetOnly;
-var propertySyncBusy=false,lastAutoZip='';
+var propertySyncBusy=false,lastAutoZip={},onlineZipPending={};
+function sameValue(a,b){
+  if(a===b)return true;
+  if(a==null||b==null)return a==null&&b==null;
+  if(typeof a==='number'||typeof b==='number')return Math.abs(N(a)-N(b))<0.005;
+  if(typeof a==='object'||typeof b==='object')try{return JSON.stringify(a)===JSON.stringify(b);}catch(e){}
+  return norm(a)===norm(b);
+}
+function directSet(root,path,value){
+  var parts=String(path).split('.'),target=root;
+  for(var n=0;n<parts.length-1;n++){
+    if(!target[parts[n]]||typeof target[parts[n]]!=='object')target[parts[n]]={};
+    target=target[parts[n]];
+  }
+  var leaf=parts[parts.length-1];
+  if(sameValue(target[leaf],value))return false;
+  target[leaf]=value;return true;
+}
+function stateName(value){
+  var code=stateCode(value),names=Object.keys(STATE_CODES);
+  for(var n=0;n<names.length;n++)if(STATE_CODES[names[n]]===code)return names[n];
+  return norm(value);
+}
+function parseAddressParts(value){
+  var raw=norm(value),parts=raw.split(',').map(function(x){return norm(x);}).filter(Boolean),zip='',state='',city='';
+  var zm=raw.match(/\b(\d{5})(?:-\d{4})?\b/);if(zm)zip=zm[1];
+  parts.forEach(function(part,index){
+    var cleaned=part.replace(/\b\d{5}(?:-\d{4})?\b/g,'').trim(),tokens=cleaned.split(/\s+/),tail=tokens[tokens.length-1]||'';
+    if(stateCode(cleaned))state=stateName(cleaned);
+    else if(stateCode(tail)){state=stateName(tail);cleaned=tokens.slice(0,-1).join(' ');if(index>0&&cleaned)city=cleaned;}
+    else if(index===1&&!city)city=cleaned;
+  });
+  return {street:streetOnly(raw),city:city,state:state,zip:zip};
+}
+V50.parseAddressParts=parseAddressParts;
+function scenarioKey(s,i){return ((s.snapshot&&s.snapshot.activeScenarioId)||'active')+'|'+norm(i.zipCode).replace(/\D/g,'').slice(0,5);}
+function scenarioId(s){return (s.snapshot&&s.snapshot.activeScenarioId)||'active';}
+function autoReplaceNumber(current,previous){return !N(current)||(previous!=null&&sameValue(N(current),N(previous)));}
+function refreshAreaEstimate(s,keyValue){
+  var i=s.activeInputs||{},zip=norm(i.zipCode).replace(/\D/g,'').slice(0,5),old=i.v503AutoArea||null;
+  var reno=N(outputs()&&outputs().renovationOut&&outputs().renovationOut.finalRenovationAmount),pullKey=keyValue+'|'+N(i.basePurchasePrice)+'|'+reno;
+  if(zip.length!==5||old&&old.key===pullKey||typeof s.applyAreaValues!=='function')return false;
+  var beforeAsIs=N(i.asIsValue),beforeArv=N(i.afterRepairValue),replaceAsIs=!!i.v20ValueAuto||autoReplaceNumber(beforeAsIs,old&&old.asIs),replaceArv=autoReplaceNumber(beforeArv,old&&old.arv);
+  try{s.applyAreaValues();}catch(e){return false;}
+  i=s.activeInputs||i;var estimatedAsIs=N(i.asIsValue),estimatedArv=N(i.afterRepairValue);
+  if(!replaceAsIs)i.asIsValue=beforeAsIs;else i.v20ValueAuto=true;
+  if(!replaceArv)i.afterRepairValue=beforeArv;
+  i.v503AutoArea={key:pullKey,zip:zip,asIs:estimatedAsIs,arv:estimatedArv,source:'ZIP area planning estimate',updatedAt:new Date().toISOString()};
+  return true;
+}
+var CLOSING_OVERRIDE_KEYS=['lenderOrigination','lenderProcessing','appraisal','creditReport','floodTaxService','titleInsurance','titleSearchSettlement','attorney','survey','recording','inspections','other'];
+function copyClosingValues(i){
+  var values={},ov=i.closing&&i.closing.overrides||{};CLOSING_OVERRIDE_KEYS.forEach(function(k){values[k]=ov[k];});
+  values.renoInspection=i.reno&&i.reno.inspectionFees;values.renoTitle=i.reno&&i.reno.titleUpdateFees;return values;
+}
+function restoreClosingValue(i,k,value){
+  if(k==='renoInspection')i.reno.inspectionFees=value;
+  else if(k==='renoTitle')i.reno.titleUpdateFees=value;
+  else i.closing.overrides[k]=value;
+}
+function refreshClosingEstimate(s,keyValue){
+  var i=s.activeInputs||{},o=outputs()||{},state=stateCode(i.state),county=i.nyCounty||i.county||i.countyArea||'';
+  var pullKey=keyValue+'|'+state+'|'+cleanCounty(county)+'|'+N(i.basePurchasePrice)+'|'+norm(i.loanProgram)+'|'+N(o.loan&&o.loan.totalLoan),old=i.v503AutoClosing||null;
+  if(old&&old.key===pullKey)return false;
+  var before=copyClosingValues(i),changed=false;
+  if(state==='NY'&&window.V18&&typeof V18.applyNYEstimate==='function'){
+    if(i.state!=='New York'){i.state='New York';changed=true;}
+    try{V18.applyNYEstimate(true);}catch(e){return changed;}
+    i=s.activeInputs||i;var estimated=copyClosingValues(i),previous=old&&old.values||null;
+    Object.keys(before).forEach(function(k){
+      if(k==='lenderOrigination'||k==='lenderProcessing')return;
+      var manual=before[k]!=null&&!sameValue(before[k],previous?previous[k]:estimated[k]);
+      if(manual){restoreClosingValue(i,k,before[k]);changed=true;}
+    });
+    i.v503AutoClosing={key:pullKey,state:state,values:estimated,source:'Attached New York Loan Estimate profiles',updatedAt:new Date().toISOString()};
+    return true;
+  }
+  if(old&&old.state==='NY'&&old.values){
+    CLOSING_OVERRIDE_KEYS.forEach(function(k){
+      if(k==='lenderOrigination'||k==='lenderProcessing')return;
+      var current=i.closing.overrides[k];if(sameValue(current,old.values[k])){i.closing.overrides[k]=null;changed=true;}
+    });
+    if(i.reno){if(sameValue(i.reno.inspectionFees,old.values.renoInspection)){i.reno.inspectionFees=0;changed=true;}if(sameValue(i.reno.titleUpdateFees,old.values.renoTitle)){i.reno.titleUpdateFees=0;changed=true;}}
+  }
+  i.v503AutoClosing={key:pullKey,state:state,values:copyClosingValues(i),source:'Suite state and ZIP planning tables',updatedAt:new Date().toISOString()};
+  return true;
+}
+function refreshAggregateSetup(i,keyValue){
+  if(!i.closing||!i.escrow)return false;
+  var old=i.v503AutoAggregate||null,pullKey=keyValue+'|'+stateCode(i.state)+'|'+cleanCounty(i.nyCounty||i.county||''),desired=/^(NE|VT)$/.test(stateCode(i.state))?1:2,changed=false;
+  if(old&&old.key===pullKey)return false;
+  if(i.closing.useAggregateEscrowForPrepaids!==false||!i.v17EscrowDateUpgrade){changed=directSet(i,'closing.useAggregateEscrowForPrepaids',true)||changed;}
+  if(i.escrow.autoFirstPaymentDate!==false||!i.v17EscrowDateUpgrade){changed=directSet(i,'escrow.autoFirstPaymentDate',true)||changed;}
+  var current=N(i.escrow.cushionMonthsOverride),replace=current<0||sameValue(current,2)||(old&&sameValue(current,old.cushionMonths));
+  if(replace)changed=directSet(i,'escrow.cushionMonthsOverride',desired)||changed;
+  i.v503AutoAggregate={key:pullKey,cushionMonths:desired,useAggregate:true,autoFirstPayment:true,updatedAt:new Date().toISOString()};
+  return true;
+}
 function annualTaxFrom(i,o){
   if(o&&o.escrowOut&&N(o.escrowOut.annualTaxes))return N(o.escrowOut.annualTaxes);
   var n=N(i.propertyTaxAmount);return /month/i.test(i.propertyTaxBasis||'')?n*12:n;
@@ -38953,37 +39050,72 @@ function taxCycleFor(state,county){
 }
 function syncScenarioProperty(runLookup){
   var s=store();if(!s||propertySyncBusy)return false;
-  propertySyncBusy=true;
+  propertySyncBusy=true;var changed=false;
   try{
-    var i=s.activeInputs||{},zip=norm(i.zipCode).replace(/\D/g,'').slice(0,5);
-    if(runLookup&&zip.length===5&&zip!==lastAutoZip){
-      lastAutoZip=zip;
+    var i=s.activeInputs||{},parsed=parseAddressParts(i.propertyAddress),zip=norm(i.zipCode).replace(/\D/g,'').slice(0,5);
+    if(!zip&&parsed.zip){i.zipCode=parsed.zip;zip=parsed.zip;changed=true;}
+    if(!norm(i.city)&&parsed.city){i.city=parsed.city;changed=true;}
+    if(!norm(i.state)&&parsed.state){i.state=parsed.state;changed=true;}
+    var cleanStreet=parsed.street,currentAddress=norm(i.propertyAddress);
+    if(currentAddress&&cleanStreet!==currentAddress){i.propertyAddress=cleanStreet;changed=true;}
+    var zipKey=scenarioKey(s,i),activeId=scenarioId(s);
+    if(zip.length!==5)delete lastAutoZip[activeId];
+    if(runLookup&&zip.length===5&&lastAutoZip[activeId]!==zip){
+      lastAutoZip[activeId]=zip;
+      /* A location carried over from the previous ZIP is not a manual
+         override. Clear only values that still match our prior lookup so
+         the new ZIP can replace them; any independently edited locality is
+         intentionally preserved. */
+      var priorLocation=i.v503ZipLocation||{};
+      if(priorLocation.key&&priorLocation.key!==zipKey){
+        if(norm(i.city)&&sameValue(i.city,priorLocation.city)){i.city='';changed=true;}
+        if(norm(i.state)&&sameValue(i.state,priorLocation.state)){i.state='';changed=true;}
+        var priorCounty=norm(i.nyCounty||i.county);
+        if(priorCounty&&sameValue(priorCounty,priorLocation.county)){
+          if(i.nyCounty!=null)i.nyCounty='';
+          if(i.county!=null)i.county='';
+          changed=true;
+        }
+      }
       try{s.applyZipLookup();}catch(e){}
       i=s.activeInputs||i;
-      if(window.V38&&typeof V38.lookupZip==='function')V38.lookupZip(zip).then(function(r){
-        if(!r)return;var st=store();if(!st)return;
-        try{if(r.city&&!norm(st.activeInputs.city))st.setField('city',r.city,'Automatic ZIP lookup');}catch(e){}
-        try{if(r.stateName&&stateCode(st.activeInputs.state)!==stateCode(r.stateName))st.setField('state',r.stateName,'Automatic ZIP lookup');}catch(e){}
-        try{if(r.county){var path=stateCode(r.stateName||st.activeInputs.state)==='NY'?'nyCounty':'county';if(!norm(st.activeInputs[path]))st.setField(path,String(r.county).replace(/\s+County$/i,''),'Automatic ZIP lookup');}}catch(e){}
-        syncScenarioProperty(false);
-      }).catch(function(){});
+      /* Some retained lookup code writes a locality label into the address
+         field. The scenario address is always the street line only. */
+      var lookedUpAddress=norm(i.propertyAddress),lookedUpStreet=streetOnly(lookedUpAddress);
+      if(lookedUpAddress&&lookedUpAddress!==lookedUpStreet){i.propertyAddress=lookedUpStreet||cleanStreet||'';changed=true;}
+      i.v503ZipLocation={key:zipKey,city:norm(i.city),state:norm(i.state),county:norm(i.nyCounty||i.county),source:'Built-in ZIP planning table'};changed=true;
+      if(window.V38&&typeof V38.lookupZip==='function'&&!onlineZipPending[zipKey]){
+        onlineZipPending[zipKey]=true;V38.lookupZip(zip).then(function(r){
+          delete onlineZipPending[zipKey];if(!r)return;var st=store();if(!st)return;
+          var si=st.activeInputs||{},marker=si.v503ZipLocation||{},locationChanged=false;propertySyncBusy=true;
+          try{
+            if(r.city&&(!norm(si.city)||sameValue(si.city,marker.city))){si.city=r.city;locationChanged=true;}
+            if(r.stateName&&(!norm(si.state)||sameValue(si.state,marker.state))){si.state=r.stateName;locationChanged=true;}
+            if(r.county){var path=stateCode(r.stateName||si.state)==='NY'?'nyCounty':'county',county=String(r.county).replace(/\s+County$/i,'');if(!norm(si[path])||sameValue(si[path],marker.county)){si[path]=county;locationChanged=true;}}
+            si.v503ZipLocation={key:zipKey,city:norm(si.city),state:norm(si.state),county:norm(si.nyCounty||si.county),source:'Online ZIP lookup'};
+            if(locationChanged){st.active.updatedAt=new Date().toISOString();st.emit();}
+          }finally{propertySyncBusy=false;}
+          syncScenarioProperty(false);
+        }).catch(function(){delete onlineZipPending[zipKey];});
+      }
     }
-    i=s.activeInputs||i;var o=outputs()||{},street=streetOnly(i.propertyAddress),current=norm(i.propertyAddress);
-    if(current&&street!==current){s.setField('propertyAddress',street,'Street-only address cleanup');i=s.activeInputs||i;}
+    i=s.activeInputs||i;var propertyKey=scenarioKey(s,i)+'|'+streetOnly(i.propertyAddress);
+    if(runLookup&&zip.length===5){changed=refreshAreaEstimate(s,propertyKey)||changed;changed=refreshClosingEstimate(s,propertyKey)||changed;changed=refreshAggregateSetup(i,propertyKey)||changed;}
+    var o=outputs()||{},street=streetOnly(i.propertyAddress);
     var P=window.LOANSUITE&&LOANSUITE.PROP,county=i.nyCounty||i.county||i.countyArea||'',annual=annualTaxFrom(i,o);
     if(P&&P.state){
-      if(norm(i.borrowerName))P.state.borrower=i.borrowerName;
+      P.state.borrower=i.borrowerName||'';
       P.state.street=street;
-      if(norm(i.city))P.state.city=i.city;
-      if(norm(i.state))P.state.state=i.state;
-      if(norm(county))P.state.county=String(county).replace(/\s+County$/i,'');
-      if(zip)P.state.zip=zip;
-      if(norm(i.propertyType))P.state.propType=i.propertyType;
-      if(N(i.units))P.state.units=N(i.units);
-      if(N(i.creditScore))P.state.creditScore=N(i.creditScore);
-      if(N(i.asIsValue))P.state.currentValue=N(i.asIsValue);
+      P.state.city=i.city||'';
+      P.state.state=i.state||'';
+      P.state.county=String(county||'').replace(/\s+County$/i,'');
+      P.state.zip=zip;
+      P.state.propType=i.propertyType||P.state.propType;
+      P.state.units=N(i.units)||1;
+      P.state.creditScore=N(i.creditScore);
+      P.state.currentValue=N(i.asIsValue);
       if(i.reno&&N(i.reno.baseCost)>=0)P.state.renoCost=N(i.reno.baseCost);
-      if(annual)P.state.annualTax=annual;
+      P.state.annualTax=annual;
       P.state.mode=street?'address':'tbd';
       if(window.V13&&V13.addressLabel)P.state.address=V13.addressLabel(P.state);
       try{P.save();}catch(e){}
@@ -38991,14 +39123,15 @@ function syncScenarioProperty(runLookup){
     }
     if(window.TAXPRO&&TAXPRO.state){
       var T=TAXPRO.state,nextCycle=taxCycleFor(i.state,county),escrow=o.escrowOut||{},autoKey=stateCode(i.state)+'|'+cleanCounty(county);
-      if(annual)T.annual=annual;
-      if(norm(i.closingDate))T.closing=i.closingDate;
-      if(norm(escrow.firstPaymentDate))T.firstPayment=escrow.firstPaymentDate;
+      T.annual=annual;
+      T.closing=i.closingDate||'';
+      T.firstPayment=escrow.firstPaymentDate||i.escrow&&i.escrow.firstPaymentDate||'';
       if(N(escrow.cushionMonths)>=0)T.cushionMonths=N(escrow.cushionMonths);
       if(!T.__v50AutoCounty||T.__v50AutoCounty!==autoKey){T.cycle=nextCycle;T.__v50AutoCounty=autoKey;}
       try{localStorage.setItem('taxProration.v1',JSON.stringify(T));}catch(e){}
       if(engineMode()==='taxes')try{TAXPRO.render();}catch(e){}
     }
+    if(changed){s.active.updatedAt=new Date().toISOString();s.emit();}
   }finally{propertySyncBusy=false;}
   return true;
 }
@@ -39018,22 +39151,88 @@ function stabilizeZipLookup(){
 }
 function wirePropertyTwoWay(){
   var P=window.LOANSUITE&&LOANSUITE.PROP,s=store();if(!P||!s||typeof P.set!=='function'||P.set.__v50TwoWay)return false;
-  var inner=P.set;
   P.set=function(k,v){
-    var result=inner.apply(P,arguments);if(propertySyncBusy)return result;
-    var map={borrower:'borrowerName',street:'propertyAddress',zip:'zipCode',state:'state',units:'units',propType:'propertyType',creditScore:'creditScore',currentValue:'asIsValue',renoCost:'reno.baseCost',annualTax:'propertyTaxAmount'};
-    var path=map[k];if(k==='county')path=stateCode(P.state.state)==='NY'?'nyCounty':'county';if(k==='address')path='propertyAddress';
-    if(path){var value=(k==='street'||k==='address')?streetOnly(v):v;if(['units','creditScore','currentValue','renoCost','annualTax'].indexOf(k)>=0)value=N(v);s.setField(path,value,'Property workspace sync');if(k==='annualTax')s.setField('propertyTaxBasis','Annual','Property workspace sync');}
-    if(k==='city')s.setField('city',v,'Property workspace sync');
-    syncScenarioProperty(k==='zip');return result;
+    if(propertySyncBusy)return;
+    propertySyncBusy=true;var changed=false;
+    try{
+      var numeric=['beds','units','currentValue','sqFt','areaRent','annualTax','lastSoldPrice','apprecPct','renoCost'];
+      P.state[k]=numeric.indexOf(k)>=0?N(v):v;try{P.save();}catch(e){}
+      var map={borrower:'borrowerName',street:'propertyAddress',zip:'zipCode',state:'state',units:'units',propType:'propertyType',creditScore:'creditScore',currentValue:'asIsValue',renoCost:'reno.baseCost',annualTax:'propertyTaxAmount'};
+      var path=map[k];if(k==='county')path=stateCode(P.state.state)==='NY'?'nyCounty':'county';if(k==='address')path='propertyAddress';
+      var i=s.activeInputs||{};
+      if(path){var value=(k==='street'||k==='address')?streetOnly(v):v;if(['units','creditScore','currentValue','renoCost','annualTax'].indexOf(k)>=0)value=N(v);changed=directSet(i,path,value)||changed;if(k==='annualTax')changed=directSet(i,'propertyTaxBasis','Annual')||changed;if(k==='currentValue')i.v20ValueAuto=false;}
+      if(k==='city')changed=directSet(i,'city',v)||changed;
+      if(k==='address'){var parsed=parseAddressParts(v);if(parsed.zip&&!norm(i.zipCode)){i.zipCode=parsed.zip;changed=true;}if(parsed.city&&!norm(i.city)){i.city=parsed.city;changed=true;}if(parsed.state&&!norm(i.state)){i.state=parsed.state;changed=true;}}
+      if(changed){s.active.updatedAt=new Date().toISOString();s.emit();}
+      try{P.render();}catch(e){}try{if(window.RECALC)window.RECALC();}catch(e){}
+    }finally{propertySyncBusy=false;}
+    syncScenarioProperty(k==='zip'||k==='address'||k==='street');
   };
   P.set.__v50TwoWay=true;return true;
+}
+function taxMonthsForCycle(cycle){
+  if(/Suffolk/i.test(cycle))return[12,5];if(/Nassau/i.test(cycle))return[1,7];if(/Quarterly/i.test(cycle))return[2,5,8,11];if(/Annual/i.test(cycle))return[1];return[1,7];
+}
+function wireTaxTwoWay(){
+  var T=window.TAXPRO,s=store();if(!T||!s||typeof T.set!=='function'||T.set.__v503TwoWay)return false;
+  var inner=T.set;
+  T.set=function(k,v){
+    if(propertySyncBusy)return inner.apply(T,arguments);
+    propertySyncBusy=true;var result,changed=false;
+    try{
+      result=inner.apply(T,arguments);var i=s.activeInputs||{};
+      if(k==='annual'){changed=directSet(i,'propertyTaxAmount',N(v))||changed;changed=directSet(i,'propertyTaxBasis','Annual')||changed;}
+      if(k==='closing'){var close=norm(v);try{if(close&&window.V15&&V15.parseDate)close=V15.parseDate(close)||close;}catch(e){}changed=directSet(i,'closingDate',close)||changed;}
+      if(k==='firstPayment'){var first=norm(v);try{if(first&&window.V15&&V15.parseDate)first=V15.parseDate(first)||first;}catch(e){}changed=directSet(i,'escrow.firstPaymentDate',first)||changed;changed=directSet(i,'escrow.autoFirstPaymentDate',!first)||changed;}
+      if(k==='cushionMonths')changed=directSet(i,'escrow.cushionMonthsOverride',Math.max(0,Math.round(N(v))))||changed;
+      if(k==='cycle'){
+        var months=taxMonthsForCycle(v),annual=N(T.state.annual),amount=months.length?annual/months.length:0;
+        changed=directSet(i,'escrow.customDisbursements',months.map(function(month,index){return{month:month,amount:Math.round(amount*100)/100,label:'Property tax installment '+(index+1)};}))||changed;
+        changed=directSet(i,'escrow.useCustomDisbursements',true)||changed;
+      }
+      if(changed){s.active.updatedAt=new Date().toISOString();s.emit();}
+    }finally{propertySyncBusy=false;}
+    syncScenarioProperty(false);return result;
+  };
+  T.set.__v503TwoWay=true;return true;
 }
 function labelStreetFields(){
   var root=$('suite-root');if(!root)return;
   $$('[data-v44-field="propertyAddress"],[data-path="propertyAddress"],[data-field="propertyAddress"]',root).forEach(function(input){
     input.placeholder='Street address only';input.setAttribute('aria-label','Street address');var label=input.closest('label'),span=label&&label.querySelector('span');if(span)span.textContent='Street address';
   });
+}
+
+/* The quote/setup proxy fields are retained from v44 and v35. A fast
+   rerender can detach a focused proxy before its older debounced handler
+   commits. Delegate the final commit from the stable suite root, and commit
+   a complete ZIP immediately so every linked worksheet receives it. */
+function wireScenarioFieldsTwoWay(){
+  var root=$('suite-root');if(!root||root.__v503ScenarioFields)return false;
+  root.__v503ScenarioFields=true;
+  function commit(el,runLookup){
+    if(!el)return;var path=el.dataset.v44Field||el.dataset.v35Quote;if(!path)return;
+    var kind=el.dataset.kind||'text',raw=el.value,s=store();if(!s)return;
+    try{
+      if(window.V20&&V20.setScenario)V20.setScenario(path,raw,kind==='pct'||kind==='percent'?'pct':kind==='num'||kind==='currency'?'num':'text');
+      else s.setField(path,raw,'Synchronized quote / setup edit');
+    }catch(e){return;}
+    setTimeout(function(){syncScenarioProperty(!!runLookup);},0);
+  }
+  root.addEventListener('change',function(e){
+    var el=e.target&&e.target.closest&&e.target.closest('[data-v44-field],[data-v35-quote]');
+    if(el)commit(el,/^(zipCode|propertyAddress)$/.test(el.dataset.v44Field||el.dataset.v35Quote||''));
+  },true);
+  root.addEventListener('focusout',function(e){
+    var el=e.target&&e.target.closest&&e.target.closest('[data-v44-field],[data-v35-quote]');
+    if(el)commit(el,/^(zipCode|propertyAddress)$/.test(el.dataset.v44Field||el.dataset.v35Quote||''));
+  },true);
+  root.addEventListener('input',function(e){
+    var el=e.target&&e.target.closest&&e.target.closest('[data-v44-field="zipCode"],[data-v35-quote="zipCode"]');if(!el)return;
+    var zip=norm(el.value).replace(/\D/g,'').slice(0,5);if(zip.length!==5||el.__v503ZipCommit===zip)return;
+    el.__v503ZipCommit=zip;clearTimeout(el.__v503ZipTimer);el.__v503ZipTimer=setTimeout(function(){commit(el,true);},110);
+  },true);
+  return true;
 }
 
 /* Loan Suite figures commit on change/blur.  Earlier retained modules render
@@ -39698,7 +39897,7 @@ function decorate(){
     try { syncCalculatorIncome(false); } catch(e){}
   }
   try { deferSuiteInputCommit(); } catch(e){}
-  try { stabilizeZipLookup(); wirePropertyTwoWay(); syncScenarioProperty(true); labelStreetFields(); } catch(e){}
+  try { stabilizeZipLookup(); wirePropertyTwoWay(); wireTaxTwoWay(); wireScenarioFieldsTwoWay(); syncScenarioProperty(true); labelStreetFields(); } catch(e){}
   try { installUniversalMenu(); } catch(e){}
   try { paintHeader(); } catch(e){}
   try { paintTabs(); } catch(e){}
@@ -39772,6 +39971,8 @@ function hook(){
   }
   stabilizeZipLookup();
   wirePropertyTwoWay();
+  wireTaxTwoWay();
+  wireScenarioFieldsTwoWay();
   syncScenarioProperty(true);
   if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ persistWorkspace(); syncScenarioProperty(true); setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
   wireWorkspacePersistence();

@@ -1,5 +1,14 @@
 # Changelog
 
+## Release 50.3 - multi-way property and escrow synchronization
+
+- Made Setup, Quote, Property, ZIP lookup, Taxes & Proration, and Escrow share one guarded scenario data flow in both directions.
+- Added freeform full-address parsing so a street address with city, state, and ZIP can populate the corresponding scenario fields while keeping the street line clean.
+- Made ZIP lookup state scenario-specific and added an online locality refinement without repeatedly re-running lookups when switching saved files.
+- Added automatic ZIP-driven ARV planning and New York closing-cost refreshes while preserving manually changed ARV, as-is values, and fee overrides.
+- Synchronized annual tax, closing date, first payment date, cushion months, and tax billing-cycle disbursements back from Taxes & Proration into the live escrow aggregate.
+- Re-runs the aggregate escrow analysis with the jurisdiction cushion and automatic first-payment timing whenever a new property/ZIP is pulled.
+
 ## Release 50.2 — county limits and property synchronization
 
 - Embedded the official 2026 conventional and FHA county loan-limit tables, including Nassau County's distinct one-unit conventional high-balance limit and FHA high-cost ceiling.

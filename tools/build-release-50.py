@@ -27,8 +27,8 @@ i = base.rindex("</body>")
 out = base[:i] + block + base[i:]
 out = out.replace(
     "<title>Mortgage Suite &mdash; Income Calculator &amp; Renovation Engine</title>",
-    "<title>Mortgage Suite v50.2 &mdash; Income Calculator &amp; Loan Suite</title>", 1)
-out = out.replace("<head>", '<head>\n<meta name="los-release" content="50.2">\n' + bootstrap, 1)
+    "<title>Mortgage Suite v50.3 &mdash; Income Calculator &amp; Loan Suite</title>", 1)
+out = out.replace("<head>", '<head>\n<meta name="los-release" content="50.3">\n' + bootstrap, 1)
 
 for name in ("mortgage-suite-los.html", "mortgage-suite-los-v50.html"):
     (root / "dist" / name).write_text(out, encoding="utf-8")
