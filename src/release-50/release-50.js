@@ -375,7 +375,8 @@ function decorateFullWorkspace(){
 function openWorkspacePage(page){
   page=key(page); exitCreditWorkspace();
   if(window.V25)V25.fullActive=false;
-  var root=$('suite-root');if(root)root.classList.remove('v25-full-active');
+  if(window.V251)V251.fullActive=false;
+  var root=$('suite-root');if(root)root.classList.remove('v25-full-active','v251-full-active');
   setWorkspaceGroup(groupForTab(page));paintWorkspaceGroups();
   var t=tabFor(page);if(t){t.click();return;}
   V50.go(page);

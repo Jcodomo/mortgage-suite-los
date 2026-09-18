@@ -7,6 +7,7 @@
 - Pinned Setup and Quote metric strips to a full-width, equal-column grid with responsive two- and one-column fallbacks.
 - Added a deliberate mid-width header wrap so scenario, date, and action controls no longer compress into one another.
 - Hardened the landing-page card grid against overflow and removed hover translation so both workspace cards remain aligned when opened or hovered.
+- Cleared both retained Full-view state flags when opening a focused workspace, so Full can be reopened repeatedly without a stale invisible page intercepting the button.
 
 ## Release 50 — Workbench layout
 
