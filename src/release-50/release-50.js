@@ -76,7 +76,7 @@ function wireWorkspacePersistence(){
   return true;
 }
 
-var V50 = window.V50 = { version:'50.0' };
+var V50 = window.V50 = { version:'50.2' };
 document.documentElement.setAttribute('data-v50','1');
 document.documentElement.setAttribute('data-los-release','50');
 
@@ -650,6 +650,30 @@ function usd2(v){ var n=N(v); return (n<0?'\u2212':'')+'$'+Math.abs(n).toLocaleS
 function liveExtraRow(label,value,mode,cls,sub,attrs){
   return '<button type="button" class="v35-live-row v44-live-row v50-live-extra-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'" '+(attrs||'')+'><span>'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><b>'+esc(value)+'</b></button>';
 }
+var STATE_CODES={Alabama:'AL',Alaska:'AK',Arizona:'AZ',Arkansas:'AR',California:'CA',Colorado:'CO',Connecticut:'CT',Delaware:'DE',Florida:'FL',Georgia:'GA',Hawaii:'HI',Idaho:'ID',Illinois:'IL',Indiana:'IN',Iowa:'IA',Kansas:'KS',Kentucky:'KY',Louisiana:'LA',Maine:'ME',Maryland:'MD',Massachusetts:'MA',Michigan:'MI',Minnesota:'MN',Mississippi:'MS',Missouri:'MO',Montana:'MT',Nebraska:'NE',Nevada:'NV','New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND',Ohio:'OH',Oklahoma:'OK',Oregon:'OR',Pennsylvania:'PA','Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD',Tennessee:'TN',Texas:'TX',Utah:'UT',Vermont:'VT',Virginia:'VA',Washington:'WA','West Virginia':'WV',Wisconsin:'WI',Wyoming:'WY','District of Columbia':'DC','Puerto Rico':'PR',Guam:'GU','Virgin Islands':'VI'};
+function stateCode(value){var v=norm(value).trim();if(v.length===2)return v.toUpperCase();return STATE_CODES[v]||'';}
+function cleanCounty(value){return norm(value).replace(/^county of\s+/i,'').replace(/\s+(county|parish|borough|census area)$/i,'').trim().toUpperCase();}
+function loanLimitRecord(i){
+  var data=window.LOS_2026_LOAN_LIMITS||{},units=Math.max(1,Math.min(4,parseInt(i.units||1,10)||1)),idx=units-1;
+  var P=window.LOANSUITE&&LOANSUITE.PROP,county=i.nyCounty||i.county||i.countyArea||(P&&P.state&&P.state.county)||'',state=stateCode(i.state||(P&&P.state&&P.state.state));
+  var keyName=state+'|'+cleanCounty(county),row=data.counties&&data.counties[keyName];
+  var conventional=(row&&row[0])||(data.conventionalBaseline||[]),fha=(row&&row[1])||(data.fhaFloor||[]);
+  return {year:data.year||2026,state:state,county:cleanCounty(county),units:units,key:keyName,countySpecific:!!row,
+    conventional:N(conventional[idx]),fha:N(fha[idx]),conventionalBaseline:N((data.conventionalBaseline||[])[idx]),fhaFloor:N((data.fhaFloor||[])[idx])};
+}
+function loanLimitStatus(i,o){
+  var r=loanLimitRecord(i),loan=o.loan||{},amount=N(loan.maximumBaseLoan||loan.totalLoan),location=(r.county?r.county.toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase();})+' County, ':'')+(r.state||'US');
+  if(o.isFha){
+    if(amount>r.fha)return {label:'FHA over county limit — Review',value:usd2(amount),kind:'jumbo',sub:r.year+' FHA limit '+usd2(r.fha)+' · '+location,record:r};
+    if(r.fha>r.fhaFloor&&amount>r.fhaFloor)return {label:'FHA high-cost — Pass',value:usd2(amount),kind:'highbalance',sub:r.year+' county limit '+usd2(r.fha)+' · '+location,record:r};
+    return {label:'FHA standard — Pass',value:usd2(amount),kind:'pass',sub:r.year+' FHA limit '+usd2(r.fha)+' · '+location,record:r};
+  }
+  if(amount<=r.conventionalBaseline)return {label:'Conventional conforming — Pass',value:usd2(amount),kind:'pass',sub:r.year+' baseline '+usd2(r.conventionalBaseline)+' · '+location,record:r};
+  if(r.conventional>r.conventionalBaseline&&amount<=r.conventional)return {label:'Conventional high-balance — Pass',value:usd2(amount),kind:'highbalance',sub:r.year+' county limit '+usd2(r.conventional)+' · '+location,record:r};
+  return {label:'Jumbo — Review',value:usd2(amount),kind:'jumbo',sub:r.year+' county conforming limit '+usd2(r.conventional)+' · '+location,record:r};
+}
+V50.loanLimitRecord=loanLimitRecord;
+V50.loanLimitStatus=loanLimitStatus;
 function paintLiveExtras(){
   var host=$('v44LiveSummary'),o=outputs(),i=inputs(); if(!host||!o||!i)return false;
   var cash=o.cash||{},closing=o.closing||{},aus=o.aus||{},rules=o.stateRules||{};
@@ -664,9 +688,11 @@ function paintLiveExtras(){
   }
   var stateName=rules.state||i.state||'State rules',closeMethod=rules.closingMethod||'';
   var stateText=/attorney/i.test(closeMethod)?'Attorney state':(closeMethod||'State rules applied');
-  var limitText=o.isFha?usd2(o.loan&&o.loan.fhaLimitApplied)+' · '+((o.loan&&o.loan.fhaTier)||'Auto'):'Not applicable';
-  var limitClass=o.isFha&&N(o.loan&&o.loan.amountOverFhaLimit)>0?'bad':'pass';
-  var sig=[cash.requiredInvestment,closing.buyerClosingCosts,cash.sellerConcessionApplied,cash.earnestMoneyDeposit,cash.cashToClose,cash.cashToCloseLow,cash.cashToCloseHigh,credit,risk,o.renovationActive,arvText,stateText,limitText].join('|');
+  var limit=loanLimitStatus(i,o);
+  /* Patch 44 rendered a second, differently sized ARV alert. Replace it with
+     the same compact linked row used by every other check. */
+  Array.prototype.slice.call(host.querySelectorAll(':scope > .v44-arv-check')).forEach(function(row){row.remove();});
+  var sig=[cash.requiredInvestment,closing.buyerClosingCosts,cash.sellerConcessionApplied,cash.earnestMoneyDeposit,cash.cashToClose,cash.cashToCloseLow,cash.cashToCloseHigh,credit,risk,o.renovationActive,arvText,stateText,limit.label,limit.value,limit.sub].join('|');
   var box=host.querySelector('.v50-live-extras'); if(box&&box.dataset.sig===sig)return true;
   if(!box){box=document.createElement('section');box.className='v50-live-extras';}
   var html='<h4>Borrower funds</h4>'+
@@ -677,8 +703,8 @@ function paintLiveExtras(){
     '<div class="v50-funds-detail">'+liveExtraRow('Less seller credit','\u2212 '+usd2(cash.sellerConcessionApplied),'closing','','Applied credit only')+liveExtraRow('Less earnest money','\u2212 '+usd2(cash.earnestMoneyDeposit),'closing','','Already paid and credited')+liveExtraRow('With the cushion',usd2(cash.cashToCloseLow)+' \u2013 '+usd2(cash.cashToCloseHigh),'closing','pass','Planning range')+'</div>';
   html+='<h4>Credit & status</h4>'+liveExtraRow('Representative score',credit,'credit',risk==='PASS'?'pass':'na',risk||'Credit review','data-v50-edit-score');
   if(o.renovationActive&&arv)html+=liveExtraRow('ARV test',arvText,'maxmortgage',arvClass,arvSub);
+  html+=liveExtraRow(limit.label,limit.value,'maxmortgage',limit.kind,limit.sub,'data-v50-loan-limit');
   html+=liveExtraRow(stateName,stateText,'closing',/attorney/i.test(stateText)?'pass':'','Closing rules');
-  html+='<h4>ZIP & limits</h4>'+liveExtraRow('ZIP '+(i.zipCode||'11530'),limitText,'maxmortgage',limitClass,o.isFha?((o.loan&&o.loan.fhaLimitStatus)||'County-limit planning check'):'Conventional county limit does not apply');
   box.dataset.sig=sig;box.innerHTML=html;
   var toggle=box.querySelector('[data-v50-funds-toggle]'); if(toggle)toggle.onclick=function(e){e.preventDefault();e.stopPropagation();box.classList.toggle('expanded');toggle.textContent=box.classList.contains('expanded')?'Hide credits & deposits':'Show credits & deposits';};
   var checks=Array.prototype.filter.call(host.querySelectorAll(':scope > h4'),function(h){return key(h.textContent)==='CHECKS';})[0];
@@ -707,6 +733,114 @@ function paintFreeformValues(){
     var v=N(s.activeInputs.finalDownPaymentPct)*100;
     var pretty=(Math.round(v*1000)/1000).toFixed(3).replace(/\.?0+$/,'');
     if(input.value!==pretty)input.value=pretty;
+  });
+}
+
+/* PROPERTY, ZIP, TAX AND PRORATION SYNC
+   A ZIP locality is never stored as the street line. The scenario remains
+   the source of truth and feeds both dedicated property workspaces plus the
+   advanced tax/proration worksheet. */
+function streetOnly(value){
+  var raw=norm(value).replace(/\s+/g,' ').trim();if(!raw)return'';
+  var first=raw.split(',')[0].trim();
+  if(/^\d{5}(?:-\d{4})?$/.test(first)||/^(village|town|city|county|borough)\s+of\b/i.test(first))return'';
+  if(/^zip\s*\d{5}/i.test(first))return'';
+  if(!/\d/.test(first)&&/\b(village|township|county|borough)\b/i.test(first))return'';
+  return first;
+}
+V50.streetOnly=streetOnly;
+var propertySyncBusy=false,lastAutoZip='';
+function annualTaxFrom(i,o){
+  if(o&&o.escrowOut&&N(o.escrowOut.annualTaxes))return N(o.escrowOut.annualTaxes);
+  var n=N(i.propertyTaxAmount);return /month/i.test(i.propertyTaxBasis||'')?n*12:n;
+}
+function taxCycleFor(state,county){
+  if(stateCode(state)==='NY'&&/nassau/i.test(county))return'Nassau County, NY — Jan 10 / Jul 10';
+  if(stateCode(state)==='NY'&&/suffolk/i.test(county))return'Suffolk County, NY — Dec 1 / May 10';
+  return'Semi-annual — Jan 1 / Jul 1';
+}
+function syncScenarioProperty(runLookup){
+  var s=store();if(!s||propertySyncBusy)return false;
+  propertySyncBusy=true;
+  try{
+    var i=s.activeInputs||{},zip=norm(i.zipCode).replace(/\D/g,'').slice(0,5);
+    if(runLookup&&zip.length===5&&zip!==lastAutoZip){
+      lastAutoZip=zip;
+      try{s.applyZipLookup();}catch(e){}
+      i=s.activeInputs||i;
+      if(window.V38&&typeof V38.lookupZip==='function')V38.lookupZip(zip).then(function(r){
+        if(!r)return;var st=store();if(!st)return;
+        try{if(r.city&&!norm(st.activeInputs.city))st.setField('city',r.city,'Automatic ZIP lookup');}catch(e){}
+        try{if(r.stateName&&stateCode(st.activeInputs.state)!==stateCode(r.stateName))st.setField('state',r.stateName,'Automatic ZIP lookup');}catch(e){}
+        try{if(r.county){var path=stateCode(r.stateName||st.activeInputs.state)==='NY'?'nyCounty':'county';if(!norm(st.activeInputs[path]))st.setField(path,String(r.county).replace(/\s+County$/i,''),'Automatic ZIP lookup');}}catch(e){}
+        syncScenarioProperty(false);
+      }).catch(function(){});
+    }
+    i=s.activeInputs||i;var o=outputs()||{},street=streetOnly(i.propertyAddress),current=norm(i.propertyAddress);
+    if(current&&street!==current){s.setField('propertyAddress',street,'Street-only address cleanup');i=s.activeInputs||i;}
+    var P=window.LOANSUITE&&LOANSUITE.PROP,county=i.nyCounty||i.county||i.countyArea||'',annual=annualTaxFrom(i,o);
+    if(P&&P.state){
+      if(norm(i.borrowerName))P.state.borrower=i.borrowerName;
+      P.state.street=street;
+      if(norm(i.city))P.state.city=i.city;
+      if(norm(i.state))P.state.state=i.state;
+      if(norm(county))P.state.county=String(county).replace(/\s+County$/i,'');
+      if(zip)P.state.zip=zip;
+      if(norm(i.propertyType))P.state.propType=i.propertyType;
+      if(N(i.units))P.state.units=N(i.units);
+      if(N(i.creditScore))P.state.creditScore=N(i.creditScore);
+      if(N(i.asIsValue))P.state.currentValue=N(i.asIsValue);
+      if(i.reno&&N(i.reno.baseCost)>=0)P.state.renoCost=N(i.reno.baseCost);
+      if(annual)P.state.annualTax=annual;
+      P.state.mode=street?'address':'tbd';
+      if(window.V13&&V13.addressLabel)P.state.address=V13.addressLabel(P.state);
+      try{P.save();}catch(e){}
+      if(engineMode()==='property')try{P.render();}catch(e){}
+    }
+    if(window.TAXPRO&&TAXPRO.state){
+      var T=TAXPRO.state,nextCycle=taxCycleFor(i.state,county),escrow=o.escrowOut||{},autoKey=stateCode(i.state)+'|'+cleanCounty(county);
+      if(annual)T.annual=annual;
+      if(norm(i.closingDate))T.closing=i.closingDate;
+      if(norm(escrow.firstPaymentDate))T.firstPayment=escrow.firstPaymentDate;
+      if(N(escrow.cushionMonths)>=0)T.cushionMonths=N(escrow.cushionMonths);
+      if(!T.__v50AutoCounty||T.__v50AutoCounty!==autoKey){T.cycle=nextCycle;T.__v50AutoCounty=autoKey;}
+      try{localStorage.setItem('taxProration.v1',JSON.stringify(T));}catch(e){}
+      if(engineMode()==='taxes')try{TAXPRO.render();}catch(e){}
+    }
+  }finally{propertySyncBusy=false;}
+  return true;
+}
+V50.syncScenarioProperty=syncScenarioProperty;
+function stabilizeZipLookup(){
+  var s=store();if(!s||typeof s.lookupZipOnline!=='function'||s.lookupZipOnline.__v50StreetOnly)return false;
+  var inner=s.lookupZipOnline.bind(s);
+  s.lookupZipOnline=function(){
+    var before=streetOnly(s.activeInputs.propertyAddress);
+    return Promise.resolve(inner()).then(function(result){
+      var entered=norm(s.activeInputs.propertyAddress),after=streetOnly(entered);
+      if(entered&&after!==entered)s.setField('propertyAddress',after||before,'Street-only ZIP lookup');
+      syncScenarioProperty(false);return result;
+    });
+  };
+  s.lookupZipOnline.__v50StreetOnly=true;return true;
+}
+function wirePropertyTwoWay(){
+  var P=window.LOANSUITE&&LOANSUITE.PROP,s=store();if(!P||!s||typeof P.set!=='function'||P.set.__v50TwoWay)return false;
+  var inner=P.set;
+  P.set=function(k,v){
+    var result=inner.apply(P,arguments);if(propertySyncBusy)return result;
+    var map={borrower:'borrowerName',street:'propertyAddress',zip:'zipCode',state:'state',units:'units',propType:'propertyType',creditScore:'creditScore',currentValue:'asIsValue',renoCost:'reno.baseCost',annualTax:'propertyTaxAmount'};
+    var path=map[k];if(k==='county')path=stateCode(P.state.state)==='NY'?'nyCounty':'county';if(k==='address')path='propertyAddress';
+    if(path){var value=(k==='street'||k==='address')?streetOnly(v):v;if(['units','creditScore','currentValue','renoCost','annualTax'].indexOf(k)>=0)value=N(v);s.setField(path,value,'Property workspace sync');if(k==='annualTax')s.setField('propertyTaxBasis','Annual','Property workspace sync');}
+    if(k==='city')s.setField('city',v,'Property workspace sync');
+    syncScenarioProperty(k==='zip');return result;
+  };
+  P.set.__v50TwoWay=true;return true;
+}
+function labelStreetFields(){
+  var root=$('suite-root');if(!root)return;
+  $$('[data-v44-field="propertyAddress"],[data-path="propertyAddress"],[data-field="propertyAddress"]',root).forEach(function(input){
+    input.placeholder='Street address only';input.setAttribute('aria-label','Street address');var label=input.closest('label'),span=label&&label.querySelector('span');if(span)span.textContent='Street address';
   });
 }
 
@@ -1372,6 +1506,7 @@ function decorate(){
     try { syncCalculatorIncome(false); } catch(e){}
   }
   try { deferSuiteInputCommit(); } catch(e){}
+  try { stabilizeZipLookup(); wirePropertyTwoWay(); syncScenarioProperty(true); labelStreetFields(); } catch(e){}
   try { installUniversalMenu(); } catch(e){}
   try { paintHeader(); } catch(e){}
   try { paintTabs(); } catch(e){}
@@ -1443,7 +1578,10 @@ function hook(){
     document.documentElement.dataset.v50ZipStarted='1';
     try{if(!norm(s.activeInputs.zipCode)){s.setField('zipCode','11530','Release 50 default ZIP');s.applyZipLookup();}}catch(e){}
   }
-  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ persistWorkspace(); setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
+  stabilizeZipLookup();
+  wirePropertyTwoWay();
+  syncScenarioProperty(true);
+  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ persistWorkspace(); syncScenarioProperty(true); setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
   wireWorkspacePersistence();
   installIncomeHandoff();
   installPopupDismissal();

@@ -1,5 +1,12 @@
 # Changelog
 
+## Release 50.2 — county limits and property synchronization
+
+- Embedded the official 2026 conventional and FHA county loan-limit tables, including Nassau County's distinct one-unit conventional high-balance limit and FHA high-cost ceiling.
+- Added compact, linked Live Summary checks for ARV and loan classification: conforming, high-balance, jumbo, FHA standard, FHA high-cost, or over the FHA county limit.
+- Kept ZIP/locality lookup text out of the street-address field and synchronized Quote/Setup property changes with the Property, Escrow, and Taxes & Proration workspaces.
+- Added automatic ZIP lookup stabilization, locality/tax-cycle handoff, compact status styling, and regression coverage for county-limit classifications and property synchronization.
+
 ## Release 50.1 — stable navigation and landing layout
 
 - Replaced mutable Loan Suite group-icon markup with fixed, theme-aware icons keyed to each navigation group, preventing late legacy redraws from changing button widths.
