@@ -37996,6 +37996,26 @@ html[data-v50] body .v50-doc-flow{ display:grid; grid-template-columns:minmax(0,
 html[data-v50] body .v50-doc-flow span{ min-height:48px; padding:9px 11px; border:1px solid var(--v50-line); border-radius:9px; background:var(--v50-card); color:var(--v50-mute); font:500 10px/1.35 Inter,sans-serif; }
 html[data-v50] body .v50-doc-flow span b{ display:block; margin-bottom:2px; color:var(--v50-ink); font-size:11px; }
 html[data-v50] body .v50-doc-flow > i{ color:var(--v50-blue-ink); font-style:normal; }
+html[data-v50] body .v50-shared-prompts{ margin:0 14px 14px; border:1px solid var(--v50-line); border-radius:11px; background:var(--v50-card); overflow:hidden; }
+html[data-v50] body .v50-shared-prompts > header{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 13px; border-bottom:1px solid var(--v50-line); background:var(--v50-soft); }
+html[data-v50] body .v50-shared-prompts header small{ display:block; color:var(--v50-blue-ink); font:800 9px Inter,sans-serif; letter-spacing:.65px; text-transform:uppercase; }
+html[data-v50] body .v50-shared-prompts h3{ margin:2px 0; color:var(--v50-ink); font:800 14px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-shared-prompts header p{ margin:0; color:var(--v50-mute); font:500 10.5px/1.4 Inter,sans-serif; }
+html[data-v50] body .v50-prompt-count{ flex:none; padding:5px 8px; border:1px solid var(--v50-line2); border-radius:999px; color:var(--v50-blue-ink); font:750 9.5px Inter,sans-serif; }
+html[data-v50] body .v50-shared-prompts details{ margin:0 12px; padding:10px 0; border-bottom:1px solid var(--v50-line); }
+html[data-v50] body .v50-shared-prompts summary{ display:flex; align-items:center; gap:7px; cursor:pointer; color:var(--v50-ink); font:750 11px "Plus Jakarta Sans",Inter,sans-serif; list-style:none; }
+html[data-v50] body .v50-shared-prompts summary::-webkit-details-marker{ display:none; }
+html[data-v50] body .v50-shared-prompts summary::before{ content:'›'; color:var(--v50-blue-ink); font-size:16px; transition:transform .14s ease; }
+html[data-v50] body .v50-shared-prompts details[open] summary::before{ transform:rotate(90deg); }
+html[data-v50] body .v50-shared-prompts summary span{ margin-left:auto; color:var(--v50-mute); font:700 9.5px Inter,sans-serif; }
+html[data-v50] body .v50-prompt-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; padding-top:9px; }
+html[data-v50] body .v50-prompt-grid button{ min-height:31px; padding:6px 9px; border:1px solid var(--v50-line); border-radius:8px; background:var(--v50-soft); color:var(--v50-ink); text-align:left; font:650 10px/1.25 "Plus Jakarta Sans",Inter,sans-serif; cursor:pointer; transition:border-color .12s ease,background .12s ease; }
+html[data-v50] body .v50-prompt-grid button:hover{ border-color:var(--v50-blue); background:var(--v50-blue-soft); color:var(--v50-blue-ink); }
+html[data-v50] body .v50-shared-prompt-output{ display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:9px; padding:12px; }
+html[data-v50] body .v50-shared-prompt-output label{ color:var(--v50-label); font:800 9.5px Inter,sans-serif; letter-spacing:.45px; text-transform:uppercase; }
+html[data-v50] body .v50-shared-prompt-output textarea{ width:100%; box-sizing:border-box; margin-top:5px; padding:9px 10px; resize:vertical; border:1px solid var(--v50-line2); border-radius:8px; background:var(--v50-input); color:var(--v50-input-ink); font:500 11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; text-transform:none; letter-spacing:0; }
+html[data-v50] body .v50-shared-prompt-output > div{ display:flex; flex-direction:column; gap:6px; }
+html[data-v50] body .v50-shared-prompt-output button{ min-height:31px; padding:0 10px; border:1px solid var(--v50-line2); border-radius:8px; background:var(--v50-soft); color:var(--v50-blue-ink); font:750 10px "Plus Jakarta Sans",Inter,sans-serif; cursor:pointer; }
 html[data-v50] body #v50LoanDocMirror{ padding:14px; }
 html[data-v50] body #v50LoanDocMirror > .card{ margin:0 0 10px; }
 html[data-v50] body .v50-loan-doc-review details{ margin:0 14px 14px; padding:10px 12px; border:1px solid var(--v50-line); border-radius:10px; background:var(--v50-soft); }
@@ -38009,6 +38029,9 @@ html[data-v50] body .v50-loan-doc-review details > button{ margin-top:9px; }
   html[data-v50] body .v50-shared-drop button{ grid-column:1/-1; width:100%; }
   html[data-v50] body .v50-doc-flow{ grid-template-columns:1fr; }
   html[data-v50] body .v50-doc-flow > i{ transform:rotate(90deg); justify-self:center; }
+  html[data-v50] body .v50-prompt-grid{ grid-template-columns:1fr; }
+  html[data-v50] body .v50-shared-prompt-output{ grid-template-columns:1fr; }
+  html[data-v50] body .v50-shared-prompt-output > div{ flex-direction:row; }
 }
 
 /* Full is a calm, grouped directory followed by the retained continuous
@@ -38203,6 +38226,33 @@ function installScrollStability(){
 function stabilizeLegacyRenderers(){
   var render=window.V20&&V20.renderSetup;if(typeof render!=='function')return false;
   render.__v22=true;render.__v24=true;return true;
+}
+
+/* Assets was added after the calculator's three workspace groups were
+   captured.  Its legacy key therefore falls through to Income after the
+   next navigation repaint.  Give it the qualification anchor key while
+   retaining its own data-tab route and worksheet. */
+function stabilizeAssetsWorkspace(){
+  var tab=$('v36AssetsTab');if(!tab)return false;
+  function anchor(){
+    if(!tab.getAttribute('data-v50-original-tab'))tab.setAttribute('data-v50-original-tab','v36assets');
+    if(tab.getAttribute('data-tab')!=='dti')tab.setAttribute('data-tab','dti');
+    if(tab.getAttribute('data-v23-key')!=='dti')tab.setAttribute('data-v23-key','dti');
+  }
+  anchor();
+  if(!tab.__v50GroupObserver){tab.__v50GroupObserver=true;new MutationObserver(anchor).observe(tab,{attributes:true,attributeFilter:['data-tab','data-v23-key']});}
+  if(!tab.__v50StableClick){
+    tab.__v50StableClick=true;var openAssets=tab.onclick;
+    tab.onclick=function(e){
+      if(openAssets)openAssets.call(tab,e);
+      setTimeout(function(){
+        anchor();try{localStorage.setItem('los.v23.calcGroup','qualification');}catch(err){}
+        var nav=$('v23CalcPrimaryNav');if(nav)$$('button[data-group]',nav).forEach(function(button){var on=button.dataset.group==='qualification';button.classList.toggle('active',on);button.setAttribute('aria-current',on?'page':'false');});
+        $$('#calc-root .tab[data-tab]').forEach(function(item){item.dataset.v23Visible=['dti','aus','summary'].indexOf(item.dataset.tab)>=0?'1':'0';item.classList.toggle('active',item===tab);});
+      },0);
+    };
+  }
+  return true;
 }
 
 var ICON = {
@@ -38462,6 +38512,11 @@ function installWorkspaceNavigation(){
     var k=tabKey(t);
     if(k==='DOCUMENTS & OCR'||k==='DOCUMENTS & WORKSHEETS'){
       e.preventDefault();e.stopImmediatePropagation();V50.openUnifiedDocuments();return;
+    }
+    if(k==='DRAFT LE'){
+      e.preventDefault();e.stopImmediatePropagation();
+      try{if(window.V11&&V11.openLe){V11.openLe();return;}}catch(err){}
+      say('Draft Loan Estimate is loading','The retained Loan Estimate workspace has not finished mounting.','info',3500);return;
     }
     if(k==='CREDIT'){
       e.preventDefault();e.stopImmediatePropagation();openCreditWorkspace(t);return;
@@ -39005,6 +39060,21 @@ function installUniversalMenu(){
    either engine is handed to the other engine, avoiding a second PDF parse or
    OCR pass while retaining both sets of field mappings and review controls. */
 var DOCUMENT_SYNC={fromIncome:{},fromLoan:{},bridging:false};
+var SHARED_ASSIGNMENT_PROMPTS={
+  income:{label:'Income assignment',text:'Extract borrower, employer or business, pay frequency, rate, hours, current and year-to-date earnings by type, taxes, deductions, net pay, period dates and document source. Do not infer missing amounts. Mark uncertain values Needs Review.'},
+  credit:{label:'Credit report assignment',text:'Extract creditor, account type, current balance, monthly payment, months remaining, status, responsibility, property or mortgage linkage, total balances, total payments and relevant REO details. Preserve source text and mark uncertain values Needs Review.'},
+  lease:{label:'Lease assignment',text:'Extract landlord, tenants, property address, term dates, monthly rent, security deposit, late fee, utilities, occupants and signature dates. Return blanks for missing fields and mark uncertainty Needs Review.'},
+  addendum:{label:'Addendum assignment',text:'Extract agreement date, purchaser or borrower names, seller names, property address, amendment text, referenced agreement, effective date, names and signature dates. Return blanks for missing fields.'},
+  contractor:{label:'Contractor estimate assignment',text:'Extract contractor or company, license, contact details, customer, property address, proposal date, permits and every scope line with labor, materials and line total. Preserve printed subtotals and flag reconciliation differences for review.'},
+  contract:{label:'Purchase contract assignment',text:'Extract buyer, seller, property address, price, earnest money, seller credits, financing terms, closing date, contingencies, contract date and signature dates. Preserve blanks and mark uncertain fields Needs Review.'},
+  lead:{label:'Lead expiration assignment',text:'Extract borrower, property, lead source, lead received date, preapproval or rate-lock expiration, follow-up date, owner, status and notes. Preserve source text and do not infer missing dates.'},
+  cd:{label:'Closing Disclosure assignment',text:'Extract loan terms and every Closing Disclosure fee using page 2 sections A through J, payer, paid-before-closing status, credits, cash to close, dates and totals. Preserve printed totals and mark differences Needs Review.'}
+};
+var SHARED_SPECIAL_PROMPTS={
+  incomeImport:'Complete Income Calculator import',
+  loanEstimate:'Loan Estimate import schema',
+  assetReview:'Asset statement / large-deposit review'
+};
 function documentHash(text){
   text=String(text||'').replace(/\s+/g,' ').trim();
   var hash=2166136261;for(var n=0;n<text.length;n+=Math.max(1,Math.floor(text.length/240))){hash^=text.charCodeAt(n);hash=Math.imul(hash,16777619);}
@@ -39085,11 +39155,60 @@ function installDocumentEngineBridge(){
   return true;
 }
 function unifiedDocumentMarkup(){
+  var universal=Object.keys(UNIVERSAL_PROMPT_TYPES).map(function(k){return '<button type="button" data-v50-prompt-kind="universal" data-v50-prompt-key="'+esc(k)+'">'+esc(UNIVERSAL_PROMPT_TYPES[k].label)+'</button>';}).join('');
+  var schemas=Object.keys(window.V46&&V46.prompts||{}).map(function(k){var p=V46.prompts[k];return '<button type="button" data-v50-prompt-kind="schema" data-v50-prompt-key="'+esc(k)+'">'+esc(p.label)+'</button>';}).join('');
+  var assignments=Object.keys(SHARED_ASSIGNMENT_PROMPTS).map(function(k){return '<button type="button" data-v50-prompt-kind="assignment" data-v50-prompt-key="'+esc(k)+'">'+esc(SHARED_ASSIGNMENT_PROMPTS[k].label)+'</button>';}).join('');
+  var special=Object.keys(SHARED_SPECIAL_PROMPTS).map(function(k){return '<button type="button" data-v50-prompt-kind="special" data-v50-prompt-key="'+esc(k)+'">'+esc(SHARED_SPECIAL_PROMPTS[k])+'</button>';}).join('');
   return '<section id="v50UnifiedDocuments" class="v50-unified-docs">'
     +'<header><div><small>Shared workspace</small><h2>Documents & OCR</h2><p>One local file read feeds both the Income Calculator and the Loan Suite. Nothing is uploaded.</p></div><div class="v50-doc-sync"><span>Income <b id="v50IncomeDocCount">0</b></span><i aria-hidden="true">↔</i><span>Loan <b id="v50LoanDocCount">0</b></span></div></header>'
     +'<div id="v50SharedDocDrop" class="v50-shared-drop" role="button" tabindex="0" aria-label="Choose documents for shared OCR"><i>'+svg('book')+'</i><span><b>Drop documents here, or browse</b><small>PDF, PNG, JPG or WebP · read once · reviewed in both workspaces</small></span><button type="button">Choose files</button><input id="v50SharedDocFile" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple hidden></div>'
     +'<div class="v50-doc-flow"><span><b>Income assignments</b>Paystubs, W-2s, VOE, tax returns, Schedule C/E, K-1, assets and AUS</span><i>→</i><span><b>Loan assignments</b>Purchase, value, rate, tax, insurance, credit, deposits, concessions and renovation</span></div>'
+    +'<section id="v50SharedPromptLibrary" class="v50-shared-prompts"><header><div><small>Prompt library</small><h3>Every document prompt</h3><p>Choose a reusable prompt or an exact import schema. Prompts remain editable before copying.</p></div><span class="v50-prompt-count">'+(Object.keys(UNIVERSAL_PROMPT_TYPES).length+Object.keys(window.V46&&V46.prompts||{}).length+Object.keys(SHARED_ASSIGNMENT_PROMPTS).length+Object.keys(SHARED_SPECIAL_PROMPTS).length)+' prompts</span></header>'
+    +'<details open><summary>Universal document prompts <span>'+Object.keys(UNIVERSAL_PROMPT_TYPES).length+'</span></summary><div class="v50-prompt-grid">'+universal+'</div></details>'
+    +'<details><summary>Mortgage import schemas <span>'+Object.keys(window.V46&&V46.prompts||{}).length+'</span></summary><div class="v50-prompt-grid">'+schemas+'</div></details>'
+    +'<details><summary>OCR assignment helpers <span>'+Object.keys(SHARED_ASSIGNMENT_PROMPTS).length+'</span></summary><div class="v50-prompt-grid">'+assignments+'</div></details>'
+    +'<details><summary>Specialized prompt workflows <span>'+Object.keys(SHARED_SPECIAL_PROMPTS).length+'</span></summary><div class="v50-prompt-grid">'+special+'</div></details>'
+    +'<div class="v50-shared-prompt-output"><label><span id="v50SharedPromptTitle">Selected prompt</span><textarea id="v50SharedPromptOutput" rows="7" placeholder="Choose a mortgage import schema or OCR assignment helper above. Universal prompts open in the full prompt builder."></textarea></label><div><button type="button" data-v50-shared-prompt-copy>Copy prompt</button><button type="button" data-v50-shared-prompt-download>Download .txt</button></div></div></section>'
     +'</section>';
+}
+function setSharedPrompt(label,value){
+  var title=$('v50SharedPromptTitle'),box=$('v50SharedPromptOutput');if(!box)return;
+  if(title)title.textContent=label||'Selected prompt';box.value=String(value||'');box.dispatchEvent(new Event('input',{bubbles:true}));
+  try{box.focus({preventScroll:true});box.setSelectionRange(0,0);}catch(e){}
+}
+function wireSharedPromptLibrary(hub){
+  if(!hub||hub.__v50Prompts)return;hub.__v50Prompts=true;
+  hub.addEventListener('click',function(e){
+    var button=e.target.closest&&e.target.closest('button[data-v50-prompt-kind]');if(!button)return;
+    var kind=button.dataset.v50PromptKind,keyName=button.dataset.v50PromptKey;
+    if(kind==='universal'){V50.openUniversalPrompt(keyName);return;}
+    if(kind==='schema'){
+      var prompt=window.V46&&V46.prompts&&V46.prompts[keyName];if(!prompt)return;
+      setSharedPrompt(prompt.label,prompt.text);ensureLoanDocumentBackend();
+      try{V46.pick(keyName);}catch(err){}
+      var loanBox=$('v50LoanPromptBox');if(loanBox)loanBox.value=prompt.text;return;
+    }
+    if(kind==='special'){
+      if(keyName==='incomeImport'){
+        var incomePrompt='';try{if(typeof EXTRACT_PROMPT!=='undefined')incomePrompt=EXTRACT_PROMPT;}catch(err){}
+        if(!incomePrompt)incomePrompt=universalPromptText('general','Return the complete Income Calculator import schema for every supported income source.',false);
+        setSharedPrompt(SHARED_SPECIAL_PROMPTS[keyName],incomePrompt);return;
+      }
+      if(keyName==='loanEstimate'){
+        var lePrompt='';try{if(window.V11&&V11.lePrompt)lePrompt=V11.lePrompt();}catch(err){}
+        if(!lePrompt&&window.V46&&V46.prompts&&V46.prompts.le)lePrompt=V46.prompts.le.text;
+        setSharedPrompt(SHARED_SPECIAL_PROMPTS[keyName],lePrompt);return;
+      }
+      if(keyName==='assetReview'){
+        try{if(window.V36&&V36.buildLargeDepositPrompt){V36.buildLargeDepositPrompt();return;}}catch(err){}
+        V50.openUniversalPrompt('assets');return;
+      }
+    }
+    var helper=SHARED_ASSIGNMENT_PROMPTS[keyName];if(helper)setSharedPrompt(helper.label,helper.text);
+  });
+  var copy=hub.querySelector('[data-v50-shared-prompt-copy]'),download=hub.querySelector('[data-v50-shared-prompt-download]');
+  if(copy)copy.onclick=function(){var box=$('v50SharedPromptOutput');if(!box||!box.value.trim()){say('Choose a prompt','Select a schema or assignment helper first.','warn',3500);return;}copyText(box.value,function(){say('Prompt copied','Paste it with the source document, then return the JSON for review.','good',4000);});};
+  if(download)download.onclick=function(){var box=$('v50SharedPromptOutput');if(!box||!box.value.trim()){say('Choose a prompt','Select a schema or assignment helper first.','warn',3500);return;}var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([box.value],{type:'text/plain'}));a.download='mortgage-suite-document-prompt.txt';a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},0);};
 }
 function mountUnifiedDocuments(){
   var host=$('subpanel-docs-import');if(!host)return false;installDocumentEngineBridge();
@@ -39103,12 +39222,17 @@ function mountUnifiedDocuments(){
     if(drop){drop.onclick=pick;drop.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};['dragenter','dragover'].forEach(function(name){drop.addEventListener(name,function(e){e.preventDefault();e.stopPropagation();drop.classList.add('drag');});});['dragleave','drop'].forEach(function(name){drop.addEventListener(name,function(e){e.preventDefault();e.stopPropagation();drop.classList.remove('drag');});});drop.addEventListener('drop',function(e){if(e.dataTransfer)read(e.dataTransfer.files);});}
     if(file)file.onchange=function(){read(file.files);file.value='';};
   }
+  wireSharedPromptLibrary(hub);
   var list=$('docList');if(list&&!$('v50LoanReview'))list.insertAdjacentHTML('afterend','<section id="v50LoanReview" class="v50-loan-doc-review"><header><div><small>Loan Suite review</small><h3>Loan, property and closing assignments</h3><p>These matches use the same extracted text and never overwrite an edited loan field silently.</p></div></header><div id="v50LoanDocMirror"></div><details><summary>Loan extraction prompt & JSON review</summary><label><span>Prompt</span><textarea id="v50LoanPromptBox" rows="5" placeholder="Choose Build an AI prompt on a loan document above."></textarea></label><label><span>Returned JSON</span><textarea id="v50LoanJsonBox" rows="5" placeholder="Paste loan-field JSON for review."></textarea></label><button type="button" data-v50-loan-json>Review loan JSON</button></details></section>');
   var apply=$('[data-v50-loan-json]');if(apply&&!apply.__v50){apply.__v50=true;apply.onclick=function(){var from=$('v50LoanJsonBox'),to=$('v9JsonBox');if(!from||!to||!window.V9)return;to.value=from.value;V9.applyAiJson();};}
   try{if(window.V9&&V9.renderDocs)V9.renderDocs();}catch(e){}syncUnifiedDocumentMirrors();return true;
 }
 V50.openUnifiedDocuments=function(){
   noteExplicitNavigation();
+  /* A deliberate Documents navigation must outrank the short-lived direct
+     Loan Suite startup pin.  Otherwise its final delayed callback can pull
+     the user back into the suite after this shared page is already open. */
+  suiteEntryPinned=false;
   try{if(window.SHELL&&SHELL.go)SHELL.go('calc');if(typeof switchTab==='function')switchTab('docs');}catch(e){}
   mountUnifiedDocuments();
 };
@@ -39346,6 +39470,7 @@ function decorate(){
   /* The Income Calculator has its own renderer. Only keep the shared shell
      menu and document launchers current while its workspace is visible. */
   try { paintIncome(); } catch(e){}
+  try { stabilizeAssetsWorkspace(); } catch(e){}
   try { installUniversalPromptLaunchers(); } catch(e){}
   try { installDocumentEngineBridge(); mountUnifiedDocuments(); } catch(e){}
   if(inCalculator()) return;
@@ -39421,6 +39546,7 @@ function pinSuiteEntry(){
 function hook(){
   installScrollStability();
   stabilizeLegacyRenderers();
+  stabilizeAssetsWorkspace();
   var s = store();
   /* Start a new file with the suite's Nassau planning ZIP and local lookup. */
   if(s&&!document.documentElement.dataset.v50ZipStarted){
