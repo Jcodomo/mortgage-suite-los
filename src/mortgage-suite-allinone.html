@@ -2734,9 +2734,10 @@ function calcTotals(){
   return {w2,sc,co,rentPos,rentNeg,ot,ad,income,pitia,debts,front,back,b1,b2};
 }
 const DTI_MAX = {FNMA:{f:0,b:0.50,label:'DU: 50% back-end max (no front-end limit)'},
-                 FHLMC:{f:0,b:0.50,label:'LPA: 50% back-end max (no front-end limit)'},
-                 FHA:{f:0.31,b:0.43,label:'Manual: 31% / 43% (up to 40% / 56.9% with compensating factors)'},
-                 VA:{f:0,b:0.41,label:'41% guideline + residual income test'}};
+                  FHLMC:{f:0,b:0.50,label:'LPA: 50% back-end max (no front-end limit)'},
+                  FHA:{f:0.31,b:0.43,label:'Manual: 31% / 43% (up to 40% / 56.9% with compensating factors)'},
+                  VA:{f:0,b:0.41,label:'41% guideline + residual income test'},
+                  AUTO:{f:0,b:0.50,label:'Auto selection pending'}};
 function renderDTI(){
   const syncOn = S.loan && S.loan.sync !== false, L0 = S.loan || {};
   $('dtiBody').innerHTML = loanSetupCard() + `
@@ -7092,7 +7093,11 @@ let guideSig='';
 function RECALC(){
   S.b1 = $('b1Name').value; S.b2 = $('b2Name').value; S.borrower = S.b1;
   S.file     = $('fileNumber').value;
-  S.agency   = $('agency').value;
+  const requestedAgency = $('agency').value;
+  if (requestedAgency === 'AUTO'){
+    if (!S.agency || S.agency === 'AUTO') S.agency = 'FNMA';
+    try { const best = agencyBest(); if (best && best.ag) S.agency = best.ag; } catch(e){}
+  } else S.agency = requestedAgency;
   syncLoanToDTI();
   paintLoan(); paintW2(); paintCombine(); paintSchC(); paintCorp(); paintSchE(); paintOther(); paintAssets(); paintDTI();
   const t=calcTotals();

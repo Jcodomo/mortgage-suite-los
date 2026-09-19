@@ -1,5 +1,17 @@
 # Changelog
 
+## Release 50.4 - workflow, autosave, and nationwide county sync
+
+- Added an **Other / Variable Income** salary source, optional job title, and Auto as the starting calculation method while preserving the underwriting engine and manual overrides.
+- Added one compact five-recent-scenarios menu shared by the Income Calculator and Loan Suite.
+- Income Report now saves a restorable income snapshot; generated Loan Suite reports and documents save a named scenario version before output.
+- Standardized automatic file names to borrower, program, price, and down payment for loan scenarios, and borrower, income used, employer, and title for income scenarios.
+- Added nationwide ZIP-to-county enrichment through the public FCC Area API, with New York City borough-to-county fallbacks and all freeform fields retained.
+- Reorganized Income Calculator file actions into the same compact, categorized action-card system used by the Loan Suite.
+- Consolidated document review into one shared Income/Loan OCR workspace, kept the complete prompt library in a collapsed collection, and added a review-first importer for any supported JSON object.
+- Fixed direct Documents navigation, the dedicated Contract & LE workspace, Draft LE generation, and delayed Loan-Suite startup protection so normal Income/Loan switching remains reliable.
+- Fixed Auto-agency recalculation so renovation preset changes resolve a real underwriting method before DTI painting instead of producing a transient console error.
+
 ## Release 50.3 - multi-way property and escrow synchronization
 
 - Made Setup, Quote, Property, ZIP lookup, Taxes & Proration, and Escrow share one guarded scenario data flow in both directions.

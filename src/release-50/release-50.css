@@ -677,6 +677,23 @@ html[data-v50] body .v50-doc-flow{ display:grid; grid-template-columns:minmax(0,
 html[data-v50] body .v50-doc-flow span{ min-height:48px; padding:9px 11px; border:1px solid var(--v50-line); border-radius:9px; background:var(--v50-card); color:var(--v50-mute); font:500 10px/1.35 Inter,sans-serif; }
 html[data-v50] body .v50-doc-flow span b{ display:block; margin-bottom:2px; color:var(--v50-ink); font-size:11px; }
 html[data-v50] body .v50-doc-flow > i{ color:var(--v50-blue-ink); font-style:normal; }
+html[data-v50] body .v50-any-json{ margin:0 14px 14px; padding:12px; border:1px solid var(--v50-line); border-radius:11px; background:var(--v50-soft); }
+html[data-v50] body .v50-any-json > header{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:9px; }
+html[data-v50] body .v50-any-json > header small{ display:block; color:var(--v50-blue-ink); font:800 9px Inter,sans-serif; letter-spacing:.65px; text-transform:uppercase; }
+html[data-v50] body .v50-any-json h3{ margin:2px 0; color:var(--v50-ink); font:800 14px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-any-json p{ margin:0; color:var(--v50-mute); font:500 10.5px/1.4 Inter,sans-serif; }
+html[data-v50] body .v50-any-json > header label{ flex:none; display:grid; gap:4px; color:var(--v50-label); font:800 8.5px Inter,sans-serif; letter-spacing:.45px; text-transform:uppercase; }
+html[data-v50] body .v50-any-json select,
+html[data-v50] body .v50-any-json textarea{ border:1px solid var(--v50-line2); border-radius:8px; background:var(--v50-input); color:var(--v50-input-ink); }
+html[data-v50] body .v50-any-json select{ min-width:150px; height:31px; padding:0 8px; font:650 10.5px "Plus Jakarta Sans",Inter,sans-serif; text-transform:none; letter-spacing:0; }
+html[data-v50] body .v50-any-json textarea{ width:100%; box-sizing:border-box; padding:9px 10px; resize:vertical; font:500 11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }
+html[data-v50] body .v50-any-json-actions{ display:flex; gap:7px; margin-top:8px; }
+html[data-v50] body .v50-any-json-actions button{ min-height:31px; padding:0 11px; border:1px solid var(--v50-blue); border-radius:8px; background:var(--v50-card); color:var(--v50-blue-ink); font:750 10.5px "Plus Jakarta Sans",Inter,sans-serif; cursor:pointer; }
+html[data-v50] body .v50-any-json-actions button:last-child{ background:var(--v50-blue); color:#fff; }
+html[data-v50] body .v50-any-json-actions button:disabled{ opacity:.42; cursor:not-allowed; }
+html[data-v50] body .v50-any-json output{ display:block; margin-top:8px; padding:8px 9px; border:1px solid var(--v50-line); border-radius:8px; color:var(--v50-mute); font:500 10.5px/1.4 Inter,sans-serif; }
+html[data-v50] body .v50-any-json output.good{ border-color:rgba(19,143,88,.35); background:rgba(19,143,88,.08); color:var(--v50-ink); }
+html[data-v50] body .v50-any-json output.bad{ border-color:rgba(196,71,71,.4); background:rgba(196,71,71,.08); color:#A63D3D; }
 html[data-v50] body .v50-shared-prompts{ margin:0 14px 14px; border:1px solid var(--v50-line); border-radius:11px; background:var(--v50-card); overflow:hidden; }
 html[data-v50] body .v50-shared-prompts > header{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 13px; border-bottom:1px solid var(--v50-line); background:var(--v50-soft); }
 html[data-v50] body .v50-shared-prompts header small{ display:block; color:var(--v50-blue-ink); font:800 9px Inter,sans-serif; letter-spacing:.65px; text-transform:uppercase; }
@@ -710,6 +727,9 @@ html[data-v50] body .v50-loan-doc-review details > button{ margin-top:9px; }
   html[data-v50] body .v50-shared-drop button{ grid-column:1/-1; width:100%; }
   html[data-v50] body .v50-doc-flow{ grid-template-columns:1fr; }
   html[data-v50] body .v50-doc-flow > i{ transform:rotate(90deg); justify-self:center; }
+  html[data-v50] body .v50-any-json > header{ flex-direction:column; }
+  html[data-v50] body .v50-any-json > header label,
+  html[data-v50] body .v50-any-json select{ width:100%; }
   html[data-v50] body .v50-prompt-grid{ grid-template-columns:1fr; }
   html[data-v50] body .v50-shared-prompt-output{ grid-template-columns:1fr; }
   html[data-v50] body .v50-shared-prompt-output > div{ flex-direction:row; }
@@ -820,6 +840,63 @@ html[data-v50] body #suite-root #advBar .advtab.on{ border-color:#9CC4E8 !import
   html[data-v50] body #suite-root .v50-full-directory-grid{ grid-template-columns:1fr; }
   html[data-v50] body #suite-root #v12Modal.v50-credit-page .v12-sum{ grid-template-columns:1fr; }
   html[data-v50] body #suite-root #advBar{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+}
+
+/* Release 50.4: one compact recent-file menu shared by both workspaces. */
+html[data-v50] body #shellbar .hand{ position:relative; }
+html[data-v50] body .v50-recent{ position:relative; flex:none; }
+html[data-v50] body .v50-recent > summary{
+  list-style:none; display:inline-flex; align-items:center; gap:6px; min-height:27px; padding:4px 9px;
+  border:1px solid rgba(127,153,183,.42); border-radius:7px; background:rgba(15,27,43,.38);
+  color:inherit; cursor:pointer; font:750 9.5px "Plus Jakarta Sans",Inter,sans-serif;
+}
+html[data-v50] body .v50-recent > summary::-webkit-details-marker{ display:none; }
+html[data-v50] body .v50-recent > summary svg{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.9; }
+html[data-v50] body .v50-recent[open] > summary{ border-color:var(--v50-blue); background:var(--v50-blue-soft); color:var(--v50-blue-ink); }
+html[data-v50] body .v50-recent-panel{
+  position:absolute; z-index:260; top:calc(100% + 8px); right:0; width:min(390px,calc(100vw - 24px)); padding:10px;
+  border:1px solid var(--v50-line2); border-radius:12px; background:var(--v50-card); color:var(--v50-ink);
+  box-shadow:0 22px 60px rgba(16,36,61,.22);
+}
+html[data-v50] body .v50-recent-panel > header{ display:flex; justify-content:space-between; gap:12px; padding:3px 3px 9px; border-bottom:1px solid var(--v50-line); }
+html[data-v50] body .v50-recent-panel > header b{ font:800 12px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-recent-panel > header small{ color:var(--v50-mute); font:600 9px Inter,sans-serif; }
+html[data-v50] body .v50-recent-panel > button{
+  display:grid; grid-template-columns:29px minmax(0,1fr); align-items:center; gap:9px; width:100%; min-height:48px; padding:7px;
+  border:0; border-bottom:1px solid var(--v50-line); background:transparent; color:var(--v50-ink); text-align:left; cursor:pointer;
+}
+html[data-v50] body .v50-recent-panel > button:hover{ background:var(--v50-blue-soft); }
+html[data-v50] body .v50-recent-panel > button i{ display:grid; place-items:center; width:29px; height:29px; border-radius:8px; background:var(--v50-blue-soft); color:var(--v50-blue-ink); }
+html[data-v50] body .v50-recent-panel > button svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.9; }
+html[data-v50] body .v50-recent-panel > button span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:750 10.5px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-recent-panel > button small{ display:block; overflow:hidden; text-overflow:ellipsis; color:var(--v50-mute); font:500 8.5px Inter,sans-serif; }
+html[data-v50] body .v50-recent-panel > p{ margin:8px 3px 3px; color:var(--v50-mute); font-size:10px; }
+
+/* The Salary worksheet keeps its familiar layout while making the added
+   variable-income action and optional job title feel native. */
+html[data-v50] body #calc-root .v50-add-variable{ margin-left:auto; white-space:nowrap; }
+html[data-v50] body #calc-root .v50-add-variable svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.9; }
+html[data-v50] body #calc-root .v50-job-title{ min-width:0; }
+
+/* Income file actions now use the same grouped action-card language as the
+   Loan Suite. Legacy controls remain in the DOM for compatibility. */
+html[data-v50] body #v23CalcActions .v23-actions-grid.v50-income-actions-mounted > :not(.v50-income-actions){ display:none !important; }
+html[data-v50] body #v23CalcActions .v23-actions-panel{ width:min(720px,calc(100vw - 28px)) !important; }
+html[data-v50] body .v50-income-actions{ display:grid; gap:10px; grid-column:1/-1; }
+html[data-v50] body .v50-income-actions section{ padding:9px; border:1px solid var(--v50-line); border-radius:10px; background:var(--v50-soft); }
+html[data-v50] body .v50-income-actions h6{ margin:0 0 7px; color:var(--v50-label); font:800 9px Inter,sans-serif; letter-spacing:.7px; text-transform:uppercase; }
+html[data-v50] body .v50-income-actions section > div{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+html[data-v50] body .v50-income-actions button{
+  display:grid; grid-template-columns:30px minmax(0,1fr); align-items:center; gap:9px; min-width:0; min-height:48px; padding:7px 9px;
+  border:1px solid var(--v50-line); border-radius:9px; background:var(--v50-card); color:var(--v50-ink); text-align:left; cursor:pointer;
+}
+html[data-v50] body .v50-income-actions button:hover{ border-color:var(--v50-blue); background:var(--v50-blue-soft); }
+html[data-v50] body .v50-income-actions button > svg{ width:17px; height:17px; fill:none; stroke:var(--v50-blue-ink); stroke-width:1.9; }
+html[data-v50] body .v50-income-actions button span{ min-width:0; font:750 10.5px "Plus Jakarta Sans",Inter,sans-serif; }
+html[data-v50] body .v50-income-actions button small{ display:block; margin-top:1px; color:var(--v50-mute); font:500 8.5px/1.3 Inter,sans-serif; }
+@media(max-width:720px){
+  html[data-v50] body .v50-income-actions section > div{ grid-template-columns:1fr; }
+  html[data-v50] body #calc-root #panel-w2 > .section-head{ flex-wrap:wrap; }
 }
 
 /* Release 50.2: compact, dimensionally consistent live checks.  High-balance
