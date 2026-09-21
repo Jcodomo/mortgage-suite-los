@@ -1,5 +1,15 @@
 # Changelog
 
+## Release 53.1 - stable navigation icons and document routing
+
+- Added one SVG icon owner for every Loan Suite and Income Calculator group, including Documents, Income, and Qualification.
+- Kept Release 50's already-stable Loan Suite masked icons as the sole owner of Loan Suite page-tab glyphs; Release 53 SVG icons now apply only where the Income Calculator needs them. This removes the square and doubled-glyph artifacts from secondary navigation.
+- Made page-tab cleanup run before the settled-state shortcut so asynchronously rebuilt tabs such as Assets cannot reintroduce stale icon markup.
+- Normalized freeform percentage display so the FHA 3.5% preset remains `3.5`, never a binary floating-point tail, and made shared screen cleanup safe during rapid workspace changes.
+- Added a startup recovery for a stale Full-form view state, so a restored Loan Suite tab cannot leave the shell visible while every normal workspace panel is hidden.
+- Retained the Release 51 document-routing improvements so payroll, VOE, tax, and income-extraction JSON is sent to the Income Calculator instead of silently falling through to Loan Suite fields.
+- Preserved the full Release 50.4 calculation, autosave, shared OCR, JSON-review, property synchronization, and scenario workflow.
+
 ## Release 50.4 - workflow, autosave, and nationwide county sync
 
 - Added an **Other / Variable Income** salary source, optional job title, and Auto as the starting calculation method while preserving the underwriting engine and manual overrides.

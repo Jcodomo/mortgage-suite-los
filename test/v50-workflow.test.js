@@ -24,7 +24,7 @@ assert.equal(jsonHelpers.detectJsonTarget({propertyAddress:'12 Main St',zipCode:
 assert.throws(()=>jsonHelpers.parseAnyJson('[{},{}]'),/one JSON object/i);
 
 const checks=[
-  ['Release is versioned as 50.4',/version:'50\.4'/.test(src)&&/"version": "50\.4\.0"/.test(fs.readFileSync(path.join(root,'package.json'),'utf8'))],
+  ['Release 50.4 workflow remains inside the current build',/version:'50\.4'/.test(src)&&/version:'50\.4'/.test(dist)&&/"version": "53\.1\.0"/.test(fs.readFileSync(path.join(root,'package.json'),'utf8'))],
   ['Income starts with automatic agency selection',/function installIncomeAutoAgency\(\)[\s\S]*?globalValue\('agencyBest'\)[\s\S]*?option\.value='AUTO'/.test(src)],
   ['Auto agency safely resolves to a real underwriting method before DTI rendering',/AUTO:\{f:0,b:0\.50,label:'Auto selection pending'\}/.test(base)&&/requestedAgency === 'AUTO'[\s\S]*?agencyBest\(\)[\s\S]*?S\.agency = best\.ag/.test(base)],
   ['Variable income uses the lexical Income Calculator factory and redraws its worksheet',/function addVariableIncome\(\)[\s\S]*?globalValue\('newW2'\)[\s\S]*?autoIncomeRecord\(factory\(\),'variable'\)[\s\S]*?decorateIncomeSources/.test(src)],

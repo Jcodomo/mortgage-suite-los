@@ -12,9 +12,11 @@ Everything runs in the browser. No server, no build step to use it, and no data 
 - **Hosted:** enable GitHub Pages on this repository (Settings → Pages → Deploy from branch → `main`, folder `/root`). The root `index.html` forwards to `dist/mortgage-suite-los.html`.
 - **Local:** download `dist/mortgage-suite-los.html` and open it in Chrome, Edge, Safari or Firefox.
 
-## Release 50 — Workbench layout
+## Release 53.1 — stable workbench navigation
 
-The Loan Suite now uses the Income Calculator's frame:
+Release 53.1 retains the Release 50 workbench and gives each navigation row one stable icon owner: the established Release 50 masked icons for Loan Suite page tabs, and SVG icons for Income Calculator tabs. It also preserves the expanded document-routing and OCR workflow introduced after Release 50.
+
+The Loan Suite uses the Income Calculator's frame:
 
 1. Navy bar with the Income Calculator / Loan Suite switch and an income menu (pull income, send figures, open the calculator or its report).
 2. Gradient header with Sync, Scenarios, the file picker and the As of / Closing dates.
@@ -31,19 +33,20 @@ See [CHANGELOG.md](CHANGELOG.md) for the full list, including the navigation fix
 ```
 index.html                     GitHub Pages entry, forwards to dist/
 dist/mortgage-suite-los.html   the app (current release)
-dist/mortgage-suite-los-v50.html
+dist/mortgage-suite-los-v53.1.html
 src/release-50/                the Release 50 layer (CSS + JS)
-archive/mortgage-suite-los-v48.html   the base the layer is applied to
-tools/build-release-50.py      rebuilds dist/ from archive/ + src/
+src/release-53/                the supplied Release 53.1 icon patch and notes
+archive/mortgage-suite-los-v53.1.html the supplied Release 53.1 snapshot
+tools/build-release-53.py      rebuilds the current dist/ files
 ```
 
 ## Rebuilding
 
 ```
-python3 tools/build-release-50.py
+python tools/build-release-53.py
 ```
 
-Edit `src/release-50/release-50.css` or `release-50.js`, run the script, and commit the updated `dist/` files.
+Edit the release sources, run the script, and commit the updated `dist/` files.
 
 ## Notes
 

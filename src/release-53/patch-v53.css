@@ -1,0 +1,57 @@
+/* =====================================================================
+   Release 53 — page-tab icons
+   ===================================================================== */
+
+/* The engine ships `.tab .icon{display:none}` and nothing later
+   overrides it — the rule that follows only sets opacity, which cannot
+   undo display:none. Turned back on for these rows, and only these. */
+.v53-tabs .tab > svg.icon.v53-ic{
+  display:inline-block !important;
+  width:14px !important; height:14px !important;
+  min-width:14px; flex:0 0 14px;
+  margin-right:7px; vertical-align:-2px;
+  fill:none !important; stroke:currentColor !important; stroke-width:2;
+  stroke-linecap:round; stroke-linejoin:round; opacity:.72;
+  pointer-events:none;
+}
+.v53-tabs .tab{
+  display:inline-flex !important; align-items:center !important; gap:0 !important;
+  white-space:nowrap;
+}
+.v53-tabs .tab:hover > svg.icon.v53-ic{ opacity:.95; }
+.v53-tabs .tab.active > svg.icon.v53-ic,
+.v53-tabs .tab[aria-current="page"] > svg.icon.v53-ic{ opacity:1; }
+
+/* Release 50 also paints a masked icon on the tab itself. Once the Release
+   53 SVG exists that pseudo-element is a second icon, not decoration. */
+.v53-tabs.v48-context .tab::before,
+#suite-root .v53-tabs .tab::before,
+#calc-root .v53-tabs .tab::before{
+  display:none !important; content:none !important;
+  width:0 !important; height:0 !important; margin:0 !important;
+  -webkit-mask:none !important; mask:none !important;
+  background:none !important; border:0 !important; box-shadow:none !important;
+}
+
+/* narrow screens: the label is what matters, the glyph goes */
+@media (max-width:820px){
+  .v53-tabs .tab > svg.icon.v53-ic{ display:none !important; }
+}
+
+/* Belt to the brace above: even if a foreign icon span survives a pass,
+   release 23's pseudo-element art cannot draw its bordered box inside a
+   tab. `.i-full:before` is `border:1.5px solid currentColor` on a 17px
+   square — that is the square appearing beside the glyph. */
+.v53-tabs .tab .v23-nav-icon,
+.v53-tabs .tab svg.icon:not(.v53-ic),
+.v53-tabs .tab i.icon{
+  display:none !important;
+}
+.v53-tabs .tab .v23-nav-icon::before,
+.v53-tabs .tab .v23-nav-icon::after,
+.v53-tabs .tab .v23-nav-icon i::before,
+.v53-tabs .tab .v23-nav-icon i::after,
+.v53-tabs .tab .v23-nav-icon i{
+  display:none !important; content:none !important;
+  border:0 !important; background:none !important; box-shadow:none !important;
+}

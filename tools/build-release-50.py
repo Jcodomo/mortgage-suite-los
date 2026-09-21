@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild dist/mortgage-suite-los.html from the v48 file plus the Release 50 layer.
+"""Legacy Release 50.4 builder. Use build-release-53.py for the current release.
 
 Usage:  python3 tools/build-release-50.py
 The layer is appended just before </body>; nothing else in the file changes.
