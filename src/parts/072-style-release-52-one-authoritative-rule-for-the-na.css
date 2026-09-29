@@ -1,0 +1,41 @@
+
+/* =====================================================================
+   Release 52 — one authoritative rule for the navigation icons
+   ===================================================================== */
+
+/* The legacy pseudo-element art is off across the whole primary nav,
+   not only where release 48's class happens to be present. Every button
+   now carries an SVG, so the art has nothing left to draw and can only
+   double up or crop. */
+.v52-nav .v23-nav-icon::before,
+.v52-nav .v23-nav-icon::after,
+.v52-nav .v23-nav-icon i::before,
+.v52-nav .v23-nav-icon i::after,
+.v52-nav .v23-nav-icon i{
+  display:none !important; content:none !important; border:0 !important; background:none !important;
+}
+
+/* Sized once, with border-box, so none of the seven earlier width rules
+   or any padding rule can squeeze the glyph. */
+.v52-nav .v23-nav-icon.v52-ic{
+  width:16px !important; height:16px !important; min-width:16px !important;
+  padding:0 !important; margin:0 6px 0 0 !important; border:0 !important; border-radius:0 !important;
+  background:none !important; box-shadow:none !important; box-sizing:border-box !important;
+  display:inline-flex !important; align-items:center !important; justify-content:center !important;
+  position:relative !important; flex:0 0 16px !important; overflow:visible !important;
+}
+.v52-nav .v23-nav-icon.v52-ic > svg{
+  width:16px !important; height:16px !important; display:block !important;
+  fill:currentColor !important; stroke:none !important; opacity:.88;
+}
+.v52-nav button:hover .v23-nav-icon.v52-ic > svg,
+.v52-nav button.active .v23-nav-icon.v52-ic > svg,
+.v52-nav button[aria-current="page"] .v23-nav-icon.v52-ic > svg{ opacity:1 !important; }
+
+/* a slightly larger glyph where the nav itself is larger */
+@media (min-width:1500px){
+  .v52-nav .v23-nav-icon.v52-ic,
+  .v52-nav .v23-nav-icon.v52-ic > svg{ width:17px !important; height:17px !important; }
+  .v52-nav .v23-nav-icon.v52-ic{ min-width:17px !important; flex:0 0 17px !important; }
+}
+

@@ -1,0 +1,38 @@
+
+/* ============ ALL-IN-ONE SHELL ============
+   Sits above both applications. Deliberately uses the income calculator's
+   own tokens so the light/dark toggle re-themes the shell too. */
+#shellbar{position:sticky;top:0;z-index:400;display:flex;align-items:center;gap:14px;
+  padding:0 18px;height:46px;background:linear-gradient(180deg,#0b1a30,#0a1526);
+  border-bottom:1px solid rgba(255,255,255,.10);box-shadow:0 1px 0 rgba(0,0,0,.35);}
+#shellbar .mark{display:flex;align-items:center;gap:8px;color:#dbe6f7;font-weight:700;
+  font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
+#shellbar .mark svg{width:17px;height:17px;fill:none;stroke:#7fb0f0;stroke-width:1.9;}
+#modeseg{display:flex;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);
+  border-radius:9px;padding:3px;gap:3px;}
+#modeseg button{appearance:none;border:0;background:transparent;color:#9fb4d0;cursor:pointer;
+  font:600 12.5px/1 Inter,system-ui,sans-serif;padding:8px 15px;border-radius:6px;
+  display:flex;align-items:center;gap:7px;transition:background .13s,color .13s;white-space:nowrap;}
+#modeseg button svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;}
+#modeseg button:hover{color:#e6eefb;background:rgba(255,255,255,.06);}
+#modeseg button.on{background:#2563eb;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);}
+#shellbar .grow{flex:1;}
+#shellbar .hand{display:flex;align-items:center;gap:7px;}
+#shellbar .hand button{appearance:none;cursor:pointer;border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.05);color:#cfe0f7;border-radius:7px;padding:7px 11px;
+  font:600 11.5px/1 Inter,system-ui,sans-serif;display:flex;align-items:center;gap:6px;
+  transition:background .13s,border-color .13s;white-space:nowrap;}
+#shellbar .hand button:hover{background:rgba(37,99,235,.30);border-color:rgba(120,170,255,.5);color:#fff;}
+#shellbar .hand button svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;}
+#shellbar .lnk{color:#8fa8c8;font:500 11px/1 Inter,system-ui,sans-serif;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;}
+#shellbar .dot{width:6px;height:6px;border-radius:50%;background:#3f7a52;}
+#shellbar .dot.stale{background:#9a7420;}
+.mode-pane{display:none;}
+.mode-pane.on{display:block;}
+/* The suite lays out against the viewport; give it back the full width. */
+#suite-root{min-height:60vh;}
+@media(max-width:1100px){#shellbar .lnk{display:none;}}
+@media(max-width:860px){#shellbar .mark span{display:none;}
+  #shellbar .hand button span{display:none;}#shellbar .hand button{padding:7px 9px;}}
+@media print{#shellbar{display:none !important;}}

@@ -1,0 +1,13 @@
+
+/* v54 - verified visual fixes (each traced to a measured defect) */
+/* Section icons had no size rule: <svg class="icon icon-lg"> rendered 300x150 in the Taxes & Escrow heading. */
+html body #suite-root svg.icon.icon-lg{width:26px!important;height:26px!important;flex:none;color:var(--accent)!important;fill:none!important;stroke:currentColor!important;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* The Rates button is absolutely positioned but its host row was never positioned, so it floated over the rail. */
+html body #suite-root .row[data-field="interestRate"]{position:relative}
+html body #suite-root .row[data-field="interestRate"] input{padding-right:84px}
+html body #suite-root .row[data-field="interestRate"] .v47-ratebtn{top:auto;bottom:6px;transform:none}
+/* Appearance control: a stowed duplicate sat on top of the day/night toggle and the 34px Look button clipped its own label. */
+html body #v23Appearance>.v39-stowed{visibility:hidden!important;pointer-events:none!important}
+html body #v23Appearance .v39-lookbtn{width:auto!important;min-width:34px;padding:0 10px!important;gap:6px;white-space:nowrap}
+/* Income Used chip: navy figure on a dark-green pill was unreadable. */
+html body #calc-root .kpi.lead,html body #calc-root .kpi.lead *{color:#f3fbf6!important}

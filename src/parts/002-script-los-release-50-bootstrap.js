@@ -1,0 +1,1 @@
+(function(){try{var a=(new URLSearchParams(location.search)).get('app'),w=/^(suite|loan|loansuite)$/i.test(a)?'suite':/^(calc|income|calculator)$/i.test(a)?'calc':'';if(w){sessionStorage.setItem('los.v50.requestedWorkspace',w);document.cookie='los.v50.workspace='+encodeURIComponent(w)+'; Path=/; Max-Age=31536000; SameSite=Lax';}}catch(e){}})();

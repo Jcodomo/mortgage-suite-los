@@ -1,15 +1,20 @@
 {
   "name": "mortgage-suite-los",
-  "version": "53.1.0",
+  "version": "54.0.0",
+  "description": "Mortgage Suite: Income Calculator and Loan Suite in one self-contained, offline-capable web app.",
   "private": true,
-  "description": "Self-contained mortgage income and renovation scenario suite",
+  "license": "UNLICENSED",
   "scripts": {
-    "build": "python tools/build-release-53.py",
-    "test": "node test/run-all.js",
-    "verify": "npm test && npm run build",
-    "verify:browser": "node build/verify-v35.cjs"
+    "build": "python3 build/build.py",
+    "build:dev": "python3 build/build.py --no-minify",
+    "test": "node --test test/node/build.test.js",
+    "test:browser": "sh test/browser/run.sh dist/mortgage-suite-los.html",
+    "verify": "npm run build && npm test && npm run test:browser",
+    "split": "python3 tools/split_parts.py"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "devDependencies": {
+    "csso": "^5.0.5",
+    "terser": "^5.51.2"
+  },
+  "engines": { "node": ">=18" }
 }

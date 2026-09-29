@@ -1,0 +1,2144 @@
+
+/* =====================================================================
+   Release 50 — the Workbench layout.
+   Puts the Loan Suite inside the Income Calculator's frame and adds the
+   pieces the layout needs: stat cards and quote presets above every
+   page, calculator-style page tabs with counts and warning dots, a Loan
+   Report button, Sync / Scenarios buttons in the header, an income menu
+   in the top bar and a verdict at the head of the live summary.
+   Additive over 48. Neither engine and no earlier layer is edited.
+   ===================================================================== */
+(function(){
+"use strict";
+var $  = function(id){ return document.getElementById(id); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+function N(v){ v = parseFloat(String(v==null?'':v).replace(/[$,%\s]/g,'')); return isFinite(v)?v:0; }
+function norm(s){ return String(s||'').replace(/\s+/g,' ').trim(); }
+function key(s){ return norm(s).toUpperCase(); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+function usd(v){ var n=N(v); return (n<0?'\u2212':'')+'$'+Math.round(Math.abs(n)).toLocaleString('en-US'); }
+function pct(v,dp){ var n=N(v); if (Math.abs(n)<=1.5) n*=100; return n.toFixed(dp==null?1:dp)+'%'; }
+function say(t,b,k,ms){ try { if (window.LOS && LOS.say) LOS.say(t,b,k,ms); } catch(e){} }
+function store(){ try { return window.mortgageSuite.store; } catch(e){ return null; } }
+function outputs(){ var s=store(); if (!s) return null; try { var o=s.outputs; return typeof o==='function'?o.call(s):o; } catch(e){ return null; } }
+function inputs(){ var s=store(); try { return s ? s.activeInputs : null; } catch(e){ return null; } }
+function globalValue(name){ try { return (0,eval)(name); } catch(e){ return undefined; } }
+function incomeState(){ return globalValue('S') || null; }
+
+/* The scenario engine already persists the full file in localStorage.  Keep a
+   small cookie plus a browser-storage resume marker for the active workspace
+   and scenario, so a refresh or a return visit restores the same workbench
+   without attempting to squeeze the full loan file into a browser cookie. */
+var RESUME_KEY='los.v50.resume', WORKSPACE_COOKIE='los.v50.workspace', REQUESTED_WORKSPACE_KEY='los.v50.requestedWorkspace';
+function readCookie(name){
+  try { var hit=document.cookie.match(new RegExp('(?:^|; )'+name.replace(/[.$?*|{}()\[\]\\/+^]/g,'\\$&')+'=([^;]*)')); return hit?decodeURIComponent(hit[1]):''; } catch(e){ return ''; }
+}
+function workspaceName(value){
+  var v=String(value||'').toLowerCase();
+  if(v==='suite'||v==='loan'||v==='loansuite')return 'suite';
+  if(v==='calc'||v==='income'||v==='calculator')return 'calc';
+  return '';
+}
+function explicitWorkspace(){
+  try { return workspaceName((new URLSearchParams(location.search)).get('app')); } catch(e){ return ''; }
+}
+function requestedWorkspace(){
+  try { return workspaceName(sessionStorage.getItem(REQUESTED_WORKSPACE_KEY)); } catch(e){ return ''; }
+}
+function savedWorkspace(){
+  var saved='';
+  try { saved=workspaceName((JSON.parse(localStorage.getItem(RESUME_KEY)||'{}')||{}).workspace); } catch(e){}
+  return saved||workspaceName(readCookie(WORKSPACE_COOKIE));
+}
+/* The tiny head bootstrap records the requested app before the legacy
+   calculator startup can rewrite the URL.  Prefer that marker so a refresh
+   from Loan Suite cannot drift into Income while the old startup settles. */
+function preferredWorkspace(){ return requestedWorkspace()||explicitWorkspace()||savedWorkspace(); }
+function persistWorkspace(next){
+  var workspace=workspaceName(next)||explicitWorkspace();
+  if(!workspace){ try { workspace=workspaceName(window.SHELL&&SHELL.mode); } catch(e){} }
+  if(!workspace)return false;
+  try {
+    var s=store(), snap=s&&s.snapshot||{};
+    localStorage.setItem(RESUME_KEY,JSON.stringify({workspace:workspace,scenarioId:snap.activeScenarioId||'',savedAt:Date.now()}));
+  } catch(e){}
+  try { sessionStorage.setItem(REQUESTED_WORKSPACE_KEY,workspace); } catch(e){}
+  try { document.cookie=WORKSPACE_COOKIE+'='+encodeURIComponent(workspace)+'; Path=/; Max-Age=31536000; SameSite=Lax'; } catch(e){}
+  return true;
+}
+function wireWorkspacePersistence(){
+  var shell=window.SHELL;
+  if(!shell||shell.__v50WorkspacePersistence)return false;
+  var go=shell.go;
+  if(typeof go==='function'){
+    shell.go=function(next){
+      /* A retained calculator initializer can fire several seconds after a
+         direct Loan Suite load. Ignore that untrusted startup handoff while
+         the suite entry is pinned. A real Income button click clears the pin
+         in capture phase before it reaches this wrapper. */
+      if(suiteEntryPinned&&workspaceName(next)==='calc'&&preferredWorkspace()==='suite')return false;
+      var result=go.apply(this,arguments);persistWorkspace(next);return result;
+    };
+  }
+  shell.__v50WorkspacePersistence=true;
+  window.addEventListener('pagehide',function(){persistWorkspace();},{passive:true});
+  window.addEventListener('beforeunload',function(){persistWorkspace();},{passive:true});
+  return true;
+}
+
+var V50 = window.V50 = { version:'50.4' };
+document.documentElement.setAttribute('data-v50','1');
+document.documentElement.setAttribute('data-los-release','50');
+
+/* Several retained presentation layers still request a top-of-page scroll
+   after delayed navigation work settles.  Keep that behavior for an actual
+   page change, but never let it override a user who has started scrolling. */
+var nativeScrollTo=window.scrollTo.bind(window),lastScrollIntent=0,lastExplicitNavigation=0;
+function noteScrollIntent(){lastScrollIntent=Date.now();}
+function noteExplicitNavigation(){lastExplicitNavigation=Date.now();}
+function installScrollStability(){
+  if(window.__v50StableScroll)return;window.__v50StableScroll=true;
+  ['wheel','touchmove'].forEach(function(name){document.addEventListener(name,noteScrollIntent,{capture:true,passive:true});});
+  document.addEventListener('keydown',function(e){
+    if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].indexOf(e.key)>=0)noteScrollIntent();
+  },true);
+  document.addEventListener('click',function(e){
+    if(!e.isTrusted||!e.target.closest)return;
+    if(e.target.closest('#calc-root .tab, #calc-root .subtab, #suite-root .tab, #v23SuitePrimaryNav button, #v44Header button, [onclick*="switchTab"], [data-v35-mode], [data-v50-full-page]'))noteExplicitNavigation();
+  },true);
+  window.scrollTo=function(a,b){
+    var top=typeof a==='object'&&a!==null?Number(a.top):Number(b),now=Date.now();
+    if(isFinite(top)){
+      if(lastScrollIntent>lastExplicitNavigation&&now-lastScrollIntent<1800)return;
+      if(top<=1&&now-lastExplicitNavigation>900)return;
+    }
+    if(typeof a==='object'&&a!==null&&a.behavior==='smooth')a=Object.assign({},a,{behavior:'auto'});
+    return arguments.length===1?nativeScrollTo(a):nativeScrollTo(a,b);
+  };
+}
+
+/* v22 and v24 both decorate V20.renderSetup on a timer.  Each historical
+   wrapper only stamped its own version flag, so the other timer saw an
+   "unwrapped" function and added another layer forever.  Preserve the two
+   retained wrappers, then mark the composed function as complete for both
+   layers so the background enhancement loops stay idempotent. */
+function stabilizeLegacyRenderers(){
+  var render=window.V20&&V20.renderSetup;if(typeof render!=='function')return false;
+  render.__v22=true;render.__v24=true;return true;
+}
+
+/* Assets was added after the calculator's three workspace groups were
+   captured.  Its legacy key therefore falls through to Income after the
+   next navigation repaint.  Give it the qualification anchor key while
+   retaining its own data-tab route and worksheet. */
+function stabilizeAssetsWorkspace(){
+  var tab=$('v36AssetsTab');if(!tab)return false;
+  function anchor(){
+    if(!tab.getAttribute('data-v50-original-tab'))tab.setAttribute('data-v50-original-tab','v36assets');
+    if(tab.getAttribute('data-tab')!=='dti')tab.setAttribute('data-tab','dti');
+    if(tab.getAttribute('data-v23-key')!=='dti')tab.setAttribute('data-v23-key','dti');
+  }
+  anchor();
+  if(!tab.__v50GroupObserver){tab.__v50GroupObserver=true;new MutationObserver(anchor).observe(tab,{attributes:true,attributeFilter:['data-tab','data-v23-key']});}
+  if(!tab.__v50StableClick){
+    tab.__v50StableClick=true;var openAssets=tab.onclick;
+    tab.onclick=function(e){
+      if(openAssets)openAssets.call(tab,e);
+      setTimeout(function(){
+        anchor();try{localStorage.setItem('los.v23.calcGroup','qualification');}catch(err){}
+        var nav=$('v23CalcPrimaryNav');if(nav)$$('button[data-group]',nav).forEach(function(button){var on=button.dataset.group==='qualification';button.classList.toggle('active',on);button.setAttribute('aria-current',on?'page':'false');});
+        $$('#calc-root .tab[data-tab]').forEach(function(item){item.dataset.v23Visible=['dti','aus','summary'].indexOf(item.dataset.tab)>=0?'1':'0';item.classList.toggle('active',item===tab);});
+      },0);
+    };
+  }
+  return true;
+}
+
+var ICON = {
+  loan:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+  dollar:'<path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/>',
+  coins:'<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>',
+  check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+  sheet:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>',
+  file:'<path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  tool:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3 17.7 6.3 21l6.3-6.3a4 4 0 0 0 5.1-5.4l-2.6 2.6-2.3-.7-.7-2.3z"/>',
+  rate:'<path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/>',
+  escrow:'<path d="M4 9h16M6 9v9m4-9v9m4-9v9m4-9v9M3 20h18"/><path d="M12 3l9 4H3z"/>',
+  tax:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  credit:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  rules:'<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  contract:'<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 12h6M9 16h4"/>',
+  chart:'<path d="M3 20h18M5 16l4-5 4 3 6-8"/>',
+  book:'<path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2zM22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/>'
+};
+function svg(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(ICON[k]||ICON.file)+'</svg>'; }
+
+/* ------------------------------------------------------------------ actions
+   Same lookup the earlier layers use: an action is a button inside the
+   File actions or Loan tools menus, found by its label. */
+function findAction(names){
+  var pools = ['v23SuiteActions','v24LoanTools','v35Panel','v43Menu'];
+  for (var p=0;p<pools.length;p++){
+    var pool = $(pools[p]); if (!pool) continue;
+    var btns = $$('button,a', pool);
+    for (var n=0;n<names.length;n++){
+      var want = key(names[n]);
+      for (var b=0;b<btns.length;b++){ if (key(btns[b].textContent).indexOf(want) === 0) return btns[b]; }
+    }
+  }
+  return null;
+}
+V50.run = function(names, fallback){
+  var b = findAction(names);
+  if (b){ b.click(); return true; }
+  if (fallback){ try { fallback(); return true; } catch(e){} }
+  say('Not available yet', 'The '+names[0]+' action has not finished loading. Try again in a moment.', 'warn', 4000);
+  return false;
+};
+V50.go = function(label){
+  var destination=key(label);
+  if((destination==='DOCUMENTS & OCR'||destination==='DOCUMENTS & WORKSHEETS')&&V50.openUnifiedDocuments){V50.openUnifiedDocuments();return;}
+  try { if (V50.choose) V50.choose(key(label)); } catch(e){}
+  try { if (window.V44 && V44.goPage){ V44.goPage(label); return; } } catch(e){}
+  var t = $$('#suite-root .tabs .tab').filter(function(x){ return key(x.textContent) === key(label); })[0];
+  if (t) t.click();
+};
+
+/* ------------------------------------------------------------------ 1
+   PAGE TABS: calculator labels, icons, counts and warning dots.
+   The tab text is left alone (other layers match on it); the visible
+   label is drawn from a data attribute. */
+var LABEL = {
+  'QUOTE':['Quote','dollar'],'SETUP':['Setup','file'],'PROPERTY':['Property','home'],
+  'RENOVATION':['Renovation','tool'],'MAX MORTGAGE':['Max mortgage','home'],'MORTGAGE RATES':['Mortgage rates','rate'],
+  'CLOSING':['Closing costs','coins'],'ESCROW':['Escrow','escrow'],'TAXES & PRORATION':['Taxes & proration','tax'],
+  'QUALIFY':['Qualify','check'],'RENTAL':['Rental','home'],'CREDIT':['Credit','credit'],'ADVANCED':['Rule tables','rules'],
+  'CONTRACT & LE':['Contract & LE','contract'],'SCENARIOS':['Scenarios','chart'],'SUMMARY':['Summary','chart'],
+  'DOCUMENTS & OCR':['Documents & OCR','book'],'DOCUMENTS & WORKSHEETS':['Worksheets','sheet'],'DRAFT LE':['Draft LE','book']
+};
+var TAB_ORDER=['SETUP','QUOTE','PROPERTY','RENOVATION','MAX MORTGAGE','MORTGAGE RATES','CLOSING','ESCROW','TAXES & PRORATION','QUALIFY','RENTAL','CREDIT','ADVANCED','CONTRACT & LE','SCENARIOS','SUMMARY','DOCUMENTS & WORKSHEETS','DRAFT LE','DOCUMENTS & OCR'];
+var MODULE_TAB = { purchase:'SETUP', loan:'MAX MORTGAGE', value:'PROPERTY', renovation:'RENOVATION', draws:'RENOVATION',
+  payment:'QUOTE', closing:'CLOSING', escrow:'ESCROW', tax:'TAXES & PRORATION', aus:'QUALIFY', qualify:'QUALIFY',
+  rental:'RENTAL', credit:'CREDIT', bps:'ADVANCED', mmw:'MAX MORTGAGE' };
+function warningTabs(o){
+  var out = {};
+  ((o && o.warnings) || []).forEach(function(w){
+    if (!w || /info/i.test(w.severity||'')) return;
+    var t = MODULE_TAB[String(w.module||'').toLowerCase()];
+    if (t) (out[t] = out[t] || []).push(w.title || w.code);
+  });
+  return out;
+}
+function paintTabs(){
+  var row = document.querySelector('#suite-root .tabs'); if (!row) return false;
+  var s = store(), o = outputs(), warn = warningTabs(o);
+  var counts = {};
+  try { counts['SCENARIOS'] = (s.scenarioList || []).length || 0; } catch(e){}
+  try { var bad = $$('#v44LiveSummary .v44-live-row.bad b')[0]; if (bad && N(bad.textContent)) counts['ADVANCED'] = N(bad.textContent); } catch(e){}
+  $$('.tab', row).forEach(function(t){
+    var k = key(t.childNodes.length ? Array.prototype.map.call(t.childNodes,function(n){ return n.nodeType===3 ? n.textContent : ''; }).join('') : t.textContent);
+    if (!k) k = key(t.textContent);
+    /* Preserve the engine key before the visible calculator-style label is
+       applied. Several friendly labels intentionally differ (Advanced is
+       Rule tables, Closing is Closing costs, Documents & worksheets is
+       Worksheets), and routing must continue to use the engine key. */
+    if (t.getAttribute('data-v50-key') !== k) t.setAttribute('data-v50-key', k);
+    var L = LABEL[k] || [norm(t.textContent).toLowerCase().replace(/^./,function(c){return c.toUpperCase();}), 'file'];
+    if (t.getAttribute('data-v50-label') !== L[0]) t.setAttribute('data-v50-label', L[0]);
+    if (t.getAttribute('data-v50-ic') !== L[1]) t.setAttribute('data-v50-ic', L[1]);
+    if (!t.getAttribute('aria-label')) t.setAttribute('aria-label', L[0]);
+    /* Release 48 still re-appends these nodes in its legacy order.  Flex
+       order is the stable visual contract, so that harmless DOM maintenance
+       can no longer make the menu jump between scheduler passes. */
+    var order=TAB_ORDER.indexOf(k);t.style.setProperty('order',String(order<0?99:order),'important');
+    /* Keep group ownership on the tab itself. Legacy releases still toggle
+       their own visibility classes on a timer; this stable data contract lets
+       CSS render the Release 50 workspace without waiting for another pass. */
+    var tabGroup=groupForTab(k);
+    if(t.getAttribute('data-v50-group')!==tabGroup)t.setAttribute('data-v50-group',tabGroup);
+    /* count badge (no text node, so textContent is unchanged) */
+    var ct = t.querySelector('.v50-ct'), n = counts[k];
+    if (n){ if (!ct){ ct = document.createElement('span'); ct.className='v50-ct'; t.appendChild(ct); } if (ct.getAttribute('data-n') !== String(n)) ct.setAttribute('data-n', n); }
+    else if (ct) ct.remove();
+    var dot = t.querySelector('.v50-dot'), w = warn[k];
+    if (w && w.length){ if (!dot){ dot = document.createElement('span'); dot.className='v50-dot'; t.appendChild(dot); } dot.title = w.join('\n'); }
+    else if (dot) dot.remove();
+  });
+  var nav = $('v23SuitePrimaryNav'), cs = $('v24ContextSummary');
+  /* Full is the last group tab */
+  if (nav){ var full = nav.querySelector('button[data-group="full"]'); var lastBtn = $$('button', nav).pop(); if (full && lastBtn !== full) nav.appendChild(full); }
+  if (nav && cs){ var txt = norm(cs.textContent).replace(/\s·\s/g, ', '); if (nav.getAttribute('data-v50-context') !== txt) nav.setAttribute('data-v50-context', txt); }
+  dedupeDocumentsNavigation();
+  paintWorkspaceGroups();
+  return true;
+}
+
+/* Release 48 owns the Documents page twice: once as the direct document
+   launcher and once as a cloned primary-nav group.  The direct launcher is
+   the one with the working first-click menu / second-click OCR behavior, so
+   keep that control and suppress only the redundant clone. */
+function dedupeDocumentsNavigation(){
+  var nav=$('v23SuitePrimaryNav'); if(!nav)return false;
+  var buttons=$$('button',nav).filter(function(b){return key(b.textContent)==='DOCUMENTS';});
+  if(buttons.length<2)return false;
+  var direct=$('v28nav-documents'), keep=buttons.indexOf(direct)>=0?direct:buttons[0];
+  buttons.forEach(function(button){
+    var duplicate=button!==keep;
+    button.classList.toggle('v50-documents-duplicate',duplicate);
+    if(duplicate){
+      button.setAttribute('aria-hidden','true'); button.tabIndex=-1;
+      button.style.setProperty('display','none','important');
+    }else{
+      button.removeAttribute('aria-hidden'); button.style.removeProperty('display');
+    }
+  });
+  if(!nav.__v50DocsObserver){
+    nav.__v50DocsObserver=true;
+    new MutationObserver(function(){ dedupeDocumentsNavigation(); }).observe(nav,{childList:true,subtree:true});
+  }
+  return true;
+}
+
+/* ------------------------------------------------------------------ 1b
+   WORKSPACE ORGANISATION
+
+   Five stable workspaces replace the old ever-growing flat tab strip.
+   Results owns the retained document workspaces, while Full opens the
+   continuous file view and a grouped directory to every page.  The page
+   keys are deliberately unchanged so every retained calculator and route
+   continues to use the same source data and calculations. */
+var WORKSPACE_GROUPS = {
+  file:['SETUP','QUOTE','PROPERTY'],
+  loan:['RENOVATION','MAX MORTGAGE','MORTGAGE RATES'],
+  costs:['CLOSING','ESCROW','TAXES & PRORATION'],
+  underwriting:['QUALIFY','RENTAL','CREDIT','ADVANCED','CONTRACT & LE'],
+  results:['SCENARIOS','SUMMARY','DOCUMENTS & WORKSHEETS','DRAFT LE','DOCUMENTS & OCR']
+};
+var WORKSPACE_ORDER = ['file','loan','costs','underwriting','results'];
+var WORKSPACE_LABELS = {file:'File',loan:'Loan',costs:'Costs',underwriting:'Underwriting',results:'Results'};
+var currentWorkspaceGroup = '';
+function groupForTab(tab){
+  tab=key(tab);
+  for(var n=0;n<WORKSPACE_ORDER.length;n++){
+    var g=WORKSPACE_ORDER[n]; if(WORKSPACE_GROUPS[g].indexOf(tab)>=0)return g;
+  }
+  return 'file';
+}
+function activeTabKey(){
+  var r=row(),a=r&&r.querySelector('.tab.active'); return a?tabKey(a):'';
+}
+function setWorkspaceGroup(group){
+  if(WORKSPACE_ORDER.indexOf(group)<0)group=groupForTab(activeTabKey());
+  currentWorkspaceGroup=group;
+  try{localStorage.setItem('los.v50.workspaceGroup',group);}catch(e){}
+  paintWorkspaceGroups();
+}
+function paintWorkspaceGroups(){
+  var r=row(),nav=$('v23SuitePrimaryNav'); if(!r||!nav)return false;
+  var root=$('suite-root');
+  var fullActive=!!(window.V25&&V25.fullActive&&$('suite-root').classList.contains('v25-full-active'));
+  var active=activeTabKey(),group=currentWorkspaceGroup;
+  var activeGroupButton=nav.querySelector('button.active[data-group]');
+  var activeGroup=activeGroupButton&&activeGroupButton.dataset.group;
+  if(activeGroup==='documents')activeGroup='results';
+  if(!fullActive&&WORKSPACE_ORDER.indexOf(activeGroup)>=0&&activeGroup!==group){
+    group=currentWorkspaceGroup=activeGroup;
+  }
+  if(!group){
+    try{group=localStorage.getItem('los.v50.workspaceGroup')||'';}catch(e){}
+    if(WORKSPACE_ORDER.indexOf(group)<0)group=groupForTab(active);
+    currentWorkspaceGroup=group;
+  }
+  if(root&&root.getAttribute('data-v50-group')!==(fullActive?'full':group))root.setAttribute('data-v50-group',fullActive?'full':group);
+  $$('.tab',r).forEach(function(t){
+    var k=tabKey(t),show=!fullActive&&WORKSPACE_GROUPS[group]&&WORKSPACE_GROUPS[group].indexOf(k)>=0;
+    t.classList.toggle('v50-nav-hidden',!show);
+    if(show)t.removeAttribute('aria-hidden');else t.setAttribute('aria-hidden','true');
+  });
+  $$('button',nav).forEach(function(b){
+    var g=b.dataset.group||'';
+    if(g==='documents'){
+      b.classList.add('v50-documents-duplicate'); b.setAttribute('aria-hidden','true'); b.tabIndex=-1;
+      b.style.setProperty('display','none','important'); return;
+    }
+    if(WORKSPACE_ORDER.indexOf(g)<0&&g!=='full')return;
+    var on=fullActive?g==='full':g===group;
+    b.classList.toggle('active',on); b.setAttribute('aria-current',on?'page':'false');
+  });
+  return true;
+}
+function fullDirectoryMarkup(){
+  return '<section id="v50FullDirectory" class="v50-full-directory"><header><div><small>Workspace directory</small><h3>Every file workspace</h3><p>Open any page without searching through a flat tab list.</p></div></header><div class="v50-full-directory-grid">'+WORKSPACE_ORDER.map(function(group){
+    return '<article><h4>'+esc(WORKSPACE_LABELS[group])+'</h4><div>'+WORKSPACE_GROUPS[group].map(function(k){
+      var meta=LABEL[k]||[k,'file']; return '<button type="button" data-v50-full-page="'+esc(k)+'" data-v50-ic="'+esc(meta[1])+'"><i>'+svg(meta[1])+'</i><span>'+esc(meta[0])+'<small>Open workspace</small></span></button>';
+    }).join('')+'</div></article>';
+  }).join('')+'</div></section>';
+}
+function decorateFullWorkspace(){
+  var sheet=$('v25FullSheet'); if(!sheet||$('v50FullDirectory'))return false;
+  var header=sheet.querySelector(':scope > header');
+  if(header)header.insertAdjacentHTML('afterend',fullDirectoryMarkup());else sheet.insertAdjacentHTML('afterbegin',fullDirectoryMarkup());
+  $$('[data-v50-full-page]',sheet).forEach(function(b){b.onclick=function(){openWorkspacePage(b.dataset.v50FullPage);};});
+  return true;
+}
+function openWorkspacePage(page){
+  page=key(page); exitCreditWorkspace();
+  if(window.V25)V25.fullActive=false;
+  if(window.V251)V251.fullActive=false;
+  var root=$('suite-root');if(root)root.classList.remove('v25-full-active','v251-full-active');
+  setWorkspaceGroup(groupForTab(page));paintWorkspaceGroups();
+  var t=tabFor(page);if(t){t.click();return;}
+  V50.go(page);
+}
+function openFullWorkspace(){
+  exitCreditWorkspace(); currentWorkspaceGroup='';
+  if(window.V25&&V25.openFull){V25.openFull();setTimeout(function(){decorateFullWorkspace();paintWorkspaceGroups();},0);return;}
+  if(window.V48&&V48.toggleFull)V48.toggleFull();
+}
+function installWorkspaceNavigation(){
+  if(document.documentElement.dataset.v50WorkspaceNav)return;
+  document.documentElement.dataset.v50WorkspaceNav='1';
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('#v23SuitePrimaryNav button'); if(!b)return;
+    var group=b.dataset.group||'';
+    if(group==='full'){
+      e.preventDefault();e.stopImmediatePropagation();openFullWorkspace();return;
+    }
+    if(WORKSPACE_ORDER.indexOf(group)>=0){exitCreditWorkspace();setWorkspaceGroup(group);setTimeout(paintWorkspaceGroups,0);}
+  },true);
+  document.addEventListener('click',function(e){
+    var t=e.target.closest&&e.target.closest('#suite-root .tabs .tab'); if(!t)return;
+    var k=tabKey(t);
+    if(k==='DOCUMENTS & OCR'||k==='DOCUMENTS & WORKSHEETS'){
+      e.preventDefault();e.stopImmediatePropagation();V50.openUnifiedDocuments();return;
+    }
+    if(k==='DRAFT LE'){
+      e.preventDefault();e.stopImmediatePropagation();
+      try{
+        if(window.LOANSUITE&&LOANSUITE.printLE){
+          autoSaveLoanScenario('Draft LE');
+          LOANSUITE.printLE();
+          return;
+        }
+      }catch(err){}
+      say('Draft Loan Estimate is loading','The retained Loan Estimate workspace has not finished mounting.','info',3500);return;
+    }
+    if(k==='CREDIT'){
+      e.preventDefault();e.stopImmediatePropagation();openCreditWorkspace(t);return;
+    }
+    exitCreditWorkspace(); currentWorkspaceGroup=groupForTab(k); setTimeout(paintWorkspaceGroups,0);
+  },true);
+}
+
+/* Credit keeps the established reader, rules and editable tradeline engine,
+   but mounts it as a real Loan Suite page instead of a detached modal. */
+function exitCreditWorkspace(){
+  var root=$('suite-root'),modal=$('v12Modal'); if(root)root.classList.remove('v50-credit-active');
+  if(!modal||!modal.classList.contains('v50-credit-page'))return;
+  modal.classList.remove('v50-credit-page','on'); modal.setAttribute('aria-hidden','true');
+  document.body.appendChild(modal); document.body.style.overflow='';
+}
+function openCreditWorkspace(tab){
+  if(window.V25){V25.fullActive=false;var root0=$('suite-root');if(root0)root0.classList.remove('v25-full-active');}
+  if(!window.V12||!V12.open)return;
+  V12.open();
+  var modal=$('v12Modal'),body=$('screen-body'),root=$('suite-root'); if(!modal||!body||!root)return;
+  body.insertBefore(modal,body.firstChild); root.classList.add('v50-credit-active');
+  modal.classList.add('v50-credit-page','on'); modal.removeAttribute('aria-hidden'); document.body.style.overflow='';
+  var title=modal.querySelector('.rpt-modal-bar .ttl'); if(title)title.textContent='Credit workspace';
+  var close=$$('.rpt-modal-bar button',modal).pop();
+  if(close&&!close.dataset.v50CreditBack){
+    close.dataset.v50CreditBack='1'; close.removeAttribute('onclick'); close.onclick=null; close.textContent='Back to Qualify';
+    close.addEventListener('click',function(){V50.go('QUALIFY');});
+  }
+  $$('.tab',row()).forEach(function(t){t.classList.toggle('active',tabKey(t)==='CREDIT');});
+  currentWorkspaceGroup='underwriting'; paintWorkspaceGroups(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function decorateAdvancedBar(){
+  var bar=$('advBar');if(!bar)return false;
+  var map={rules:['Rule tables','rules'],rates:['Mortgage rates','rate'],taxes:['Taxes & escrow','tax'],docparse:['Contract & LE','contract']};
+  $$('.advtab',bar).forEach(function(b){
+    var meta=map[b.dataset.adv];if(!meta)return;
+    b.dataset.v50Ic=meta[1];b.setAttribute('aria-label',meta[0]);
+    if(!b.dataset.v50AdvancedDecorated){b.dataset.v50AdvancedDecorated='1';b.innerHTML=svg(meta[1])+'<span>'+esc(meta[0])+'</span>';}
+  });
+  return true;
+}
+
+/* ------------------------------------------------------------------ 2
+   STAT CARDS AND QUOTE PRESETS above every page */
+var PRESETS = [
+  ['fha35','FHA 3.5%','No renovation'],
+  ['conv5','Conventional 5%','No renovation'],
+  ['fha203','FHA 203(k)','Renovation'],
+  ['convhs','HomeStyle','Renovation']
+];
+function activePreset(i){
+  if (!i) return '';
+  var fha = /fha/i.test(i.loanProgram||''), reno = !!i.renovation;
+  if (fha && !reno) return 'fha35';
+  if (!fha && !reno) return 'conv5';
+  if (fha && reno) return 'fha203';
+  return 'convhs';
+}
+function ensureTop(){
+  var main = document.querySelector('#suite-root .cols-main .v31-main'); if (!main) return null;
+  var top = $('v50Top');
+  if (!top){
+    top = document.createElement('div'); top.id = 'v50Top'; top.className = 'no-print';
+    top.innerHTML =
+      '<div class="v50-stats">'+
+        '<button type="button" class="v50-card" data-v50-go="MAX MORTGAGE"><i>'+svg('loan')+'</i><span><em>Total loan</em><b data-v50="loan">—</b><small data-v50="loanSub"></small></span></button>'+
+        '<button type="button" class="v50-card" data-v50-go="QUOTE"><i>'+svg('dollar')+'</i><span><em>Monthly payment</em><b data-v50="pay">—</b><small data-v50="paySub"></small></span></button>'+
+        '<button type="button" class="v50-card" data-v50-go="CLOSING"><i>'+svg('coins')+'</i><span><em>Cash to close</em><b data-v50="cash">—</b><small data-v50="cashSub"></small></span></button>'+
+        '<button type="button" class="v50-card" data-v50-go="QUALIFY" data-v50-card="dti"><i>'+svg('check')+'</i><span><em>Back-end DTI</em><b data-v50="dti">—</b><small data-v50="dtiSub"></small></span></button>'+
+      '</div>'+
+      '<div class="v50-presets" role="group" aria-label="Quote presets"><em>Quote preset</em>'+
+        PRESETS.map(function(p){ return '<button type="button" class="v50-pill" data-v50-preset="'+p[0]+'" title="'+esc(p[2])+'">'+esc(p[1])+'</button>'; }).join('')+
+        '<button type="button" class="v50-pill v50-switch" data-v50-switch>Switch program</button>'+
+        '<button type="button" class="v50-pill v50-compare" data-v50-compare>Compare both</button>'+
+      '</div>';
+    top.addEventListener('click', function(e){
+      var g = e.target.closest('[data-v50-go]'), p = e.target.closest('[data-v50-preset]');
+      if (g){ V50.go(g.getAttribute('data-v50-go')); return; }
+      if (p){ if (window.V48 && V48.preset){ V48.preset(p.getAttribute('data-v50-preset')); setTimeout(paintTop, 60); } return; }
+      if (e.target.closest('[data-v50-switch]')){
+        var s = store(), i = inputs(); if (!s || !i) return;
+        var to = /fha/i.test(i.loanProgram||'') ? 'Conventional' : 'FHA';
+        try { s.switchProgram(to); say('Switched to '+to, to==='Conventional' ? 'Rate +0.375%.' : 'Rate \u22120.375%.', 'good', 3500); } catch(err){}
+        setTimeout(paintTop, 60); return;
+      }
+      if (e.target.closest('[data-v50-compare]')){
+        var st = store();
+        try { if (st && st.compareProgramScenario){ st.compareProgramScenario(); V50.go('SCENARIOS'); return; } } catch(err){}
+        V50.run(['Compare FHA vs Conventional','Compare','Live comparison']);
+      }
+    });
+  }
+  if (main.firstElementChild !== top) main.insertBefore(top, main.firstChild);
+  return top;
+}
+function set(top, k, v){ var el = top.querySelector('[data-v50="'+k+'"]'); if (el && el.textContent !== v) el.textContent = v; }
+function paintTop(){
+  var top = ensureTop(); if (!top) return false;
+  var o = outputs(), i = inputs(); if (!o || !i) return true;
+  var loan = o.loan||{}, pay = o.payment||{}, cash = o.cash||{}, aus = o.aus||{};
+  var fha = /fha/i.test(i.loanProgram||'');
+  set(top,'loan', usd(loan.totalLoan));
+  set(top,'loanSub', fha ? 'Base '+usd(loan.maximumBaseLoan)+' + UFMIP '+usd(loan.ufmip) : 'Base loan, no upfront fee');
+  set(top,'pay', usd(pay.totalMonthlyPayment));
+  var mi = fha ? 'MIP '+usd(pay.monthlyFhaMip) : (N(pay.monthlyPmi) ? 'PMI '+usd(pay.monthlyPmi) : 'no MI');
+  set(top,'paySub', 'P&I '+usd(pay.principalAndInterest)+', '+mi+', T&I '+usd(pay.monthlyTaxesAndInsuranceUsed));
+  set(top,'cash', usd(cash.cashToClose));
+  set(top,'cashSub', N(cash.emdCreditApplied) ? 'After '+usd(cash.emdCreditApplied)+' EMD' : 'After credits and deposits');
+  var hasIncome = N(aus.totalQualifyingIncome) > 0;
+  var card = top.querySelector('[data-v50-card="dti"]');
+  set(top,'dti', hasIncome ? pct(aus.backEndDti) : 'Enter income');
+  set(top,'dtiSub', hasIncome ? 'Front '+pct(aus.frontEndDti)+', cap '+pct(aus.backEndLimit) : 'Pull it from the Income Calculator');
+  if (card){ var over = hasIncome && N(aus.backEndDti) > N(aus.backEndLimit) && N(aus.backEndLimit) > 0; card.classList.toggle('warn', !hasIncome || over); }
+  var ap = activePreset(i);
+  $$('[data-v50-preset]', top).forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-v50-preset') === ap); });
+  var sw = top.querySelector('[data-v50-switch]');
+  var lab = fha ? 'Switch to Conventional (+0.375%)' : 'Switch to FHA (\u22120.375%)';
+  if (sw && sw.textContent !== lab) sw.textContent = lab;
+  return true;
+}
+
+/* ------------------------------------------------------------------ 3
+   HEADER: Sync + Scenarios buttons, Loan Report button */
+function paintHeader(){
+  var main = $('v25HeaderMain'), bar = $('v24ScenarioBar');
+  if (main && bar){
+    var box = $('v50AppBtns');
+    if (!box){
+      box = document.createElement('div'); box.id = 'v50AppBtns'; box.className = 'v50-appbtns no-print';
+      box.innerHTML = '<button type="button" class="v50-sync" data-v50-sync>Sync on</button><button type="button" data-v50-scen>Scenarios</button>';
+      box.addEventListener('click', function(e){
+        if (e.target.closest('[data-v50-sync]')){
+          try { var on = LOS.syncOn(); LOS.setSync(!on); } catch(err){}
+          paintSync(); return;
+        }
+        if (e.target.closest('[data-v50-scen]')) V50.go('SCENARIOS');
+      });
+    }
+    if (box.nextElementSibling !== bar) main.insertBefore(box, bar);
+    paintSync();
+  }
+  var hdr = $('v44Header');
+  if (hdr && !$('v50Report')){
+    var r = document.createElement('button');
+    r.type = 'button'; r.id = 'v50Report'; r.className = 'v50-report';
+    r.title = 'Print the scenario summary';
+    r.innerHTML = svg('sheet') + '<span>Loan Report</span>';
+    r.addEventListener('click', function(){ V50.run(['Print summary','Print / PDF'], function(){ V50.go('SUMMARY'); }); });
+    hdr.appendChild(r);
+  }
+  var live=$('v44Live');
+  if(live){ live.setAttribute('aria-label','Toggle live summary'); live.title='Toggle live summary'; }
+  return !!main;
+}
+function paintSync(){
+  var b = document.querySelector('[data-v50-sync]'); if (!b) return;
+  var on = true; try { on = LOS.syncOn(); } catch(e){}
+  var t = on ? 'Sync on' : 'Sync off';
+  if (b.textContent !== t) b.textContent = t;
+  b.classList.toggle('off', !on);
+}
+
+/* ------------------------------------------------------------------ 4
+   INCOME MENU in the top bar. The Income Calculator itself is untouched. */
+function paintIncome(){
+  var lnk = document.querySelector('#shellbar .lnk'); if (!lnk) return false;
+  if (!lnk.__v50){
+    lnk.__v50 = true;
+    lnk.classList.add('v50-inc');
+    lnk.setAttribute('role','button'); lnk.setAttribute('tabindex','0');
+    lnk.setAttribute('aria-haspopup','true'); lnk.setAttribute('title','Income Calculator link');
+    var m = document.createElement('div'); m.id = 'v50IncMenu'; m.setAttribute('role','menu');
+    m.innerHTML = '<h6>Income Calculator</h6>'+
+      '<button type="button" role="menuitem" data-a="pull">Pull income into this loan</button>'+
+      '<button type="button" role="menuitem" data-a="send">Send loan figures to the calculator</button>'+
+      '<button type="button" role="menuitem" data-a="open">Open the Income Calculator</button>'+
+      '<button type="button" role="menuitem" data-a="suite">Open the Loan Suite</button>'+
+      '<button type="button" role="menuitem" data-a="report">Open income report</button>';
+    document.body.appendChild(m);
+    var toggle = function(e){
+      if (e) e.stopPropagation();
+      var open = !m.classList.contains('open');
+      if (open){ var r = lnk.getBoundingClientRect(); m.style.top = (r.bottom + 6)+'px'; m.style.left = Math.max(8, Math.min(innerWidth - 270, r.right - 260))+'px'; }
+      m.classList.toggle('open', open); lnk.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    lnk.addEventListener('click', toggle);
+    lnk.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(e); } });
+    /* The launcher is outside of the portaled menu; keep it in the inside
+       boundary so its own click can open the menu instead of immediately
+       closing it again. */
+    document.addEventListener('click', function(e){ if (!e.target.closest('#v50IncMenu, #shellbar .lnk.v50-inc')) m.classList.remove('open'); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') m.classList.remove('open'); });
+    m.addEventListener('click', function(e){
+      var b = e.target.closest('[data-a]'); if (!b) return;
+      m.classList.remove('open');
+      var a = b.getAttribute('data-a');
+      try {
+        if (a === 'pull'){ SHELL.toSuite(); }
+        else if (a === 'send'){ SHELL.toCalc(); }
+        else if (a === 'open'){ SHELL.go('calc'); }
+        else if (a === 'suite'){ SHELL.go('suite'); }
+        else if (a === 'report'){ SHELL.go('calc'); setTimeout(function(){ if (typeof window.openReport === 'function') window.openReport(); }, 120); }
+      } catch(err){ say('Could not reach the Income Calculator', String(err && err.message || err), 'warn', 4000); }
+    });
+  }
+  return true;
+}
+
+/* ------------------------------------------------------------------ 5
+   VERDICT at the head of the live summary */
+function paintVerdict(){
+  var sec = $('v44LiveSummary'); if (!sec) return false;
+  var o = outputs(), i = inputs(); if (!o || !i) return true;
+  var v = sec.querySelector('.v50-verdict');
+  if (!v){ v = document.createElement('div'); v.className = 'v50-verdict'; }
+  var loan = o.loan || {}, cash = o.cash || {};
+  var bind = loan.limitBinding && loan.limitBinding !== 'none';
+  var deficit = N(cash.deficit) > 0;
+  var t = null; try { t = window.V48 && V48.arvTest ? V48.arvTest(i, o) : null; } catch(e){}
+  var valueOpen = !!(t && t.pass !== true);
+  var head = bind ? 'Loan limit is binding' : deficit ? 'Borrower funds are short'
+           : (t && t.pass === false) ? 'Value test does not pass' : (t && t.pass == null) ? 'Waiting on the after-repair value' : 'Structured within limits';
+  var body = 'Maximum base loan ' + usd(loan.maximumBaseLoan) + '.';
+  if (t && t.text) body += ' ' + t.text;
+  if (deficit) body += ' Short by ' + usd(cash.deficit) + '.';
+  var html = '<b>'+esc(head)+'</b>'+esc(body);
+  if (v.__sig !== html){ v.__sig = html; v.innerHTML = html; }
+  v.classList.toggle('warn', bind || deficit || valueOpen);
+  var title = sec.querySelector('.v44-live-title');
+  var anchor = title ? title.nextSibling : sec.firstChild;
+  if (v.parentNode !== sec || v.previousSibling !== title) sec.insertBefore(v, anchor);
+  return true;
+}
+
+/* ------------------------------------------------------------------ 5b
+   EXPANDED LIVE SUMMARY
+   These are views of existing engine outputs only.  Each line stays linked
+   to its source workspace through the same row handler as the base summary. */
+function usd2(v){ var n=N(v); return (n<0?'\u2212':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function liveExtraRow(label,value,mode,cls,sub,attrs){
+  return '<button type="button" class="v35-live-row v44-live-row v50-live-extra-row '+(cls||'')+'" data-v35-label="'+esc(label)+'" data-v35-mode="'+esc(mode)+'" '+(attrs||'')+'><span>'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><b>'+esc(value)+'</b></button>';
+}
+var STATE_CODES={Alabama:'AL',Alaska:'AK',Arizona:'AZ',Arkansas:'AR',California:'CA',Colorado:'CO',Connecticut:'CT',Delaware:'DE',Florida:'FL',Georgia:'GA',Hawaii:'HI',Idaho:'ID',Illinois:'IL',Indiana:'IN',Iowa:'IA',Kansas:'KS',Kentucky:'KY',Louisiana:'LA',Maine:'ME',Maryland:'MD',Massachusetts:'MA',Michigan:'MI',Minnesota:'MN',Mississippi:'MS',Missouri:'MO',Montana:'MT',Nebraska:'NE',Nevada:'NV','New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND',Ohio:'OH',Oklahoma:'OK',Oregon:'OR',Pennsylvania:'PA','Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD',Tennessee:'TN',Texas:'TX',Utah:'UT',Vermont:'VT',Virginia:'VA',Washington:'WA','West Virginia':'WV',Wisconsin:'WI',Wyoming:'WY','District of Columbia':'DC','Puerto Rico':'PR',Guam:'GU','Virgin Islands':'VI'};
+function stateCode(value){var v=norm(value).trim();if(v.length===2)return v.toUpperCase();return STATE_CODES[v]||'';}
+function cleanCounty(value){return norm(value).replace(/^county of\s+/i,'').replace(/\s+(county|parish|borough|census area)$/i,'').trim().toUpperCase();}
+function loanLimitRecord(i){
+  var data=window.LOS_2026_LOAN_LIMITS||{},units=Math.max(1,Math.min(4,parseInt(i.units||1,10)||1)),idx=units-1;
+  var P=window.LOANSUITE&&LOANSUITE.PROP,county=i.nyCounty||i.county||i.countyArea||(P&&P.state&&P.state.county)||'',state=stateCode(i.state||(P&&P.state&&P.state.state));
+  var keyName=state+'|'+cleanCounty(county),row=data.counties&&data.counties[keyName];
+  var conventional=(row&&row[0])||(data.conventionalBaseline||[]),fha=(row&&row[1])||(data.fhaFloor||[]);
+  return {year:data.year||2026,state:state,county:cleanCounty(county),units:units,key:keyName,countySpecific:!!row,
+    conventional:N(conventional[idx]),fha:N(fha[idx]),conventionalBaseline:N((data.conventionalBaseline||[])[idx]),fhaFloor:N((data.fhaFloor||[])[idx])};
+}
+function loanLimitStatus(i,o){
+  var r=loanLimitRecord(i),loan=o.loan||{},amount=N(loan.maximumBaseLoan||loan.totalLoan),location=(r.county?r.county.toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase();})+' County, ':'')+(r.state||'US');
+  if(o.isFha){
+    if(amount>r.fha)return {label:'FHA over county limit — Review',value:usd2(amount),kind:'jumbo',sub:r.year+' FHA limit '+usd2(r.fha)+' · '+location,record:r};
+    if(r.fha>r.fhaFloor&&amount>r.fhaFloor)return {label:'FHA high-cost — Pass',value:usd2(amount),kind:'highbalance',sub:r.year+' county limit '+usd2(r.fha)+' · '+location,record:r};
+    return {label:'FHA standard — Pass',value:usd2(amount),kind:'pass',sub:r.year+' FHA limit '+usd2(r.fha)+' · '+location,record:r};
+  }
+  if(amount<=r.conventionalBaseline)return {label:'Conventional conforming — Pass',value:usd2(amount),kind:'pass',sub:r.year+' baseline '+usd2(r.conventionalBaseline)+' · '+location,record:r};
+  if(r.conventional>r.conventionalBaseline&&amount<=r.conventional)return {label:'Conventional high-balance — Pass',value:usd2(amount),kind:'highbalance',sub:r.year+' county limit '+usd2(r.conventional)+' · '+location,record:r};
+  return {label:'Jumbo — Review',value:usd2(amount),kind:'jumbo',sub:r.year+' county conforming limit '+usd2(r.conventional)+' · '+location,record:r};
+}
+V50.loanLimitRecord=loanLimitRecord;
+V50.loanLimitStatus=loanLimitStatus;
+function paintLiveExtras(){
+  var host=$('v44LiveSummary'),o=outputs(),i=inputs(); if(!host||!o||!i)return false;
+  var cash=o.cash||{},closing=o.closing||{},aus=o.aus||{},rules=o.stateRules||{};
+  var arv=null; try{arv=window.V48&&V48.arvTest?V48.arvTest(i,o):null;}catch(e){}
+  var risk=''; try{risk=((aus.riskFactors||[]).filter(function(x){return x.factor==='Credit';})[0]||{}).result||'';}catch(e){}
+  var credit=N(i.creditScore)>0 ? String(Math.round(N(i.creditScore)))+(aus.creditTier?' · '+aus.creditTier:'') : 'Enter score';
+  var arvText='',arvClass='na',arvSub='';
+  if(o.renovationActive&&arv){
+    arvClass=arv.status==='pass'?'pass':arv.status==='fail'?'bad':'na';
+    arvText=arv.status==='pass'?'Passes by '+usd2(Math.abs(N(arv.shortfall||arv.gap))):arv.status==='fail'?'Fails by '+usd2(Math.abs(N(arv.shortfall||arv.gap))):'Pending appraisal';
+    arvSub=arv.status==='na'?'Enter an after-repair value to run the program value test.':('Value ratio '+N(arv.ratio).toFixed(2)+'% · threshold '+N(arv.threshold).toFixed(0)+'%');
+  }
+  var stateName=rules.state||i.state||'State rules',closeMethod=rules.closingMethod||'';
+  var stateText=/attorney/i.test(closeMethod)?'Attorney state':(closeMethod||'State rules applied');
+  var limit=loanLimitStatus(i,o);
+  /* Patch 44 rendered a second, differently sized ARV alert. Replace it with
+     the same compact linked row used by every other check. */
+  Array.prototype.slice.call(host.querySelectorAll(':scope > .v44-arv-check')).forEach(function(row){row.remove();});
+  var sig=[cash.requiredInvestment,closing.buyerClosingCosts,cash.sellerConcessionApplied,cash.earnestMoneyDeposit,cash.cashToClose,cash.cashToCloseLow,cash.cashToCloseHigh,credit,risk,o.renovationActive,arvText,stateText,limit.label,limit.value,limit.sub].join('|');
+  var box=host.querySelector('.v50-live-extras'); if(box&&box.dataset.sig===sig)return true;
+  if(!box){box=document.createElement('section');box.className='v50-live-extras';}
+  var html='<h4>Borrower funds</h4>'+
+    liveExtraRow('Minimum investment',usd2(cash.requiredInvestment),'setup','','Down payment / required investment')+
+    liveExtraRow('Plus closing costs',usd2(closing.buyerClosingCosts),'closing','','Buyer fees and prepaids')+
+    liveExtraRow('Remaining cash to close',usd2(cash.cashToClose),'closing','total')+
+    '<button type="button" class="v50-funds-toggle" data-v50-funds-toggle>Show credits & deposits</button>'+
+    '<div class="v50-funds-detail">'+liveExtraRow('Less seller credit','\u2212 '+usd2(cash.sellerConcessionApplied),'closing','','Applied credit only')+liveExtraRow('Less earnest money','\u2212 '+usd2(cash.earnestMoneyDeposit),'closing','','Already paid and credited')+liveExtraRow('With the cushion',usd2(cash.cashToCloseLow)+' \u2013 '+usd2(cash.cashToCloseHigh),'closing','pass','Planning range')+'</div>';
+  html+='<h4>Credit & status</h4>'+liveExtraRow('Representative score',credit,'credit',risk==='PASS'?'pass':'na',risk||'Credit review','data-v50-edit-score');
+  if(o.renovationActive&&arv)html+=liveExtraRow('ARV test',arvText,'maxmortgage',arvClass,arvSub);
+  html+=liveExtraRow(limit.label,limit.value,'maxmortgage',limit.kind,limit.sub,'data-v50-loan-limit');
+  html+=liveExtraRow(stateName,stateText,'closing',/attorney/i.test(stateText)?'pass':'','Closing rules');
+  box.dataset.sig=sig;box.innerHTML=html;
+  var toggle=box.querySelector('[data-v50-funds-toggle]'); if(toggle)toggle.onclick=function(e){e.preventDefault();e.stopPropagation();box.classList.toggle('expanded');toggle.textContent=box.classList.contains('expanded')?'Hide credits & deposits':'Show credits & deposits';};
+  var checks=Array.prototype.filter.call(host.querySelectorAll(':scope > h4'),function(h){return key(h.textContent)==='CHECKS';})[0];
+  if(checks)host.insertBefore(box,checks);else host.appendChild(box);
+  return true;
+}
+
+/* Credit retains its reader and gains a compact planning panel above it. */
+function paintCreditOverview(){
+  var o=outputs(),i=inputs(),body=$('screen-body'); if(!o||!i||!body||engineMode()!=='credit')return false;
+  var cash=o.cash||{},pay=o.payment||{},loan=o.loan||{},aus=o.aus||{},old=$('v50CreditOverview');
+  var sig=[loan.totalLoan,pay.totalMonthlyPayment,cash.cashToClose,aus.backEndDti,cash.cashToCloseLow,cash.cashToCloseHigh].join('|');
+  if(old&&old.dataset.sig===sig)return true; if(!old){old=document.createElement('section');old.id='v50CreditOverview';old.className='v50-credit-overview no-print';}
+  old.dataset.sig=sig;old.innerHTML='<header><div><small>Borrower planning range</small><h3>Credit overview</h3></div><button type="button" data-v50-open-mi>Mortgage insurance worksheet</button></header><div class="v50-credit-metrics">'+
+    '<button data-v35-label="Total loan" data-v35-mode="maxmortgage"><span>Total loan</span><b>'+usd2(loan.totalLoan)+'</b></button><button data-v35-label="Monthly payment" data-v35-mode="quote"><span>Monthly payment</span><b>'+usd2(pay.totalMonthlyPayment)+'</b></button><button data-v35-label="Cash to close" data-v35-mode="closing"><span>Cash to close</span><b>'+usd2(cash.cashToClose)+'</b></button><button data-v35-label="Back-end DTI" data-v35-mode="income"><span>Back-end DTI</span><b>'+(N(aus.totalQualifyingIncome)?pct(aus.backEndDti):'Enter income')+'</b></button></div><div class="v50-planning-range"><span>FHA planning: 46% front / 56% back</span><span>Conventional planning: 50% front / 50% back</span><span>Cash: '+usd2(cash.cashToCloseLow)+' – '+usd2(cash.cashToCloseHigh)+'</span></div>';
+  old.querySelector('[data-v50-open-mi]').onclick=function(){V50.run(['PMI Worksheet','PMI / FHA MIP'],function(){V50.go('QUALIFY');});};
+  old.querySelectorAll('.v50-credit-metrics button').forEach(function(b){b.onclick=function(){if(window.V35&&V35.openRailEditor)V35.openRailEditor(b,b.dataset.v35Label,b.dataset.v35Mode);};});
+  body.insertBefore(old,body.firstChild);return true;
+}
+
+/* Keep freeform percentage fields readable without changing the stored fraction. */
+function paintFreeformValues(){
+  var s=store();if(!s)return;
+  $$('[data-v35-quote][data-kind="percent"]').forEach(function(input){
+    if(document.activeElement===input)return;
+    var v=N(s.activeInputs.finalDownPaymentPct)*100;
+    var pretty=(Math.round(v*1000)/1000).toFixed(3).replace(/\.?0+$/,'');
+    if(input.value!==pretty)input.value=pretty;
+  });
+}
+
+/* PROPERTY, ZIP, TAX AND PRORATION SYNC
+   A ZIP locality is never stored as the street line. The scenario remains
+   the source of truth and feeds both dedicated property workspaces plus the
+   advanced tax/proration worksheet. */
+function streetOnly(value){
+  var raw=norm(value).replace(/\s+/g,' ').trim();if(!raw)return'';
+  var first=raw.split(',')[0].trim();
+  if(/^\d{5}(?:-\d{4})?$/.test(first)||/^(village|town|city|county|borough)\s+of\b/i.test(first))return'';
+  if(/^zip\s*\d{5}/i.test(first))return'';
+  if(!/\d/.test(first)&&/\b(village|township|county|borough)\b/i.test(first))return'';
+  return first;
+}
+V50.streetOnly=streetOnly;
+var propertySyncBusy=false,lastAutoZip={},onlineZipPending={};
+function sameValue(a,b){
+  if(a===b)return true;
+  if(a==null||b==null)return a==null&&b==null;
+  if(typeof a==='number'||typeof b==='number')return Math.abs(N(a)-N(b))<0.005;
+  if(typeof a==='object'||typeof b==='object')try{return JSON.stringify(a)===JSON.stringify(b);}catch(e){}
+  return norm(a)===norm(b);
+}
+function directSet(root,path,value){
+  var parts=String(path).split('.'),target=root;
+  for(var n=0;n<parts.length-1;n++){
+    if(!target[parts[n]]||typeof target[parts[n]]!=='object')target[parts[n]]={};
+    target=target[parts[n]];
+  }
+  var leaf=parts[parts.length-1];
+  if(sameValue(target[leaf],value))return false;
+  target[leaf]=value;return true;
+}
+function stateName(value){
+  var code=stateCode(value),names=Object.keys(STATE_CODES);
+  for(var n=0;n<names.length;n++)if(STATE_CODES[names[n]]===code)return names[n];
+  return norm(value);
+}
+function parseAddressParts(value){
+  var raw=norm(value),parts=raw.split(',').map(function(x){return norm(x);}).filter(Boolean),zip='',state='',city='';
+  var zm=raw.match(/\b(\d{5})(?:-\d{4})?\b/);if(zm)zip=zm[1];
+  parts.forEach(function(part,index){
+    var cleaned=part.replace(/\b\d{5}(?:-\d{4})?\b/g,'').trim(),tokens=cleaned.split(/\s+/),tail=tokens[tokens.length-1]||'';
+    if(stateCode(cleaned))state=stateName(cleaned);
+    else if(stateCode(tail)){state=stateName(tail);cleaned=tokens.slice(0,-1).join(' ');if(index>0&&cleaned)city=cleaned;}
+    else if(index===1&&!city)city=cleaned;
+  });
+  return {street:streetOnly(raw),city:city,state:state,zip:zip};
+}
+V50.parseAddressParts=parseAddressParts;
+function scenarioKey(s,i){return ((s.snapshot&&s.snapshot.activeScenarioId)||'active')+'|'+norm(i.zipCode).replace(/\D/g,'').slice(0,5);}
+function scenarioId(s){return (s.snapshot&&s.snapshot.activeScenarioId)||'active';}
+function autoReplaceNumber(current,previous){return !N(current)||(previous!=null&&sameValue(N(current),N(previous)));}
+function refreshAreaEstimate(s,keyValue){
+  var i=s.activeInputs||{},zip=norm(i.zipCode).replace(/\D/g,'').slice(0,5),old=i.v503AutoArea||null;
+  var reno=N(outputs()&&outputs().renovationOut&&outputs().renovationOut.finalRenovationAmount),pullKey=keyValue+'|'+N(i.basePurchasePrice)+'|'+reno;
+  if(zip.length!==5||old&&old.key===pullKey||typeof s.applyAreaValues!=='function')return false;
+  var beforeAsIs=N(i.asIsValue),beforeArv=N(i.afterRepairValue),replaceAsIs=!!i.v20ValueAuto||autoReplaceNumber(beforeAsIs,old&&old.asIs),replaceArv=autoReplaceNumber(beforeArv,old&&old.arv);
+  try{s.applyAreaValues();}catch(e){return false;}
+  i=s.activeInputs||i;var estimatedAsIs=N(i.asIsValue),estimatedArv=N(i.afterRepairValue);
+  if(!replaceAsIs)i.asIsValue=beforeAsIs;else i.v20ValueAuto=true;
+  if(!replaceArv)i.afterRepairValue=beforeArv;
+  i.v503AutoArea={key:pullKey,zip:zip,asIs:estimatedAsIs,arv:estimatedArv,source:'ZIP area planning estimate',updatedAt:new Date().toISOString()};
+  return true;
+}
+var CLOSING_OVERRIDE_KEYS=['lenderOrigination','lenderProcessing','appraisal','creditReport','floodTaxService','titleInsurance','titleSearchSettlement','attorney','survey','recording','inspections','other'];
+function copyClosingValues(i){
+  var values={},ov=i.closing&&i.closing.overrides||{};CLOSING_OVERRIDE_KEYS.forEach(function(k){values[k]=ov[k];});
+  values.renoInspection=i.reno&&i.reno.inspectionFees;values.renoTitle=i.reno&&i.reno.titleUpdateFees;return values;
+}
+function restoreClosingValue(i,k,value){
+  if(k==='renoInspection')i.reno.inspectionFees=value;
+  else if(k==='renoTitle')i.reno.titleUpdateFees=value;
+  else i.closing.overrides[k]=value;
+}
+function refreshClosingEstimate(s,keyValue){
+  var i=s.activeInputs||{},o=outputs()||{},state=stateCode(i.state),county=i.nyCounty||i.county||i.countyArea||'';
+  var pullKey=keyValue+'|'+state+'|'+cleanCounty(county)+'|'+N(i.basePurchasePrice)+'|'+norm(i.loanProgram)+'|'+N(o.loan&&o.loan.totalLoan),old=i.v503AutoClosing||null;
+  if(old&&old.key===pullKey)return false;
+  var before=copyClosingValues(i),changed=false;
+  if(state==='NY'&&window.V18&&typeof V18.applyNYEstimate==='function'){
+    if(i.state!=='New York'){i.state='New York';changed=true;}
+    try{V18.applyNYEstimate(true);}catch(e){return changed;}
+    i=s.activeInputs||i;var estimated=copyClosingValues(i),previous=old&&old.values||null;
+    Object.keys(before).forEach(function(k){
+      if(k==='lenderOrigination'||k==='lenderProcessing')return;
+      var manual=before[k]!=null&&!sameValue(before[k],previous?previous[k]:estimated[k]);
+      if(manual){restoreClosingValue(i,k,before[k]);changed=true;}
+    });
+    i.v503AutoClosing={key:pullKey,state:state,values:estimated,source:'Attached New York Loan Estimate profiles',updatedAt:new Date().toISOString()};
+    return true;
+  }
+  if(old&&old.state==='NY'&&old.values){
+    CLOSING_OVERRIDE_KEYS.forEach(function(k){
+      if(k==='lenderOrigination'||k==='lenderProcessing')return;
+      var current=i.closing.overrides[k];if(sameValue(current,old.values[k])){i.closing.overrides[k]=null;changed=true;}
+    });
+    if(i.reno){if(sameValue(i.reno.inspectionFees,old.values.renoInspection)){i.reno.inspectionFees=0;changed=true;}if(sameValue(i.reno.titleUpdateFees,old.values.renoTitle)){i.reno.titleUpdateFees=0;changed=true;}}
+  }
+  i.v503AutoClosing={key:pullKey,state:state,values:copyClosingValues(i),source:'Suite state and ZIP planning tables',updatedAt:new Date().toISOString()};
+  return true;
+}
+function refreshAggregateSetup(i,keyValue){
+  if(!i.closing||!i.escrow)return false;
+  var old=i.v503AutoAggregate||null,pullKey=keyValue+'|'+stateCode(i.state)+'|'+cleanCounty(i.nyCounty||i.county||''),desired=/^(NE|VT)$/.test(stateCode(i.state))?1:2,changed=false;
+  if(old&&old.key===pullKey)return false;
+  if(i.closing.useAggregateEscrowForPrepaids!==false||!i.v17EscrowDateUpgrade){changed=directSet(i,'closing.useAggregateEscrowForPrepaids',true)||changed;}
+  if(i.escrow.autoFirstPaymentDate!==false||!i.v17EscrowDateUpgrade){changed=directSet(i,'escrow.autoFirstPaymentDate',true)||changed;}
+  var current=N(i.escrow.cushionMonthsOverride),replace=current<0||sameValue(current,2)||(old&&sameValue(current,old.cushionMonths));
+  if(replace)changed=directSet(i,'escrow.cushionMonthsOverride',desired)||changed;
+  i.v503AutoAggregate={key:pullKey,cushionMonths:desired,useAggregate:true,autoFirstPayment:true,updatedAt:new Date().toISOString()};
+  return true;
+}
+function annualTaxFrom(i,o){
+  if(o&&o.escrowOut&&N(o.escrowOut.annualTaxes))return N(o.escrowOut.annualTaxes);
+  var n=N(i.propertyTaxAmount);return /month/i.test(i.propertyTaxBasis||'')?n*12:n;
+}
+function taxCycleFor(state,county){
+  if(stateCode(state)==='NY'&&/nassau/i.test(county))return'Nassau County, NY — Jan 10 / Jul 10';
+  if(stateCode(state)==='NY'&&/suffolk/i.test(county))return'Suffolk County, NY — Dec 1 / May 10';
+  return'Semi-annual — Jan 1 / Jul 1';
+}
+function syncScenarioProperty(runLookup){
+  var s=store();if(!s||propertySyncBusy)return false;
+  propertySyncBusy=true;var changed=false;
+  try{
+    var i=s.activeInputs||{},parsed=parseAddressParts(i.propertyAddress),zip=norm(i.zipCode).replace(/\D/g,'').slice(0,5);
+    if(!zip&&parsed.zip){i.zipCode=parsed.zip;zip=parsed.zip;changed=true;}
+    if(!norm(i.city)&&parsed.city){i.city=parsed.city;changed=true;}
+    if(!norm(i.state)&&parsed.state){i.state=parsed.state;changed=true;}
+    var cleanStreet=parsed.street,currentAddress=norm(i.propertyAddress);
+    if(currentAddress&&cleanStreet!==currentAddress){i.propertyAddress=cleanStreet;changed=true;}
+    var zipKey=scenarioKey(s,i),activeId=scenarioId(s);
+    if(zip.length!==5)delete lastAutoZip[activeId];
+    if(runLookup&&zip.length===5&&lastAutoZip[activeId]!==zip){
+      lastAutoZip[activeId]=zip;
+      /* A location carried over from the previous ZIP is not a manual
+         override. Clear only values that still match our prior lookup so
+         the new ZIP can replace them; any independently edited locality is
+         intentionally preserved. */
+      var priorLocation=i.v503ZipLocation||{};
+      if(priorLocation.key&&priorLocation.key!==zipKey){
+        if(norm(i.city)&&sameValue(i.city,priorLocation.city)){i.city='';changed=true;}
+        if(norm(i.state)&&sameValue(i.state,priorLocation.state)){i.state='';changed=true;}
+        var priorCounty=norm(i.nyCounty||i.county);
+        if(priorCounty&&sameValue(priorCounty,priorLocation.county)){
+          if(i.nyCounty!=null)i.nyCounty='';
+          if(i.county!=null)i.county='';
+          changed=true;
+        }
+      }
+      try{s.applyZipLookup();}catch(e){}
+      i=s.activeInputs||i;
+      /* Some retained lookup code writes a locality label into the address
+         field. The scenario address is always the street line only. */
+      var lookedUpAddress=norm(i.propertyAddress),lookedUpStreet=streetOnly(lookedUpAddress);
+      if(lookedUpAddress&&lookedUpAddress!==lookedUpStreet){i.propertyAddress=lookedUpStreet||cleanStreet||'';changed=true;}
+      i.v503ZipLocation={key:zipKey,city:norm(i.city),state:norm(i.state),county:norm(i.nyCounty||i.county),source:'Built-in ZIP planning table'};changed=true;
+      if(window.V38&&typeof V38.lookupZip==='function'&&!onlineZipPending[zipKey]){
+        onlineZipPending[zipKey]=true;V38.lookupZip(zip).then(function(r){
+          delete onlineZipPending[zipKey];if(!r)return;var st=store();if(!st)return;
+          var si=st.activeInputs||{},marker=si.v503ZipLocation||{},locationChanged=false;propertySyncBusy=true;
+          try{
+            if(r.city&&(!norm(si.city)||sameValue(si.city,marker.city))){si.city=r.city;locationChanged=true;}
+            if(r.stateName&&(!norm(si.state)||sameValue(si.state,marker.state))){si.state=r.stateName;locationChanged=true;}
+            if(r.county){var path=stateCode(r.stateName||si.state)==='NY'?'nyCounty':'county',county=String(r.county).replace(/\s+County$/i,'');if(!norm(si[path])||sameValue(si[path],marker.county)){si[path]=county;locationChanged=true;}}
+            si.v503ZipLocation={key:zipKey,city:norm(si.city),state:norm(si.state),county:norm(si.nyCounty||si.county),source:'Online ZIP lookup'};
+            if(locationChanged){st.active.updatedAt=new Date().toISOString();st.emit();}
+          }finally{propertySyncBusy=false;}
+          syncScenarioProperty(false);
+        }).catch(function(){delete onlineZipPending[zipKey];});
+      }
+    }
+    i=s.activeInputs||i;var propertyKey=scenarioKey(s,i)+'|'+streetOnly(i.propertyAddress);
+    if(runLookup&&zip.length===5){changed=refreshAreaEstimate(s,propertyKey)||changed;changed=refreshClosingEstimate(s,propertyKey)||changed;changed=refreshAggregateSetup(i,propertyKey)||changed;}
+    var o=outputs()||{},street=streetOnly(i.propertyAddress);
+    var P=window.LOANSUITE&&LOANSUITE.PROP,county=i.nyCounty||i.county||i.countyArea||'',annual=annualTaxFrom(i,o);
+    if(P&&P.state){
+      P.state.borrower=i.borrowerName||'';
+      P.state.street=street;
+      P.state.city=i.city||'';
+      P.state.state=i.state||'';
+      P.state.county=String(county||'').replace(/\s+County$/i,'');
+      P.state.zip=zip;
+      P.state.propType=i.propertyType||P.state.propType;
+      P.state.units=N(i.units)||1;
+      P.state.creditScore=N(i.creditScore);
+      P.state.currentValue=N(i.asIsValue);
+      if(i.reno&&N(i.reno.baseCost)>=0)P.state.renoCost=N(i.reno.baseCost);
+      P.state.annualTax=annual;
+      P.state.mode=street?'address':'tbd';
+      if(window.V13&&V13.addressLabel)P.state.address=V13.addressLabel(P.state);
+      try{P.save();}catch(e){}
+      if(engineMode()==='property')try{P.render();}catch(e){}
+    }
+    if(window.TAXPRO&&TAXPRO.state){
+      var T=TAXPRO.state,nextCycle=taxCycleFor(i.state,county),escrow=o.escrowOut||{},autoKey=stateCode(i.state)+'|'+cleanCounty(county);
+      T.annual=annual;
+      T.closing=i.closingDate||'';
+      T.firstPayment=escrow.firstPaymentDate||i.escrow&&i.escrow.firstPaymentDate||'';
+      if(N(escrow.cushionMonths)>=0)T.cushionMonths=N(escrow.cushionMonths);
+      if(!T.__v50AutoCounty||T.__v50AutoCounty!==autoKey){T.cycle=nextCycle;T.__v50AutoCounty=autoKey;}
+      try{localStorage.setItem('taxProration.v1',JSON.stringify(T));}catch(e){}
+      if(engineMode()==='taxes')try{TAXPRO.render();}catch(e){}
+    }
+    if(changed){s.active.updatedAt=new Date().toISOString();s.emit();}
+  }finally{propertySyncBusy=false;}
+  return true;
+}
+V50.syncScenarioProperty=syncScenarioProperty;
+function stabilizeZipLookup(){
+  var s=store();if(!s||typeof s.lookupZipOnline!=='function'||s.lookupZipOnline.__v50StreetOnly)return false;
+  var inner=s.lookupZipOnline.bind(s);
+  s.lookupZipOnline=function(){
+    var before=streetOnly(s.activeInputs.propertyAddress);
+    return Promise.resolve(inner()).then(function(result){
+      var entered=norm(s.activeInputs.propertyAddress),after=streetOnly(entered);
+      if(entered&&after!==entered)s.setField('propertyAddress',after||before,'Street-only ZIP lookup');
+      syncScenarioProperty(false);return result;
+    });
+  };
+  s.lookupZipOnline.__v50StreetOnly=true;return true;
+}
+function wirePropertyTwoWay(){
+  var P=window.LOANSUITE&&LOANSUITE.PROP,s=store();if(!P||!s||typeof P.set!=='function'||P.set.__v50TwoWay)return false;
+  P.set=function(k,v){
+    if(propertySyncBusy)return;
+    propertySyncBusy=true;var changed=false;
+    try{
+      var numeric=['beds','units','currentValue','sqFt','areaRent','annualTax','lastSoldPrice','apprecPct','renoCost'];
+      P.state[k]=numeric.indexOf(k)>=0?N(v):v;try{P.save();}catch(e){}
+      var map={borrower:'borrowerName',street:'propertyAddress',zip:'zipCode',state:'state',units:'units',propType:'propertyType',creditScore:'creditScore',currentValue:'asIsValue',renoCost:'reno.baseCost',annualTax:'propertyTaxAmount'};
+      var path=map[k];if(k==='county')path=stateCode(P.state.state)==='NY'?'nyCounty':'county';if(k==='address')path='propertyAddress';
+      var i=s.activeInputs||{};
+      if(path){var value=(k==='street'||k==='address')?streetOnly(v):v;if(['units','creditScore','currentValue','renoCost','annualTax'].indexOf(k)>=0)value=N(v);changed=directSet(i,path,value)||changed;if(k==='annualTax')changed=directSet(i,'propertyTaxBasis','Annual')||changed;if(k==='currentValue')i.v20ValueAuto=false;}
+      if(k==='city')changed=directSet(i,'city',v)||changed;
+      if(k==='address'){var parsed=parseAddressParts(v);if(parsed.zip&&!norm(i.zipCode)){i.zipCode=parsed.zip;changed=true;}if(parsed.city&&!norm(i.city)){i.city=parsed.city;changed=true;}if(parsed.state&&!norm(i.state)){i.state=parsed.state;changed=true;}}
+      if(changed){s.active.updatedAt=new Date().toISOString();s.emit();}
+      try{P.render();}catch(e){}try{if(window.RECALC)window.RECALC();}catch(e){}
+    }finally{propertySyncBusy=false;}
+    syncScenarioProperty(k==='zip'||k==='address'||k==='street');
+  };
+  P.set.__v50TwoWay=true;return true;
+}
+function taxMonthsForCycle(cycle){
+  if(/Suffolk/i.test(cycle))return[12,5];if(/Nassau/i.test(cycle))return[1,7];if(/Quarterly/i.test(cycle))return[2,5,8,11];if(/Annual/i.test(cycle))return[1];return[1,7];
+}
+function wireTaxTwoWay(){
+  var T=window.TAXPRO,s=store();if(!T||!s||typeof T.set!=='function'||T.set.__v503TwoWay)return false;
+  var inner=T.set;
+  T.set=function(k,v){
+    if(propertySyncBusy)return inner.apply(T,arguments);
+    propertySyncBusy=true;var result,changed=false;
+    try{
+      result=inner.apply(T,arguments);var i=s.activeInputs||{};
+      if(k==='annual'){changed=directSet(i,'propertyTaxAmount',N(v))||changed;changed=directSet(i,'propertyTaxBasis','Annual')||changed;}
+      if(k==='closing'){var close=norm(v);try{if(close&&window.V15&&V15.parseDate)close=V15.parseDate(close)||close;}catch(e){}changed=directSet(i,'closingDate',close)||changed;}
+      if(k==='firstPayment'){var first=norm(v);try{if(first&&window.V15&&V15.parseDate)first=V15.parseDate(first)||first;}catch(e){}changed=directSet(i,'escrow.firstPaymentDate',first)||changed;changed=directSet(i,'escrow.autoFirstPaymentDate',!first)||changed;}
+      if(k==='cushionMonths')changed=directSet(i,'escrow.cushionMonthsOverride',Math.max(0,Math.round(N(v))))||changed;
+      if(k==='cycle'){
+        var months=taxMonthsForCycle(v),annual=N(T.state.annual),amount=months.length?annual/months.length:0;
+        changed=directSet(i,'escrow.customDisbursements',months.map(function(month,index){return{month:month,amount:Math.round(amount*100)/100,label:'Property tax installment '+(index+1)};}))||changed;
+        changed=directSet(i,'escrow.useCustomDisbursements',true)||changed;
+      }
+      if(changed){s.active.updatedAt=new Date().toISOString();s.emit();}
+    }finally{propertySyncBusy=false;}
+    syncScenarioProperty(false);return result;
+  };
+  T.set.__v503TwoWay=true;return true;
+}
+function labelStreetFields(){
+  var root=$('suite-root');if(!root)return;
+  $$('[data-v44-field="propertyAddress"],[data-path="propertyAddress"],[data-field="propertyAddress"]',root).forEach(function(input){
+    input.placeholder='Street address only';input.setAttribute('aria-label','Street address');var label=input.closest('label'),span=label&&label.querySelector('span');if(span)span.textContent='Street address';
+  });
+}
+
+/* The quote/setup proxy fields are retained from v44 and v35. A fast
+   rerender can detach a focused proxy before its older debounced handler
+   commits. Delegate the final commit from the stable suite root, and commit
+   a complete ZIP immediately so every linked worksheet receives it. */
+function wireScenarioFieldsTwoWay(){
+  var root=$('suite-root');if(!root||root.__v503ScenarioFields)return false;
+  root.__v503ScenarioFields=true;
+  function commit(el,runLookup){
+    if(!el)return;var path=el.dataset.v44Field||el.dataset.v35Quote;if(!path)return;
+    var kind=el.dataset.kind||'text',raw=el.value,s=store();if(!s)return;
+    try{
+      if(window.V20&&V20.setScenario)V20.setScenario(path,raw,kind==='pct'||kind==='percent'?'pct':kind==='num'||kind==='currency'?'num':'text');
+      else s.setField(path,raw,'Synchronized quote / setup edit');
+    }catch(e){return;}
+    setTimeout(function(){syncScenarioProperty(!!runLookup);},0);
+  }
+  root.addEventListener('change',function(e){
+    var el=e.target&&e.target.closest&&e.target.closest('[data-v44-field],[data-v35-quote]');
+    if(el)commit(el,/^(zipCode|propertyAddress)$/.test(el.dataset.v44Field||el.dataset.v35Quote||''));
+  },true);
+  root.addEventListener('input',function(e){var d=e.target&&e.target.closest&&e.target.closest('[data-v44-field],[data-v35-quote]');if(d)d.__v54dirty=true;},true);
+  root.addEventListener('change',function(e){var d=e.target&&e.target.closest&&e.target.closest('[data-v44-field],[data-v35-quote]');if(d)d.__v54dirty=true;},true);
+  root.addEventListener('focusout',function(e){
+    var el=e.target&&e.target.closest&&e.target.closest('[data-v44-field],[data-v35-quote]');
+    if(el&&!el.__v54dirty)return;if(el)el.__v54dirty=false;
+    if(el)commit(el,/^(zipCode|propertyAddress)$/.test(el.dataset.v44Field||el.dataset.v35Quote||''));
+  },true);
+  root.addEventListener('input',function(e){
+    var el=e.target&&e.target.closest&&e.target.closest('[data-v44-field="zipCode"],[data-v35-quote="zipCode"]');if(!el)return;
+    var zip=norm(el.value).replace(/\D/g,'').slice(0,5);if(zip.length!==5||el.__v503ZipCommit===zip)return;
+    el.__v503ZipCommit=zip;clearTimeout(el.__v503ZipTimer);el.__v503ZipTimer=setTimeout(function(){commit(el,true);},110);
+  },true);
+  return true;
+}
+
+/* Loan Suite figures commit on change/blur.  Earlier retained modules render
+   a few inline oninput handlers, so move those handlers to change once their
+   field is in the Loan Suite.  The Income Calculator is deliberately outside
+   this function and continues to update while the user types. */
+function deferSuiteInputCommit(){
+  var root=$('suite-root'); if(!root||inCalculator())return false;
+  $$('input[oninput],textarea[oninput]',root).forEach(function(el){
+    if(el.__v50DeferredCommit)return;
+    var type=String(el.type||'text').toLowerCase();
+    if(/^(button|submit|reset|file|hidden|checkbox|radio|range)$/.test(type))return;
+    var commit=el.oninput;
+    if(typeof commit!=='function')return;
+    el.__v50DeferredCommit=true;
+    el.__v50InlineCommit=commit;
+    el.oninput=null;
+    el.removeAttribute('oninput');
+    el.addEventListener('change',function(event){
+      try { commit.call(el,event); } catch(e){}
+    });
+    el.addEventListener('keydown',function(event){
+      if(event.key==='Enter'&&el.tagName==='INPUT'&&!event.shiftKey){ event.preventDefault(); el.blur(); }
+    });
+  });
+  return true;
+}
+
+/* ------------------------------------------------------------------ 5c
+   DEFAULT INCOME HANDOFF
+   The manual "Send income" action remains available, but entering the Loan
+   Suite now brings across the current Income Calculator result by default.
+   It deliberately uses the Suite's public importer (rather than touching
+   scenario state directly), so the existing borrower/liability mapping,
+   recalculation, audit trail and no-overwrite rules stay in one place.
+
+   A signature and a value comparison prevent a scheduler tick from writing
+   the same figures repeatedly. A Loan Suite-only edit remains in place until
+   the Income Calculator result itself changes.
+   ------------------------------------------------------------------ */
+var incomeSignature = '';
+function sameIncomeInputs(i, borrowers){
+  var rows=(i&&i.borrowers)||[];
+  return borrowers.every(function(src,index){
+    var current=rows[index]||{};
+    var sourceName=norm(src.name), currentName=norm(current.name);
+    var nameMatches=/^Borrower\s+\d+$/i.test(sourceName) || sourceName===currentName;
+    return nameMatches &&
+      Math.abs(N(current.grossMonthlyIncome)-N(src.grossMonthlyIncome))<0.005 &&
+      Math.abs(N(current.otherMonthlyIncome)-N(src.otherMonthlyIncome))<0.005 &&
+      Math.abs(N(current.monthlyDebts)-N(src.monthlyDebts))<0.005;
+  });
+}
+function syncCalculatorIncome(force){
+  var shell=window.SHELL, s=store();
+  if(!s || !shell || (!force && shell.mode!=='suite')) return false;
+  var totals, patch;
+  try {
+    if(typeof window.calcTotals!=='function' || typeof window.renoPatch!=='function') return false;
+    totals=window.calcTotals(); patch=window.renoPatch();
+  } catch(e){ return false; }
+  if(!patch || !Array.isArray(patch.borrowers) || !(N(totals.income)>0 || N(totals.debts)>0)) return false;
+  var signature=JSON.stringify(patch.borrowers.map(function(b){ return [norm(b.name),N(b.grossMonthlyIncome),N(b.otherMonthlyIncome),N(b.monthlyDebts)]; }));
+  if(signature===incomeSignature) return false;
+  /* A fresh page may already contain the same imported figures. Remember
+     that state without producing a redundant audit entry. */
+  if(sameIncomeInputs(s.activeInputs,patch.borrowers)){
+    incomeSignature=signature;
+    return false;
+  }
+  try {
+    s.importIncomeText(JSON.stringify(patch),'Income Calculator default handoff');
+    incomeSignature=signature;
+    return true;
+  } catch(e){ return false; }
+}
+function installIncomeHandoff(){
+  var shell=window.SHELL;
+  if(!shell || typeof shell.go!=='function' || shell.__v50IncomeHandoff) return false;
+  var originalGo=shell.go;
+  shell.go=function(next){
+    if(next==='suite') syncCalculatorIncome(true);
+    var result=originalGo.apply(this,arguments);
+    /* The Loan Suite is no longer painted while the calculator is active.
+       Refresh it immediately on the way back instead of waiting for the
+       scheduler's next idle pass. */
+    if(next==='suite') setTimeout(function(){ soon(true); },0);
+    return result;
+  };
+  shell.__v50IncomeHandoff=true;
+  return true;
+}
+V50.syncCalculatorIncome=syncCalculatorIncome;
+
+/* ------------------------------------------------------------------ 5d
+   POPUP DISMISSAL
+   Every menu remains keyboard accessible, but a click/tap in the page
+   background now closes the action popovers consistently in both products.
+   Native <details> menus use their existing markup; this only closes an
+   already-open surface and never removes its controls or handlers.
+   ------------------------------------------------------------------ */
+function installPopupDismissal(){
+  if(document.__v50PopupDismiss) return;
+  document.__v50PopupDismiss=true;
+  document.addEventListener('pointerdown',function(e){
+    var target=e.target;
+    if(target&&target.closest&&target.closest('#v50IncMenu, #shellbar .lnk.v50-inc, #v44Menu, #v44Header, .v23-action-menu, .v23-sync-menu')) return;
+    $$('#calc-root .v23-action-menu[open], #calc-root .v23-sync-menu[open], #suite-root .v23-action-menu[open], #suite-root .v23-sync-menu[open]').forEach(function(menu){ menu.open=false; });
+    try { if(window.V44&&V44.closeMenu) V44.closeMenu(); } catch(err){}
+    var incomeMenu=$('v50IncMenu'); if(incomeMenu) incomeMenu.classList.remove('open');
+  },true);
+}
+
+/* ------------------------------------------------------------------ 5e
+   INCOME SOURCES, AUTO METHOD AND RECENT SCENARIOS
+
+   Income records still use the original underwriting engine.  This layer
+   only makes its safest calculation mode the default, adds an explicit
+   variable-income record, and keeps five small browser-local snapshots for
+   the cross-workspace recent menu. */
+var INCOME_RECENT_KEY='los.v50.incomeScenarios', recentMenuSignature='';
+function readIncomeRecent(){
+  try { var rows=JSON.parse(localStorage.getItem(INCOME_RECENT_KEY)||'[]');return Array.isArray(rows)?rows:[]; } catch(e){ return []; }
+}
+function writeIncomeRecent(rows){ try { localStorage.setItem(INCOME_RECENT_KEY,JSON.stringify(rows.slice(0,5))); } catch(e){} }
+function borrowerLastName(name){
+  var parts=norm(name).split(/\s+/).filter(Boolean);return parts.length?parts[parts.length-1]:'';
+}
+function compactThousands(value){
+  var n=Math.max(0,N(value));if(n>=1000000)return parseFloat((n/1000000).toFixed(n%1000000?1:0))+'m';
+  if(n>=1000)return parseFloat((n/1000).toFixed(n%1000?1:0))+'k';return String(Math.round(n));
+}
+function loanScenarioName(i){
+  i=i||inputs()||{};var who=borrowerLastName(i.borrowerName)||'Borrower';
+  var program=/conventional/i.test(i.loanProgram||'')?'CONV':'FHA',down=N(i.finalDownPaymentPct);if(down<=1)down*=100;
+  var price=compactThousands(i.basePurchasePrice||i.finalPurchasePrice);
+  return who+' \u2013 '+program+' '+price+' '+parseFloat(down.toFixed(2))+'% down';
+}
+V50.loanScenarioName=loanScenarioName;
+function incomeScenarioName(){
+  var state=incomeState()||{},totals={};try{if(typeof window.calcTotals==='function')totals=window.calcTotals()||{};}catch(e){}
+  var who=norm(state.b1||state.borrower)||'Borrower',jobs=(state.w2||[]).filter(function(j){return j&&j.use!==false;}),job=jobs[0]||{};
+  var detail=[norm(job.employer),norm(job.jobTitle)].filter(Boolean).join(' \u00b7 ');
+  return [who,usd(totals.income||0)+'/mo',detail].filter(Boolean).join(' \u2013 ');
+}
+V50.incomeScenarioName=incomeScenarioName;
+function saveIncomeScenario(reason){
+  var state=incomeState();if(!state)return null;
+  try { if(typeof window.RECALC==='function')window.RECALC(); } catch(e){}
+  var now=new Date().toISOString(),name=incomeScenarioName(),row={id:'income-'+Date.now(),type:'income',name:name,updatedAt:now,reason:reason||'Autosave',data:JSON.parse(JSON.stringify(state))};
+  var list=readIncomeRecent().filter(function(x){return x&&x.name!==name;});list.unshift(row);writeIncomeRecent(list);renderRecentScenarios(true);return row;
+}
+V50.saveIncomeScenario=saveIncomeScenario;
+function restoreIncomeScenario(id){
+  var row=readIncomeRecent().filter(function(x){return x.id===id;})[0],state=incomeState();if(!row||!row.data||!state)return false;
+  Object.keys(state).forEach(function(k){delete state[k];});Object.keys(row.data).forEach(function(k){state[k]=row.data[k];});
+  try { if(typeof window.normalise==='function')window.normalise(); } catch(e){}
+  var b1=$('b1Name'),b2=$('b2Name'),file=$('fileNumber'),agency=$('agency');
+  if(b1)b1.value=state.b1||state.borrower||'';if(b2)b2.value=state.b2||'';if(file)file.value=state.file||'';if(agency)agency.value=state.agency||'FNMA';
+  try { if(window.SHELL&&SHELL.go)SHELL.go('calc');if(typeof window.renderAll==='function')window.renderAll(); } catch(e){}
+  return true;
+}
+function autoIncomeRecord(record,kind){
+  if(!record)return record;record.mode='auto';
+  if(kind==='variable'){record.incomeType='variable';record.variableOnly=true;record.notes=record.notes||'Variable income source';}
+  if(record.jobTitle==null)record.jobTitle='';return record;
+}
+function installIncomeRecordFactories(){
+  [['newW2','w2'],['newSchC','business'],['newCorp','business']].forEach(function(pair){
+    var name=pair[0],fn=window[name];if(typeof fn!=='function'||fn.__v50Auto)return;
+    var wrapped=function(){var record=fn.apply(this,arguments);if(record&&record.mode!=null)record.mode='auto';if(name==='newW2'&&record.jobTitle==null)record.jobTitle='';return record;};
+    wrapped.__v50Auto=true;wrapped.__v50Original=fn;window[name]=wrapped;
+  });
+  var calc=window.calcW2;if(typeof calc==='function'&&!calc.__v50Variable){
+    var wrappedCalc=function(job){var result=calc.apply(this,arguments),variable=job&&((job.incomeType==='variable')||job.variableOnly||N(job.y1&&job.y1.other)||N(job.y2&&job.y2.other)||N(job.y3&&job.y3.other));if(result&&variable)result.hasVariable=true;return result;};
+    wrappedCalc.__v50Variable=true;window.calcW2=wrappedCalc;
+  }
+  var importer=window.importExtract;if(typeof importer==='function'&&!importer.__v50Position){
+    var wrappedImport=function(text){
+      var state=incomeState(),before=state&&state.w2?state.w2.length:0,parsed=null;try{parsed=JSON.parse(String(text).replace(/^\s*```(?:json)?/i,'').replace(/```\s*$/,''));}catch(e){}
+      var result=importer.apply(this,arguments);state=incomeState();
+      if(state&&parsed&&Array.isArray(parsed.w2))parsed.w2.forEach(function(src,index){var row=state.w2[before+index];if(row&&src&&src.position)row.jobTitle=String(src.position);if(row&&src&&src.jobTitle)row.jobTitle=String(src.jobTitle);});
+      return result;
+    };wrappedImport.__v50Position=true;window.importExtract=wrappedImport;
+  }
+}
+function installIncomeAutoAgency(){
+  var select=$('agency'),state=incomeState(),best=globalValue('agencyBest');if(!select||!state)return false;
+  if(!select.querySelector('option[value="AUTO"]')){var option=document.createElement('option');option.value='AUTO';option.textContent='Auto (best fit)';select.insertBefore(option,select.firstChild);}
+  var mode='auto';try{mode=localStorage.getItem('los.v44.agencyMode2')||'auto';if(!localStorage.getItem('los.v44.agencyMode2'))localStorage.setItem('los.v44.agencyMode2','auto');}catch(e){}
+  if(mode==='auto'){
+    try { var choice=typeof best==='function'?best():null;if(choice&&choice.ag&&choice.ag!=='AUTO')state.agency=choice.ag; } catch(e){}
+    select.value='AUTO';select.title='Auto (best fit) is active; the calculator evaluates the available agency methods.';
+  }
+  if(!select.__v50AutoAgency){select.__v50AutoAgency=true;select.addEventListener('change',function(){try{localStorage.setItem('los.v44.agencyMode2',select.value==='AUTO'?'auto':'manual');}catch(e){}},false);}
+  return true;
+}
+function addVariableIncome(){
+  var state=incomeState(),factory=globalValue('newW2'),render=globalValue('renderW2'),recalc=globalValue('RECALC'),go=globalValue('switchTab');
+  if(!state||typeof factory!=='function')return;
+  var record=autoIncomeRecord(factory(),'variable');record.v50MethodChosen='variable';state.w2.push(record);
+  try { if(typeof render==='function')render();decorateIncomeSources();if(typeof recalc==='function')recalc();if(typeof go==='function')go('w2'); } catch(e){}
+}
+V50.addVariableIncome=addVariableIncome;window.addVariableIncome=addVariableIncome;
+function decorateIncomeSources(){
+  installIncomeRecordFactories();var state=incomeState(),head=document.querySelector('#panel-w2 > .section-head');if(!state||!head)return false;
+  (state.w2||[]).forEach(function(record){
+    if(record.jobTitle==null)record.jobTitle='';
+    var blank=!norm(record.employer)&&!N(record.rate)&&!N(record.y1&&record.y1.base)&&!N(record.y2&&record.y2.base)&&!N(record.y3&&record.y3.base);
+    if(blank&&record.mode==='manual'&&!record.v50MethodChosen){record.mode='auto';record.v50MethodChosen='auto-default';}
+  });
+  if(!$('v50AddVariableIncome')){
+    var button=document.createElement('button');button.id='v50AddVariableIncome';button.type='button';button.className='btn btn-light btn-sm no-print v50-add-variable';button.innerHTML=svg('rate')+'<span>Add Other / Variable Income</span>';button.onclick=addVariableIncome;
+    var add=$$('button',head).filter(function(b){return /add employment|add salary/i.test(b.textContent||'');})[0];if(add)head.insertBefore(button,add);else head.appendChild(button);
+  }
+  $$('#w2List .emprec').forEach(function(row,index){
+    var record=state.w2[index];if(!record)return;
+    var type=$$('select',row).filter(function(s){return String(s.getAttribute('onchange')||'').indexOf('incomeType')>=0;})[0];
+    if(type&&!type.querySelector('option[value="variable"]')){var option=document.createElement('option');option.value='variable';option.textContent='Variable / Other Pay';type.appendChild(option);if(record.incomeType==='variable')type.value='variable';}
+    if(!row.querySelector('[data-v50-job-title]')){
+      var field=document.createElement('div');field.className='er v50-job-title';field.setAttribute('data-v50-job-title','');
+      field.innerHTML='<label>Job title (optional)</label><input class="cell-input" value="'+esc(record.jobTitle||'')+'" placeholder="Position or title">';
+      var input=field.querySelector('input');input.addEventListener('input',function(){var set=globalValue('setField');try{if(typeof set==='function')set('w2',record.id,'jobTitle',input.value);else record.jobTitle=input.value;}catch(e){record.jobTitle=input.value;}});
+      var employer=$$('input',row).filter(function(x){return String(x.getAttribute('oninput')||'').indexOf("'employer'")>=0;})[0];var host=employer&&employer.closest('.er');if(host&&host.nextSibling)row.insertBefore(field,host.nextSibling);else row.appendChild(field);
+    }
+  });
+  return true;
+}
+function installIncomeReportAutosave(){
+  var report=window.openReport;if(typeof report!=='function'||report.__v50Autosave)return false;
+  var wrapped=function(){saveIncomeScenario('Income report');return report.apply(this,arguments);};wrapped.__v50Autosave=true;window.openReport=wrapped;return true;
+}
+function renderRecentScenarios(force){
+  var hand=document.querySelector('#shellbar .hand');if(!hand)return false;
+  var loan=[];try{loan=(store()&&store().scenarioList||[]).map(function(x){return{id:x.id,type:'loan',name:x.name,updatedAt:x.updatedAt};});}catch(e){}
+  var income=readIncomeRecent().map(function(x){return{id:x.id,type:'income',name:x.name,updatedAt:x.updatedAt};});
+  var rows=loan.concat(income).sort(function(a,b){return String(b.updatedAt||'').localeCompare(String(a.updatedAt||''));}).slice(0,5),sig=JSON.stringify(rows.map(function(x){return[x.type,x.id,x.name,x.updatedAt];}));
+  var details=$('v50RecentScenarios');
+  if(!details){details=document.createElement('details');details.id='v50RecentScenarios';details.className='v50-recent no-print';details.innerHTML='<summary>'+svg('file')+'<span>Recent</span></summary><div class="v50-recent-panel"></div>';var appearance=$('v23Appearance');hand.insertBefore(details,appearance||hand.firstChild);}
+  if(!force&&recentMenuSignature===sig)return true;recentMenuSignature=sig;
+  var panel=details.querySelector('.v50-recent-panel');panel.innerHTML='<header><b>5 most recent scenarios</b><small>Income and loan files</small></header>'+(rows.length?rows.map(function(row){return '<button type="button" data-v50-recent-type="'+row.type+'" data-v50-recent-id="'+esc(row.id)+'"><i>'+svg(row.type==='loan'?'home':'sheet')+'</i><span>'+esc(row.name||'Saved scenario')+'<small>'+esc(row.type==='loan'?'Loan Suite':'Income Calculator')+' \u00b7 '+new Date(row.updatedAt).toLocaleString()+'</small></span></button>';}).join(''):'<p>No saved scenarios yet.</p>');
+  panel.onclick=function(e){var b=e.target.closest('[data-v50-recent-id]');if(!b)return;details.open=false;if(b.dataset.v50RecentType==='loan'){var s=store();if(s&&s.selectScenario)s.selectScenario(b.dataset.v50RecentId);if(window.SHELL&&SHELL.go)SHELL.go('suite');}else restoreIncomeScenario(b.dataset.v50RecentId);};
+  return true;
+}
+function runIncomeFileAction(action){
+  if(action==='report'){if(typeof window.openReport==='function')window.openReport();}
+  else if(action==='save'){saveIncomeScenario('Saved income file');if(typeof window.saveJSON==='function')window.saveJSON();}
+  else if(action==='load'){var f=$('loadFile');if(f)f.click();}
+  else if(action==='excel'&&typeof window.exportWorkbook==='function')window.exportWorkbook();
+  else if(action==='summary'&&typeof window.printSummary==='function')window.printSummary();
+  else if(action==='documents'&&typeof window.switchTab==='function')window.switchTab('docs');
+  else if(action==='restore'&&typeof window.restoreAutosave==='function')window.restoreAutosave();
+  else if(action==='from-suite'&&typeof window.importReno==='function')window.importReno();
+  else if(action==='to-suite'&&typeof window.exportReno==='function')window.exportReno();
+  else if(action==='new'&&typeof window.clearAll==='function'){if(confirm('Start a new income file? The five recent report snapshots remain available.'))window.clearAll();}
+  else if(action==='recent'){var d=$('v50RecentScenarios');if(d)d.open=true;}
+}
+function paintIncomeFileActions(){
+  var details=$('v23CalcActions'),grid=details&&details.querySelector('.v23-actions-grid');if(!grid)return false;
+  var panel=grid.querySelector('.v50-income-actions');if(!panel){
+    panel=document.createElement('div');panel.className='v50-income-actions';
+    panel.innerHTML='<section><h6>File</h6><div><button data-a="save">'+svg('file')+'<span>Save income file<small>Snapshot and download JSON</small></span></button><button data-a="load">'+svg('file')+'<span>Load saved file<small>Open an Income Calculator JSON file</small></span></button><button data-a="recent">'+svg('chart')+'<span>Recent scenarios<small>Open the five newest income or loan files</small></span></button><button data-a="new">'+svg('sheet')+'<span>New income file<small>Start with a clean worksheet</small></span></button></div></section>'+
+      '<section><h6>Reports & documents</h6><div><button data-a="report">'+svg('sheet')+'<span>Income Report<small>Autosave and open the report builder</small></span></button><button data-a="excel">'+svg('sheet')+'<span>Excel workbook<small>Export the complete calculation workbook</small></span></button><button data-a="summary">'+svg('chart')+'<span>UW summary<small>Print the underwriting summary</small></span></button><button data-a="documents">'+svg('book')+'<span>Documents & OCR<small>Open the shared document workspace</small></span></button></div></section>'+
+      '<section><h6>Loan Suite sync</h6><div><button data-a="from-suite">'+svg('loan')+'<span>Load from Loan Suite<small>Bring the active loan into income</small></span></button><button data-a="to-suite">'+svg('loan')+'<span>Send income to Loan Suite<small>Push qualifying income and liabilities</small></span></button><button data-a="restore">'+svg('file')+'<span>Restore browser autosave<small>Recover the latest worksheet state</small></span></button></div></section>';
+    grid.appendChild(panel);grid.classList.add('v50-income-actions-mounted');panel.onclick=function(e){var b=e.target.closest('button[data-a]');if(!b)return;e.preventDefault();e.stopPropagation();runIncomeFileAction(b.dataset.a);details.open=false;};
+  }
+  return true;
+}
+
+/* Every borrower-facing generated loan document captures a named scenario
+   version first.  Saving runs after the click begins so no legacy action is
+   interrupted by a synchronous redraw. */
+var loanDocumentSaveAt=0;
+function autoSaveLoanScenario(reason){
+  var s=store();if(!s)return false;var name=loanScenarioName(s.activeInputs);
+  try { if(norm(s.activeInputs.name)!==name)s.renameScenario(name);s.saveVersion('Auto-saved before '+(reason||'document output'));renderRecentScenarios(true);return true; } catch(e){ return false; }
+}
+V50.autoSaveLoanScenario=autoSaveLoanScenario;
+function installLoanDocumentAutosave(){
+  if(document.__v50LoanDocumentAutosave)return;document.__v50LoanDocumentAutosave=true;
+  document.addEventListener('click',function(e){
+    var button=e.target.closest&&e.target.closest('button,a,[role="button"]');if(!button)return;
+    var inside=button.closest('#suite-root,#v44Menu,#v43Menu,#v23SuiteActions,#v35Panel,#v12Modal,#v50UnifiedDocuments');if(!inside)return;
+    var label=norm(button.textContent||button.getAttribute('aria-label')||button.title);
+    if(!/(PRINT|PDF|REPORT|GENERATE|DRAFT LOAN ESTIMATE|DRAFT LE|PROFIT & LOSS|P&L|PAY STATEMENT|SCHEDULE C|ITEMIZED FEES|CONTRACTOR ESTIMATE|LEASE AGREEMENT|ADDENDUM|PMI|MIP|RENOVATION FEES)/i.test(label))return;
+    var now=Date.now();if(now-loanDocumentSaveAt<700)return;loanDocumentSaveAt=now;setTimeout(function(){autoSaveLoanScenario(label);},0);
+  },true);
+}
+function installLoanNaming(){
+  if(window.V45&&!V45.__v50Naming){V45.__v50Naming=true;V45.nameFor=function(i){return loanScenarioName(i);};}
+  if(window.V13&&V13.scenarioName&&!V13.scenarioName.__v50){var f=function(){return loanScenarioName(inputs());};f.__v50=true;V13.scenarioName=f;}
+}
+
+/* Nationwide county refinement: Zippopotam supplies coordinates and the
+   public FCC Area API resolves those coordinates to a county.  The offline
+   ZIP table remains the fail-safe and manual city/county edits still win. */
+var V50_ZIP_CACHE={};
+function nycCounty(city,zip){
+  var c=norm(city).toLowerCase(),z=String(zip||'');
+  if(/brooklyn/.test(c)||/^112/.test(z))return'Kings';if(/bronx/.test(c)||/^104/.test(z))return'Bronx';
+  if(/staten island/.test(c)||/^103/.test(z))return'Richmond';if(/queens|jamaica|flushing|astoria|long island city|far rockaway/.test(c)||/^(111|113|114|116)/.test(z))return'Queens';
+  if(/manhattan|new york/.test(c)||/^(100|101|102)/.test(z))return'New York';return'';
+}
+function installNationwideCountyLookup(){
+  if(!window.V38||typeof V38.lookupZip!=='function'||V38.lookupZip.__v50County)return false;
+  var fallback=V38.lookupZip;
+  var enhanced=function(zip){
+    zip=String(zip||'').replace(/\D/g,'').slice(0,5);if(zip.length!==5)return Promise.resolve(null);if(V50_ZIP_CACHE[zip])return Promise.resolve(V50_ZIP_CACHE[zip]);
+    return fetch('https://api.zippopotam.us/us/'+zip).then(function(response){if(!response.ok)throw new Error('ZIP '+response.status);return response.json();}).then(function(data){
+      var place=data&&data.places&&data.places[0];if(!place)throw new Error('No ZIP place');
+      var out={zip:zip,city:place['place name']||'',state:place['state abbreviation']||'',stateName:place.state||'',county:'',fips:'',latitude:place.latitude||'',longitude:place.longitude||''};
+      var lat=parseFloat(out.latitude),lon=parseFloat(out.longitude);if(!isFinite(lat)||!isFinite(lon)){out.county=stateCode(out.stateName)==='NY'?nycCounty(out.city,zip):'';return out;}
+      return fetch('https://geo.fcc.gov/api/census/area?lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&format=json').then(function(response){return response.ok?response.json():null;}).then(function(area){
+        var row=area&&area.results&&area.results[0]||{};out.county=row.county_name||row.county||row.name||'';out.fips=String(row.county_fips||row.countyFips||row.fips||'').slice(0,5);
+        if(!out.county&&stateCode(out.stateName)==='NY')out.county=nycCounty(out.city,zip);return out;
+      }).catch(function(){if(stateCode(out.stateName)==='NY')out.county=nycCounty(out.city,zip);return out;});
+    }).then(function(out){if(out&&(out.city||out.county))V50_ZIP_CACHE[zip]=out;return out;}).catch(function(){return fallback(zip);});
+  };
+  enhanced.__v50County=true;enhanced.__v50Original=fallback;V38.lookupZip=enhanced;return true;
+}
+
+/* ------------------------------------------------------------------ 5f
+   UNIVERSAL DOCUMENT PROMPT
+   A shared, browser-only prompt builder for both applications.  The
+   existing file-specific OCR prompts remain where they are; this is an
+   additional freeform way to create one consistent prompt for any
+   document.  It never calls an external service, and it deliberately
+   leaves document import/review in the existing Documents & OCR flow. */
+var UNIVERSAL_PROMPT_TYPES = {
+  general:{label:'Any mortgage document',focus:'Identify the document and extract only figures, dates, names, identifiers and terms printed on it.',fields:'documentType, sourceName, borrowerName, propertyAddress, dates, amounts, rates, identifiers'},
+  paystub:{label:'Income - paystub / earnings statement',focus:'Extract employee, employer, pay frequency, pay-period dates, hourly or salary rate, hours, current earnings, YTD earnings, taxes, deductions and net pay.',fields:'documentType:"paystub", employeeName, employer, payDate, periodStart, periodEnd, payFrequency, hourlyRate, salaryRate, regularHours, overtimeHours, grossThisPeriod, grossYtd, baseYtd, overtimeYtd, bonusYtd, commissionYtd, taxes, deductions, netPay'},
+  w2:{label:'Income - W-2',focus:'Extract employee, employer, EIN, tax year, wages, Social Security wages, Medicare wages, withholding and all printed Box 12 codes.',fields:'documentType:"w2", employeeName, employer, employerEin, taxYear, box1Wages, box2FederalWithheld, box3SocialSecurityWages, box5MedicareWages, box12Codes:[{code,amount}]'},
+  voe:{label:'Income - written VOE / Work Number',focus:'Extract employee, employer, position, employment status, hire date, base pay, pay frequency, current and prior-year overtime, bonus, commission and other income.',fields:'documentType:"voe", employeeName, employer, position, employmentStatus, hireDate, payFrequency, baseRate, currentYearBase, currentYearOvertime, currentYearBonus, currentYearCommission, priorYearTotal, twoYearsPriorTotal, verifiedOn'},
+  tax1040:{label:'Income - 1040 / tax return',focus:'Extract the tax year, filers, wages, interest, dividends, capital gains, other income, adjusted gross income, taxable income and all attached schedules that are present.',fields:'documentType:"1040", taxYear, filers, line1Wages, taxableInterest, ordinaryDividends, capitalGainOrLoss, otherIncome, adjustedGrossIncome, taxableIncome, schedulesPresent'},
+  scheduleC:{label:'Income - Schedule C / sole proprietor',focus:'Extract business name, owner, tax year, gross receipts, cost of goods sold, total expenses, net profit or loss, depreciation, business use of home, meals and vehicle expenses.',fields:'documentType:"scheduleC", businessName, ownerName, taxYear, grossReceipts, costOfGoodsSold, totalExpenses, line31NetProfit, depreciation, homeOffice, mealsDeducted, carExpenses'},
+  scheduleE:{label:'Income - Schedule E / rental',focus:'Extract each property, rents received, royalties, mortgage interest, taxes, insurance, repairs, HOA, depreciation, total expenses and net rental income or loss.',fields:'documentType:"scheduleE", taxYear, properties:[{propertyAddress,rentsReceived,royalties,mortgageInterest,taxes,insurance,repairs,hoa,depreciation,totalExpenses,netRentalIncome}]'},
+  k1:{label:'Income - K-1 / 1065 / 1120-S',focus:'Extract entity name, EIN, taxpayer, ownership percentage, ordinary business income or loss, rental income, guaranteed payments, distributions, depreciation and tax year.',fields:'documentType:"k1", entityName, entityEin, taxpayerName, taxYear, ownershipPct, ordinaryBusinessIncome, rentalIncome, guaranteedPayments, distributions, depreciation'},
+  business:{label:'Income - business return / P&L',focus:'Extract business name, ownership, tax year or period, revenue, cost of goods sold, operating expenses, depreciation, officer compensation, net income and recurring versus one-time items.',fields:'documentType:"businessReturn", businessName, entityType, taxYear, periodStart, periodEnd, grossRevenue, costOfGoodsSold, operatingExpenses, depreciation, officerCompensation, netIncome, oneTimeItems'},
+  income1099:{label:'Income - 1099 / independent contractor',focus:'Extract recipient, payer, tax year, 1099 form type, nonemployee compensation, interest, dividends, retirement distributions or other printed income.',fields:'documentType:"1099", formType, recipientName, payerName, payerTin, taxYear, nonemployeeCompensation, interestIncome, dividends, retirementDistribution, otherIncome'},
+  benefits:{label:'Income - retirement, pension, Social Security or VA',focus:'Extract beneficiary, agency or payer, benefit type, monthly or periodic gross benefit, effective date, continuation evidence, withholding and any Medicare deduction.',fields:'documentType:"benefitAward", beneficiary, agencyOrPayer, benefitType, grossMonthlyBenefit, grossPeriodicBenefit, payFrequency, effectiveDate, continuationDate, federalWithholding, medicareDeduction'},
+  support:{label:'Income - support, maintenance or other award',focus:'Extract recipient, payer, court or agency, award type, monthly amount, start and end dates, received-payment history and continuance terms when printed.',fields:'documentType:"supportAward", recipient, payer, awardType, monthlyAmount, startDate, endDate, paymentHistory, continuanceTerms'},
+  assets:{label:'Assets - bank or investment statement',focus:'Extract institution, account, owners, statement dates, balances, transaction rows and every deposit or withdrawal exactly as printed.',fields:'documentType:"assetStatement", institution, accountLast4, accountType, owners, statementStart, statementEnd, beginningBalance, endingBalance, deposits:[{date,amount,description}], withdrawals:[{date,amount,description}]'},
+  credit:{label:'Credit report',focus:'Extract scores, tradelines, balances, payments, months remaining, status, responsibility, inquiries and real-estate-owned details.',fields:'documentType:"creditReport", scores, tradelines:[{creditor,type,balance,monthlyPayment,monthsRemaining,status,responsibility}], inquiries, reo'},
+  property:{label:'Property / appraisal / rent',focus:'Extract address, property facts, dates, as-is value, after-repair value, appraisal facts, taxes, insurance and market or contract rent when printed.',fields:'documentType:"property", propertyAddress, effectiveDate, asIsValue, afterRepairValue, propertyType, units, yearBuilt, annualTaxes, annualInsurance, marketRent'},
+  contract:{label:'Contract / Loan Estimate / Closing Disclosure',focus:'Extract parties, property, transaction dates, price, loan terms, credits, deposits, fees, cash to close and all material conditions.',fields:'documentType:"contract|loanEstimate|closingDisclosure", buyer, seller, propertyAddress, purchasePrice, loanAmount, interestRate, closingDate, earnestMoney, sellerCredits, fees, cashToClose'},
+  legal:{label:'Lease / addendum / agreement',focus:'Extract parties, property, dates, rent or financial terms, deposits, obligations, amendments and signature information.',fields:'documentType:"lease|addendum", landlord, tenants, propertyAddress, leaseStart, leaseEnd, monthlyRent, securityDeposit, amendments, signatureDates'},
+  renovation:{label:'Contractor estimate / renovation',focus:'Extract contractor details, property, dates, scope, line items, labor, materials, permits, contingencies, draws and totals.',fields:'documentType:"contractorEstimate", contractor, licenseNumber, propertyAddress, estimateDate, lineItems:[{item,description,labor,materials,total}], permits, contingency, drawSchedule, total'}
+};
+function universalContext(){
+  var i=inputs()||{}, o=outputs()||{}, loan=o.loan||{};
+  var borrower=norm(i.borrowerName || ((i.borrowers||[])[0]||{}).name);
+  var address=[i.propertyAddress,i.city,i.state,i.zipCode].filter(Boolean).join(', ');
+  var rows=[];
+  if(borrower) rows.push('Borrower: '+borrower);
+  if(address) rows.push('Property: '+address);
+  if(i.loanProgram) rows.push('Program: '+i.loanProgram);
+  if(N(i.basePurchasePrice)) rows.push('Purchase price: '+usd2(i.basePurchasePrice));
+  if(N(loan.totalLoan)) rows.push('Current total loan: '+usd2(loan.totalLoan));
+  return rows.length ? '\n\nCurrent file context (reference only; never use it to fill a missing document value):\n- '+rows.join('\n- ') : '';
+}
+function universalPromptText(type, extra, useContext){
+  var spec=UNIVERSAL_PROMPT_TYPES[type]||UNIVERSAL_PROMPT_TYPES.general;
+  return 'You are reviewing a mortgage-loan document for a human reviewer. '+spec.focus+'\n\n'
+    + 'Requirements:\n'
+    + '- Return ONLY one valid JSON object. Do not add prose or markdown fences.\n'
+    + '- Include "documentType" and "sourceName" when they are printed or known.\n'
+    + '- Use descriptive camelCase keys that match the printed labels.\n'
+    + '- Numbers must be plain numbers without currency symbols, commas or percent signs.\n'
+    + '- Keep rates as printed, for example 6.875, never 0.06875.\n'
+    + '- Use YYYY-MM-DD for complete dates; preserve partial or ambiguous dates as sourceText.\n'
+    + '- Never guess, calculate, annualize, reconcile or replace a missing value. Omit an uncertain field instead.\n'
+    + '- Add "review": [{"field":"","value":"","status":"Auto-matched|Needs Review","sourceText":""}] only for fields that need human review.\n'
+    + '- Add "notes": [] for relevant caveats found in the document.\n'
+    + (spec.fields ? '\nPreferred JSON keys when printed:\n'+spec.fields+'\n' : '')
+    + (useContext ? universalContext() : '')
+    + (norm(extra) ? '\n\nAdditional reviewer instructions:\n'+norm(extra) : '')
+    + '\n\nDocument text or file follows:';
+}
+function copyText(value,done){
+  if(!value) return;
+  var fallback=function(){
+    var ta=document.createElement('textarea'); ta.value=value; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(x){} ta.remove(); if(done)done();
+  };
+  try { if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(done,fallback);return;} } catch(e){}
+  fallback();
+}
+function universalModal(){
+  var modal=$('v50UniversalPrompt');
+  if(modal) return modal;
+  modal=document.createElement('div'); modal.id='v50UniversalPrompt'; modal.className='v50-universal-modal no-print';
+  modal.innerHTML='<button type="button" class="v50-universal-backdrop" aria-label="Close Universal Prompt"></button>'
+    + '<section class="v50-universal-dialog" role="dialog" aria-modal="true" aria-labelledby="v50UniversalTitle">'
+    + '<header><div><span>Documentation workspace</span><h2 id="v50UniversalTitle">Universal Prompt</h2><p>Build a reusable extraction prompt without changing the current file.</p></div><button type="button" class="v50-universal-close" aria-label="Close">&#215;</button></header>'
+    + '<div class="v50-universal-controls"><label><span>Document focus</span><select id="v50UniversalType">'+Object.keys(UNIVERSAL_PROMPT_TYPES).map(function(k){return '<option value="'+k+'">'+esc(UNIVERSAL_PROMPT_TYPES[k].label)+'</option>';}).join('')+'</select></label>'
+    + '<label class="v50-universal-context"><input id="v50UniversalContext" type="checkbox" checked> Include current file context as reference only</label>'
+    + '<label class="v50-universal-extra"><span>Additional instructions <em>Optional and freeform</em></span><textarea id="v50UniversalExtra" rows="2" placeholder="For example: prioritize rental income, flag handwritten edits, or preserve payer names."></textarea></label></div>'
+    + '<label class="v50-universal-output"><span>Prompt <em>Editable before copying</em></span><textarea id="v50UniversalOutput" rows="15"></textarea></label>'
+    + '<footer><div><button type="button" class="primary" data-v50-up-copy>Copy prompt</button><button type="button" data-v50-up-download>Download .txt</button></div><div><button type="button" data-v50-up-docs>Open Documents & OCR</button><button type="button" data-v50-up-review>Send returned JSON to review</button></div></footer>'
+    + '<label class="v50-universal-return"><span>Returned JSON <em>Optional; it is placed into the existing review box, never auto-applied</em></span><textarea id="v50UniversalJson" rows="4" placeholder="Paste the assistant JSON here when ready."></textarea></label>'
+    + '</section>';
+  document.body.appendChild(modal);
+  var update=function(){ $('v50UniversalOutput').value=universalPromptText($('v50UniversalType').value,$('v50UniversalExtra').value,$('v50UniversalContext').checked); };
+  $('v50UniversalType').addEventListener('change',update); $('v50UniversalContext').addEventListener('change',update); $('v50UniversalExtra').addEventListener('input',update);
+  modal.querySelector('.v50-universal-backdrop').onclick=V50.closeUniversalPrompt;
+  modal.querySelector('.v50-universal-close').onclick=V50.closeUniversalPrompt;
+  modal.querySelector('[data-v50-up-copy]').onclick=function(){ copyText($('v50UniversalOutput').value,function(){say('Prompt copied','Paste it into your assistant with the document, then return the JSON for review.','good',4500);}); };
+  modal.querySelector('[data-v50-up-download]').onclick=function(){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([$('v50UniversalOutput').value],{type:'text/plain'})); a.download='mortgage-suite-universal-prompt.txt'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},0); };
+  modal.querySelector('[data-v50-up-docs]').onclick=function(){ V50.closeUniversalPrompt(); V50.openUnifiedDocuments(); };
+  modal.querySelector('[data-v50-up-review]').onclick=function(){
+    var value=$('v50UniversalJson').value.trim(); if(!value){say('No JSON entered','Paste the returned JSON before sending it to the document review box.','warn',4000);return;}
+    V50.openUnifiedDocuments(); setTimeout(function(){var target=$('v50LoanJsonBox')||$('v9JsonBox');if(target){target.value=value;target.dispatchEvent(new Event('input',{bubbles:true}));try{target.focus({preventScroll:true});}catch(e){}say('JSON ready for review','Review it in Documents & OCR, then apply it only if the matched fields are correct.','good',5000);}else say('Document review is loading','Open Documents & OCR and paste the JSON into its review field.','info',4000);},80);
+  };
+  return modal;
+}
+V50.closeUniversalPrompt=function(){var modal=$('v50UniversalPrompt');if(modal)modal.classList.remove('open');};
+V50.openUniversalPrompt=function(type){var modal=universalModal();var pick=$('v50UniversalType');if(type&&UNIVERSAL_PROMPT_TYPES[type])pick.value=type;modal.classList.add('open');$('v50UniversalOutput').value=universalPromptText(pick.value,$('v50UniversalExtra').value,$('v50UniversalContext').checked);setTimeout(function(){$('v50UniversalOutput').focus();},0);};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')V50.closeUniversalPrompt();});
+function universalEntry(type){
+  var b=document.createElement('button');b.type='button';b.className='v50-universal-entry';b.dataset.v50UniversalPrompt=type||'general';
+  b.setAttribute('aria-label','Open Universal Prompt');b.title='Universal documentation prompt';b.textContent='AI';
+  b.onclick=function(){V50.openUniversalPrompt(b.dataset.v50UniversalPrompt);};return b;
+}
+function placeUniversalEntry(host,id,type,position){
+  if(!host||$(id))return false;var b=universalEntry(type);b.id=id;
+  if(position==='first')host.insertBefore(b,host.firstChild);else host.appendChild(b);return true;
+}
+function installUniversalPromptLaunchers(){
+  /* Keep the launcher in each existing document header instead of adding a new card. */
+  var hub=$('v15DocsHub');if(hub)placeUniversalEntry(hub.querySelector('.v15-hub-head'),'v50UniversalCalcHub','general');
+  var loanDocs=$('v16LoanDocs');if(loanDocs)placeUniversalEntry(loanDocs.querySelector('.card-top'),'v50UniversalLoanHub','general');
+  /* Remove the first-pass standalone cards if this build was open during an update. */
+  ['v50UniversalCalcDocs','v50UniversalLoanDocs'].forEach(function(id){var old=$(id);if(old)old.remove();});
+  /* Contract & LE is a separate routed stage, so it retains its own compact AI action. */
+  var stage=$('v8Stage');if(stage&&(window.V8&&V8.active==='docparse'||/contract\s*&\s*le/i.test(stage.textContent||'')))placeUniversalEntry(stage,'v50UniversalContract','contract','first');
+}
+function installUniversalMenu(){
+  if(!window.V44||!V44.openMenu||V44.__v50UniversalMenu)return false;
+  var open=V44.openMenu;V44.openMenu=function(kind){var result=open.apply(this,arguments);if(kind==='docs'||kind==='actions')setTimeout(function(){var menu=$('v44Menu');if(!menu||menu.querySelector('[data-v50-universal-menu]'))return;var section=document.createElement('section');section.className='v44-menu-section v50-universal-menu';section.innerHTML='<span>Document AI</span><div class="v44-menu-grid"></div>';var b=universalEntry('general');b.classList.add('v44-menu-item');b.dataset.v50UniversalMenu='1';b.innerHTML='<i aria-hidden="true">AI</i><span><b>AI</b><small>Universal documentation prompt</small></span>';section.querySelector('.v44-menu-grid').appendChild(b);menu.appendChild(section);},0);return result;};V44.__v50UniversalMenu=true;return true;
+}
+
+/* ------------------------------------------------------------------ 5f
+   UNIFIED DOCUMENTS & OCR
+
+   The Income Calculator already owns the broad income/AUS extractor and the
+   Loan Suite owns the mortgage-field assignment reader.  A single canonical
+   page now presents both.  Each physical file is read only once: text read by
+   either engine is handed to the other engine, avoiding a second PDF parse or
+   OCR pass while retaining both sets of field mappings and review controls. */
+var DOCUMENT_SYNC={fromIncome:{},fromLoan:{},bridging:false};
+var SHARED_ASSIGNMENT_PROMPTS={
+  income:{label:'Income assignment',text:'Extract borrower, employer or business, pay frequency, rate, hours, current and year-to-date earnings by type, taxes, deductions, net pay, period dates and document source. Do not infer missing amounts. Mark uncertain values Needs Review.'},
+  credit:{label:'Credit report assignment',text:'Extract creditor, account type, current balance, monthly payment, months remaining, status, responsibility, property or mortgage linkage, total balances, total payments and relevant REO details. Preserve source text and mark uncertain values Needs Review.'},
+  lease:{label:'Lease assignment',text:'Extract landlord, tenants, property address, term dates, monthly rent, security deposit, late fee, utilities, occupants and signature dates. Return blanks for missing fields and mark uncertainty Needs Review.'},
+  addendum:{label:'Addendum assignment',text:'Extract agreement date, purchaser or borrower names, seller names, property address, amendment text, referenced agreement, effective date, names and signature dates. Return blanks for missing fields.'},
+  contractor:{label:'Contractor estimate assignment',text:'Extract contractor or company, license, contact details, customer, property address, proposal date, permits and every scope line with labor, materials and line total. Preserve printed subtotals and flag reconciliation differences for review.'},
+  contract:{label:'Purchase contract assignment',text:'Extract buyer, seller, property address, price, earnest money, seller credits, financing terms, closing date, contingencies, contract date and signature dates. Preserve blanks and mark uncertain fields Needs Review.'},
+  lead:{label:'Lead expiration assignment',text:'Extract borrower, property, lead source, lead received date, preapproval or rate-lock expiration, follow-up date, owner, status and notes. Preserve source text and do not infer missing dates.'},
+  cd:{label:'Closing Disclosure assignment',text:'Extract loan terms and every Closing Disclosure fee using page 2 sections A through J, payer, paid-before-closing status, credits, cash to close, dates and totals. Preserve printed totals and mark differences Needs Review.'}
+};
+var SHARED_SPECIAL_PROMPTS={
+  incomeImport:'Complete Income Calculator import',
+  loanEstimate:'Loan Estimate import schema',
+  assetReview:'Asset statement / large-deposit review'
+};
+function documentHash(text){
+  text=String(text||'').replace(/\s+/g,' ').trim();
+  var hash=2166136261;for(var n=0;n<text.length;n+=Math.max(1,Math.floor(text.length/240))){hash^=text.charCodeAt(n);hash=Math.imul(hash,16777619);}
+  return String(text.length)+':'+String(hash>>>0);
+}
+function incomeDocumentList(){try{return typeof DOCS!=='undefined'?DOCS:null;}catch(e){return null;}}
+function ensureLoanDocumentBackend(){
+  if($('v9DocBody')&&$('v9PromptBox')&&$('v9JsonBox'))return true;
+  if(!window.V9)return false;
+  var backend=$('v50LoanDocsBackend');
+  if(!backend){backend=document.createElement('div');backend.id='v50LoanDocsBackend';backend.hidden=true;backend.setAttribute('aria-hidden','true');backend.innerHTML='<div id="v9DocBody"></div><textarea id="v9PromptBox"></textarea><textarea id="v9JsonBox"></textarea>';document.body.appendChild(backend);}
+  try{V9.renderDocs();}catch(e){}
+  return !!$('v9DocBody');
+}
+function ingestIncomeDocumentText(name,size,text){
+  var docs=incomeDocumentList(),hash=documentHash(text);if(!docs||!text||docs.some(function(d){return documentHash(d.text)===hash;}))return false;
+  try{
+    if(typeof classify!=='function'||typeof extractFields!=='function'||typeof renderDocs!=='function')return false;
+    var type=classify(text),segments=type==='wvoe'&&typeof wvoeSegments==='function'?wvoeSegments(text):[{label:'',text:text}],made=[];
+    segments.forEach(function(segment,index){
+      var rec={id:'v50i'+Date.now().toString(36)+index+Math.random().toString(36).slice(2,5),name:segment.label?name+' — '+segment.label:name,size:Number(size)||0,status:'done',note:'Shared OCR text · '+(extractFields(type,segment.text)||[]).length+' field(s) detected',text:segment.text,type:type,fields:extractFields(type,segment.text)||[],target:'',yearCol:'y1',prog:1,open:false};
+      try{if(typeof defaultTarget==='function')rec.target=defaultTarget(type);}catch(e){}
+      docs.push(rec);made.push(rec);
+    });
+    renderDocs();
+    if(type==='aus'&&typeof applyAUS==='function')try{applyAUS(text,name);}catch(e){}
+    var auto=false;try{auto=typeof AUTO_APPLY!=='undefined'&&AUTO_APPLY;}catch(e){}
+    if(auto&&typeof applyDoc==='function')made.forEach(function(rec){
+      try{var kind=typeof docType==='function'?docType(rec.type).kind:'';if(typeof REC_KIND!=='undefined'&&REC_KIND[kind])applyDoc(rec.id,true);}catch(e){}
+    });
+    return true;
+  }catch(e){return false;}
+}
+function sendIncomeTextToLoan(records){
+  if(!window.V9||!V9.addDocs)return;
+  records.forEach(function(rec){
+    if(!rec||rec.status!=='done'||!rec.text)return;var hash=documentHash(rec.text);if(DOCUMENT_SYNC.fromIncome[hash])return;
+    DOCUMENT_SYNC.fromIncome[hash]=true;
+    try{var clean=String(rec.name||'document').replace(/\.[^.]+$/,'').replace(/[\\/:*?"<>|]/g,'_');V9.addDocs([new File([rec.text],clean+' — shared OCR.txt',{type:'text/plain'})]);}catch(e){}
+  });
+}
+function syncUnifiedDocumentMirrors(){
+  var income=incomeDocumentList(),incomeCount=$('v50IncomeDocCount'),loanCount=$('v50LoanDocCount');
+  if(incomeCount)incomeCount.textContent=String(income?income.length:0);
+  var loanFiles=window.V9&&V9.DOCS&&V9.DOCS.files||[];if(loanCount)loanCount.textContent=String(loanFiles.length);
+  var source=$('v9DocBody'),mirror=$('v50LoanDocMirror');
+  if(source&&mirror&&mirror.__v50Html!==source.innerHTML){mirror.__v50Html=source.innerHTML;mirror.innerHTML=source.innerHTML;}
+}
+function installDocumentEngineBridge(){
+  ensureLoanDocumentBackend();
+  if(typeof window.handleFiles==='function'&&!window.handleFiles.__v50Shared){
+    var incomeReader=window.handleFiles;
+    var sharedReader=async function(files){
+      var docs=incomeDocumentList(),before=docs?docs.map(function(d){return d.id;}):[];
+      var result=await incomeReader.apply(this,arguments);docs=incomeDocumentList();
+      if(docs)sendIncomeTextToLoan(docs.filter(function(d){return before.indexOf(d.id)<0;}));
+      syncUnifiedDocumentMirrors();return result;
+    };
+    sharedReader.__v50Shared=true;sharedReader.__v50Original=incomeReader;window.handleFiles=sharedReader;
+  }
+  if(typeof window.renderDocs==='function'&&!window.renderDocs.__v50Shared){
+    var incomeRender=window.renderDocs;var sharedIncomeRender=function(){var result=incomeRender.apply(this,arguments);syncUnifiedDocumentMirrors();return result;};
+    sharedIncomeRender.__v50Shared=true;window.renderDocs=sharedIncomeRender;
+  }
+  if(window.V9&&V9.renderDocs&&!V9.renderDocs.__v50Shared){
+    var loanRender=V9.renderDocs;V9.renderDocs=function(){
+      var result=loanRender.apply(this,arguments),files=V9.DOCS&&V9.DOCS.files||[];
+      files.forEach(function(rec){
+        if(!rec||rec.status!=='done'||!rec.text)return;var hash=documentHash(rec.text);if(DOCUMENT_SYNC.fromIncome[hash]||DOCUMENT_SYNC.fromLoan[hash])return;
+        DOCUMENT_SYNC.fromLoan[hash]=true;ingestIncomeDocumentText(rec.name,0,rec.text);
+      });
+      syncUnifiedDocumentMirrors();return result;
+    };V9.renderDocs.__v50Shared=true;
+  }
+  if(window.V9&&V9.aiPrompt&&!V9.aiPrompt.__v50Shared){
+    var loanPrompt=V9.aiPrompt;V9.aiPrompt=function(){var result=loanPrompt.apply(this,arguments),from=$('v9PromptBox'),to=$('v50LoanPromptBox');if(from&&to){to.value=from.value;try{to.focus({preventScroll:true});to.select();}catch(e){}}return result;};V9.aiPrompt.__v50Shared=true;
+  }
+  return true;
+}
+var ANY_JSON_REVIEW=null;
+function parseAnyJson(text){
+  var raw=String(text||'').trim().replace(/^\s*```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'');
+  if(!raw)throw new Error('Paste a JSON object first.');
+  var value=JSON.parse(raw);if(Array.isArray(value)){if(value.length!==1||!value[0]||typeof value[0]!=='object')throw new Error('Use one JSON object, not a list.');value=value[0];}
+  if(!value||typeof value!=='object')throw new Error('The pasted JSON must be an object.');return value;
+}
+function detectJsonTarget(value){
+  var root=value&&typeof value==='object'?value:{},keys=Object.keys(root).map(function(k){return k.toLowerCase();});
+  if(root.schema==='mortgage-suite-scenario'||root.inputs||root.activeInputs||(root.scenario&&root.scenario.inputs))return'loan';
+  if(keys.some(function(k){return['w2','schc','corp','sche','other','assets','borrowers','agency'].indexOf(k)>=0;}))return'income';
+  if(keys.some(function(k){return['basepurchaseprice','finaldownpaymentpct','loanprogram','propertyaddress','zipcode','closing','escrow','reno','creditscore','interestrate'].indexOf(k)>=0;}))return'loan';
+  return'loan';
+}
+function jsonRoot(value){return value.inputs||value.activeInputs||(value.scenario&&value.scenario.inputs)||(value.data&&value.data.inputs)||value;}
+function flattenJson(value,prefix,out){
+  out=out||[];prefix=prefix||'';
+  if(!value||typeof value!=='object'||Array.isArray(value)){if(prefix)out.push([prefix,value]);return out;}
+  Object.keys(value).forEach(function(k){if(k==='id')return;var path=prefix?prefix+'.'+k:k,v=value[k];if(v&&typeof v==='object'&&!Array.isArray(v))flattenJson(v,path,out);else out.push([path,v]);});return out;
+}
+function pathExists(root,path){
+  var parts=String(path).split('.'),node=root;for(var n=0;n<parts.length;n++){if(!node||typeof node!=='object'||!Object.prototype.hasOwnProperty.call(node,parts[n]))return false;node=node[parts[n]];}return true;
+}
+function reviewAnyJson(hub){
+  var input=hub&&hub.querySelector('#v50AnyJsonInput'),target=hub&&hub.querySelector('#v50AnyJsonTarget'),status=hub&&hub.querySelector('#v50AnyJsonStatus'),apply=hub&&hub.querySelector('[data-v50-json-apply]');if(!input||!status)return;
+  try{
+    var value=parseAnyJson(input.value),chosen=target&&target.value!=='auto'?target.value:detectJsonTarget(value),root=jsonRoot(value),keys=Object.keys(root||{});
+    ANY_JSON_REVIEW={raw:input.value,value:value,target:chosen};status.className='good';status.innerHTML='<b>Ready for '+(chosen==='income'?'Income Calculator':'Loan Suite')+'.</b> '+keys.length+' top-level field'+(keys.length===1?'':'s')+' found: '+esc(keys.slice(0,10).join(', '))+(keys.length>10?'…':'')+'. Nothing has been changed yet.';if(apply)apply.disabled=false;
+  }catch(err){ANY_JSON_REVIEW=null;status.className='bad';status.textContent=String(err&&err.message||err);if(apply)apply.disabled=true;}
+}
+function applyAnyJson(hub){
+  var status=hub&&hub.querySelector('#v50AnyJsonStatus'),input=hub&&hub.querySelector('#v50AnyJsonInput');if(!ANY_JSON_REVIEW||!input||ANY_JSON_REVIEW.raw!==input.value){reviewAnyJson(hub);if(!ANY_JSON_REVIEW)return;}
+  var review=ANY_JSON_REVIEW,result,count=0;
+  try{
+    if(review.target==='income'){
+      var importer=globalValue('importExtract'),render=globalValue('renderAll'),recalc=globalValue('RECALC');if(typeof importer!=='function')throw new Error('Income import is not ready yet.');
+      result=importer(JSON.stringify(review.value));if(result&&result.error)throw new Error(result.error);count=N(result&&result.total);if(typeof render==='function')render();if(typeof recalc==='function')recalc();decorateIncomeSources();saveIncomeScenario('JSON import');
+    }else{
+      var s=store(),root=jsonRoot(review.value);if(!s)throw new Error('Loan Suite is not ready yet.');
+      flattenJson(root).forEach(function(row){if(pathExists(s.activeInputs,row[0])&&row[1]!==undefined){s.setField(row[0],row[1],'Reviewed JSON import');count++;}});
+      if(!count&&window.V9){ensureLoanDocumentBackend();var box=$('v9JsonBox');if(box){box.value=JSON.stringify(root);V9.applyAiJson();count=Object.keys(root).length;}}
+      if(!count)throw new Error('No supported Loan Suite fields were found. Choose a mortgage schema prompt, then review the returned keys.');
+      try{syncScenarioProperty(true);}catch(ignore){}autoSaveLoanScenario('JSON import');
+    }
+    status.className='good';status.innerHTML='<b>Applied '+count+' supported field'+(count===1?'':'s')+'.</b> Review the source fields against the document before using the results.';
+  }catch(err){status.className='bad';status.textContent=String(err&&err.message||err);}
+}
+function wireAnyJson(hub){
+  if(!hub||hub.__v50AnyJson)return;hub.__v50AnyJson=true;var input=hub.querySelector('#v50AnyJsonInput'),target=hub.querySelector('#v50AnyJsonTarget'),review=hub.querySelector('[data-v50-json-review]'),apply=hub.querySelector('[data-v50-json-apply]');
+  if(input)input.addEventListener('input',function(){ANY_JSON_REVIEW=null;if(apply)apply.disabled=true;});if(target)target.addEventListener('change',function(){ANY_JSON_REVIEW=null;if(apply)apply.disabled=true;});if(review)review.onclick=function(){reviewAnyJson(hub);};if(apply)apply.onclick=function(){applyAnyJson(hub);};
+}
+V50.parseAnyJson=parseAnyJson;V50.detectJsonTarget=detectJsonTarget;
+function unifiedDocumentMarkup(){
+  var universal=Object.keys(UNIVERSAL_PROMPT_TYPES).map(function(k){return '<button type="button" data-v50-prompt-kind="universal" data-v50-prompt-key="'+esc(k)+'">'+esc(UNIVERSAL_PROMPT_TYPES[k].label)+'</button>';}).join('');
+  var schemas=Object.keys(window.V46&&V46.prompts||{}).map(function(k){var p=V46.prompts[k];return '<button type="button" data-v50-prompt-kind="schema" data-v50-prompt-key="'+esc(k)+'">'+esc(p.label)+'</button>';}).join('');
+  var assignments=Object.keys(SHARED_ASSIGNMENT_PROMPTS).map(function(k){return '<button type="button" data-v50-prompt-kind="assignment" data-v50-prompt-key="'+esc(k)+'">'+esc(SHARED_ASSIGNMENT_PROMPTS[k].label)+'</button>';}).join('');
+  var special=Object.keys(SHARED_SPECIAL_PROMPTS).map(function(k){return '<button type="button" data-v50-prompt-kind="special" data-v50-prompt-key="'+esc(k)+'">'+esc(SHARED_SPECIAL_PROMPTS[k])+'</button>';}).join('');
+  return '<section id="v50UnifiedDocuments" class="v50-unified-docs">'
+    +'<header><div><small>Shared workspace</small><h2>Documents & OCR</h2><p>One local file read feeds both the Income Calculator and the Loan Suite. Nothing is uploaded.</p></div><div class="v50-doc-sync"><span>Income <b id="v50IncomeDocCount">0</b></span><i aria-hidden="true">↔</i><span>Loan <b id="v50LoanDocCount">0</b></span></div></header>'
+    +'<div id="v50SharedDocDrop" class="v50-shared-drop" role="button" tabindex="0" aria-label="Choose documents for shared OCR"><i>'+svg('book')+'</i><span><b>Drop documents here, or browse</b><small>PDF, PNG, JPG or WebP · read once · reviewed in both workspaces</small></span><button type="button">Choose files</button><input id="v50SharedDocFile" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple hidden></div>'
+    +'<div class="v50-doc-flow"><span><b>Income assignments</b>Paystubs, W-2s, VOE, tax returns, Schedule C/E, K-1, assets and AUS</span><i>→</i><span><b>Loan assignments</b>Purchase, value, rate, tax, insurance, credit, deposits, concessions and renovation</span></div>'
+    +'<section id="v50AnyJson" class="v50-any-json"><header><div><small>Quick import</small><h3>Paste any document or scenario JSON</h3><p>Validate and preview the destination first. Nothing is applied until you confirm.</p></div><label>Send to<select id="v50AnyJsonTarget"><option value="auto">Auto-detect</option><option value="income">Income Calculator</option><option value="loan">Loan Suite</option></select></label></header><textarea id="v50AnyJsonInput" rows="5" spellcheck="false" placeholder="Paste a JSON object from any document prompt, saved income file, or Loan Suite scenario…"></textarea><div class="v50-any-json-actions"><button type="button" data-v50-json-review>Review JSON</button><button type="button" data-v50-json-apply disabled>Apply reviewed JSON</button></div><output id="v50AnyJsonStatus">Paste JSON, choose a destination or leave Auto-detect selected, then review it.</output></section>'
+    +'<section id="v50SharedPromptLibrary" class="v50-shared-prompts"><header><div><small>Prompt library</small><h3>Every document prompt</h3><p>Choose a reusable prompt or an exact import schema. Prompts remain editable before copying.</p></div><span class="v50-prompt-count">'+(Object.keys(UNIVERSAL_PROMPT_TYPES).length+Object.keys(window.V46&&V46.prompts||{}).length+Object.keys(SHARED_ASSIGNMENT_PROMPTS).length+Object.keys(SHARED_SPECIAL_PROMPTS).length)+' prompts</span></header>'
+    +'<details><summary>Universal document prompts <span>'+Object.keys(UNIVERSAL_PROMPT_TYPES).length+'</span></summary><div class="v50-prompt-grid">'+universal+'</div></details>'
+    +'<details><summary>Mortgage import schemas <span>'+Object.keys(window.V46&&V46.prompts||{}).length+'</span></summary><div class="v50-prompt-grid">'+schemas+'</div></details>'
+    +'<details><summary>OCR assignment helpers <span>'+Object.keys(SHARED_ASSIGNMENT_PROMPTS).length+'</span></summary><div class="v50-prompt-grid">'+assignments+'</div></details>'
+    +'<details><summary>Specialized prompt workflows <span>'+Object.keys(SHARED_SPECIAL_PROMPTS).length+'</span></summary><div class="v50-prompt-grid">'+special+'</div></details>'
+    +'<div class="v50-shared-prompt-output"><label><span id="v50SharedPromptTitle">Selected prompt</span><textarea id="v50SharedPromptOutput" rows="7" placeholder="Choose a mortgage import schema or OCR assignment helper above. Universal prompts open in the full prompt builder."></textarea></label><div><button type="button" data-v50-shared-prompt-copy>Copy prompt</button><button type="button" data-v50-shared-prompt-download>Download .txt</button></div></div></section>'
+    +'</section>';
+}
+function setSharedPrompt(label,value){
+  var title=$('v50SharedPromptTitle'),box=$('v50SharedPromptOutput');if(!box)return;
+  if(title)title.textContent=label||'Selected prompt';box.value=String(value||'');box.dispatchEvent(new Event('input',{bubbles:true}));
+  try{box.focus({preventScroll:true});box.setSelectionRange(0,0);}catch(e){}
+}
+function wireSharedPromptLibrary(hub){
+  if(!hub||hub.__v50Prompts)return;hub.__v50Prompts=true;
+  hub.addEventListener('click',function(e){
+    var button=e.target.closest&&e.target.closest('button[data-v50-prompt-kind]');if(!button)return;
+    var kind=button.dataset.v50PromptKind,keyName=button.dataset.v50PromptKey;
+    if(kind==='universal'){V50.openUniversalPrompt(keyName);return;}
+    if(kind==='schema'){
+      var prompt=window.V46&&V46.prompts&&V46.prompts[keyName];if(!prompt)return;
+      setSharedPrompt(prompt.label,prompt.text);ensureLoanDocumentBackend();
+      try{V46.pick(keyName);}catch(err){}
+      var loanBox=$('v50LoanPromptBox');if(loanBox)loanBox.value=prompt.text;return;
+    }
+    if(kind==='special'){
+      if(keyName==='incomeImport'){
+        var incomePrompt='';try{if(typeof EXTRACT_PROMPT!=='undefined')incomePrompt=EXTRACT_PROMPT;}catch(err){}
+        if(!incomePrompt)incomePrompt=universalPromptText('general','Return the complete Income Calculator import schema for every supported income source.',false);
+        setSharedPrompt(SHARED_SPECIAL_PROMPTS[keyName],incomePrompt);return;
+      }
+      if(keyName==='loanEstimate'){
+        var lePrompt='';try{if(window.V11&&V11.lePrompt)lePrompt=V11.lePrompt();}catch(err){}
+        if(!lePrompt&&window.V46&&V46.prompts&&V46.prompts.le)lePrompt=V46.prompts.le.text;
+        setSharedPrompt(SHARED_SPECIAL_PROMPTS[keyName],lePrompt);return;
+      }
+      if(keyName==='assetReview'){
+        try{if(window.V36&&V36.buildLargeDepositPrompt){V36.buildLargeDepositPrompt();return;}}catch(err){}
+        V50.openUniversalPrompt('assets');return;
+      }
+    }
+    var helper=SHARED_ASSIGNMENT_PROMPTS[keyName];if(helper)setSharedPrompt(helper.label,helper.text);
+  });
+  var copy=hub.querySelector('[data-v50-shared-prompt-copy]'),download=hub.querySelector('[data-v50-shared-prompt-download]');
+  if(copy)copy.onclick=function(){var box=$('v50SharedPromptOutput');if(!box||!box.value.trim()){say('Choose a prompt','Select a schema or assignment helper first.','warn',3500);return;}copyText(box.value,function(){say('Prompt copied','Paste it with the source document, then return the JSON for review.','good',4000);});};
+  if(download)download.onclick=function(){var box=$('v50SharedPromptOutput');if(!box||!box.value.trim()){say('Choose a prompt','Select a schema or assignment helper first.','warn',3500);return;}var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([box.value],{type:'text/plain'}));a.download='mortgage-suite-document-prompt.txt';a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},0);};
+}
+function mountUnifiedDocuments(){
+  var host=$('subpanel-docs-import');if(!host)return false;installDocumentEngineBridge();
+  host.classList.add('v50-unified-mounted');var hub=$('v50UnifiedDocuments');
+  if(!hub){
+    var head=host.querySelector('.section-head');(head||host).insertAdjacentHTML(head?'afterend':'afterbegin',unifiedDocumentMarkup());hub=$('v50UnifiedDocuments');
+    var drop=$('v50SharedDocDrop'),file=$('v50SharedDocFile'),choose=drop&&drop.querySelector('button');
+    function pick(){if(file)file.click();}
+    function read(files){if(!files||!files.length)return;installDocumentEngineBridge();try{var p=window.handleFiles(files);if(p&&p.catch)p.catch(function(err){say('Document could not be read',String(err&&err.message||err),'warn',5000);});}catch(err){say('Document could not be read',String(err&&err.message||err),'warn',5000);}}
+    if(choose)choose.onclick=function(e){e.stopPropagation();pick();};
+    if(drop){drop.onclick=pick;drop.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};['dragenter','dragover'].forEach(function(name){drop.addEventListener(name,function(e){e.preventDefault();e.stopPropagation();drop.classList.add('drag');});});['dragleave','drop'].forEach(function(name){drop.addEventListener(name,function(e){e.preventDefault();e.stopPropagation();drop.classList.remove('drag');});});drop.addEventListener('drop',function(e){if(e.dataTransfer)read(e.dataTransfer.files);});}
+    if(file)file.onchange=function(){read(file.files);file.value='';};
+  }
+  wireSharedPromptLibrary(hub);
+  wireAnyJson(hub);
+  var list=$('docList');if(list&&!$('v50LoanReview'))list.insertAdjacentHTML('afterend','<section id="v50LoanReview" class="v50-loan-doc-review"><header><div><small>Loan Suite review</small><h3>Loan, property and closing assignments</h3><p>These matches use the same extracted text and never overwrite an edited loan field silently.</p></div></header><div id="v50LoanDocMirror"></div><details><summary>Loan extraction prompt & JSON review</summary><label><span>Prompt</span><textarea id="v50LoanPromptBox" rows="5" placeholder="Choose Build an AI prompt on a loan document above."></textarea></label><label><span>Returned JSON</span><textarea id="v50LoanJsonBox" rows="5" placeholder="Paste loan-field JSON for review."></textarea></label><button type="button" data-v50-loan-json>Review loan JSON</button></details></section>');
+  var apply=$('[data-v50-loan-json]');if(apply&&!apply.__v50){apply.__v50=true;apply.onclick=function(){var from=$('v50LoanJsonBox'),to=$('v9JsonBox');if(!from||!to||!window.V9)return;to.value=from.value;V9.applyAiJson();};}
+  try{if(window.V9&&V9.renderDocs)V9.renderDocs();}catch(e){}syncUnifiedDocumentMirrors();return true;
+}
+V50.openUnifiedDocuments=function(){
+  noteExplicitNavigation();
+  /* A deliberate Documents navigation must outrank the short-lived direct
+     Loan Suite startup pin.  Otherwise its final delayed callback can pull
+     the user back into the suite after this shared page is already open. */
+  suiteEntryPinned=false;
+  try{
+    var calcButton=$('mode-calc');
+    if(calcButton)calcButton.click();else if(window.SHELL&&SHELL.go)SHELL.go('calc');
+    var openDocs=globalValue('switchTab');if(typeof openDocs==='function')openDocs('docs');
+  }catch(e){}
+  mountUnifiedDocuments();
+  /* Some retained route layers settle one frame after the header click. Keep
+     the shared page authoritative without introducing a recurring repaint. */
+  setTimeout(function(){
+    var calc=$('calc-root');if(calc&&calc.getBoundingClientRect().height<=0){var b=$('mode-calc');if(b)b.click();}
+    var openDocs=globalValue('switchTab');if(typeof openDocs==='function')openDocs('docs');mountUnifiedDocuments();
+  },40);
+};
+V50.mountUnifiedDocuments=mountUnifiedDocuments;
+
+/* ------------------------------------------------------------------ 6
+   RAIL: when the live summary is hidden, the page takes the full width */
+function paintCols(){
+  var cols = document.querySelector('#suite-root .cols-main'); if (!cols) return;
+  var rail = cols.querySelector('.rail');
+  var hidden = !rail || getComputedStyle(rail).display === 'none';
+  cols.classList.toggle('v50-norail', hidden);
+}
+
+
+/* ------------------------------------------------------------------ 7
+   ROUTING GUARD
+   Two faults carried from 48: the engine re-highlights its own last page
+   after a click on a page it does not own, so the highlight lags one
+   click behind; and release 47 reads that stale highlight as "the user
+   left", which closes Mortgage rates and Documents & OCR under the
+   previous page. The guard remembers the tab the user chose, keeps the
+   highlight on it, and keeps those two pages on screen until the user
+   goes somewhere else. */
+var STAGE = {
+  'MORTGAGE RATES':'rates',
+  'DOCUMENTS & OCR':'docs',
+  'DOCUMENTS & WORKSHEETS':'docs'
+};
+var MOVED_STAGE = { 'CONTRACT & LE':'docparse' };
+var intended = null, lastTrusted = 0, lastMode = null, guarding = false;
+/* The retained tab renderer keeps an accessible original label and our
+   visible label in the same button. Prefer the stable data label so routing
+   does not see strings such as "SETUP Setup" as a new, unknown page. */
+function tabKey(t){ return key(t && (t.getAttribute('data-v50-key') || t.getAttribute('data-v23-key') || t.getAttribute('data-v50-label') || t.textContent)); }
+function row(){ return document.querySelector('#suite-root .tabs'); }
+function tabFor(k){ var r = row(); return r ? $$('.tab', r).filter(function(t){ return tabKey(t) === k; })[0] : null; }
+function isEngineTab(t){ return t && !t.classList.contains('v8-tab') && !t.classList.contains('v43-tab') && !t.dataset.v8 && !STAGE[tabKey(t)]; }
+function engineMode(){ try { var s = store(); return s && s.snapshot ? s.snapshot.mode : null; } catch(e){ return null; } }
+function modeKey(m){ return key(m).replace('MAXMORTGAGE','MAX MORTGAGE'); }
+function showStage(id){
+  var sr = $('suite-root'); if (!sr) return;
+  var host = $('v8Stage'), cm = sr.querySelector('.cols-main');
+  var need = !window.V8 || V8.active !== id || !host || host.style.display === 'none';
+  if (need && window.V8 && V8.go){
+    var y = window.scrollY; V8.go(id);
+    if (V8.active === id && y && intended && intended.at && Date.now() - intended.at > 900) window.scrollTo(0, y);
+    host = $('v8Stage');
+  }
+  if (host && host.style.display === 'none') host.style.display = '';
+  if (cm && cm.style.display !== 'none') cm.style.display = 'none';
+  var moved = $('suiteMoved'); if (moved && moved.style.display !== 'none') moved.style.display = 'none';
+  sr.classList.add('v47-parked'); sr.dataset.v47Parked = id;
+}
+function showMovedStage(id){
+  var sr=$('suite-root'); if(!sr||!window.LOANSUITE||!LOANSUITE.goMoved)return;
+  var host=$('suiteMoved'),active=host&&host.querySelector('.panel.active');
+  if(!host||host.style.display==='none'||!active||active.id!=='panel-'+id) LOANSUITE.goMoved(id);
+  host=$('suiteMoved'); if(host&&host.style.display==='none')host.style.display='';
+  var cm=sr.querySelector('.cols-main'); if(cm&&cm.style.display!=='none')cm.style.display='none';
+  var stage=$('v8Stage'); if(stage&&stage.style.display!=='none')stage.style.display='none';
+  sr.classList.remove('v47-parked'); sr.classList.add('v44-moved-active');
+}
+function enforce(){
+  if (guarding || !intended) return;
+  var r = row(); if (!r) return;
+  var t = tabFor(intended.key);
+  if (!t){ intended = null; return; }
+  guarding = true;
+  try {
+    $$('.tab', r).forEach(function(x){ var on = x === t; if (x.classList.contains('active') !== on) x.classList.toggle('active', on); });
+    var st = STAGE[intended.key], moved=MOVED_STAGE[intended.key];
+    if (st) showStage(st);
+    else if(moved) showMovedStage(moved);
+    else if (isEngineTab(t) && window.V8 && V8.active && V8.active !== 'property'){ V8.leave(); }
+  } finally { guarding = false; }
+}
+function V48full(){ try { return window.V48 && V48.fullOpen && V48.fullOpen(); } catch(e){ return false; } }
+var GROUP_OF = { 'QUOTE':'file','SETUP':'file','PROPERTY':'file','RENOVATION':'loan','MAX MORTGAGE':'loan','MORTGAGE RATES':'loan',
+  'CLOSING':'costs','ESCROW':'costs','TAXES & PRORATION':'costs','QUALIFY':'underwriting','RENTAL':'underwriting','CREDIT':'underwriting',
+  'ADVANCED':'underwriting','CONTRACT & LE':'underwriting','SCENARIOS':'results','SUMMARY':'results',
+  'DOCUMENTS & OCR':'documents','DOCUMENTS & WORKSHEETS':'documents','DRAFT LE':'documents' };
+function syncGroup(k){
+  var g = GROUP_OF[k]; if (!g || V48full()) return;
+  try { if (localStorage.getItem('los.v23.suiteGroup') !== g) localStorage.setItem('los.v23.suiteGroup', g); } catch(e){}
+  var nav = $('v23SuitePrimaryNav');
+  if (nav) $$('button[data-group]', nav).forEach(function(b){ var on = b.dataset.group === g; if (b.classList.contains('active') !== on) b.classList.toggle('active', on); });
+  /* The visible Documents button is the direct launcher, not the hidden
+     compatibility group clone. Preserve its active state for orientation. */
+  var docsDirect=$('v28nav-documents');
+  if(docsDirect) docsDirect.classList.toggle('active',g==='documents');
+  var r = row();
+  if (r) $$('.tab', r).forEach(function(t){ var on = GROUP_OF[tabKey(t)] === g; if (t.classList.contains('v48-hide') === on) t.classList.toggle('v48-hide', !on); });
+  try { if (window.LOS_SCHEDULER) LOS_SCHEDULER.request(0); } catch(e){}
+}
+var userEpoch=0;
+document.addEventListener('click',function(e){if(!e.isTrusted||!e.target||!e.target.closest)return;if(e.target.closest('#suite-root .tabs .tab')){userEpoch++;intended=null;}},true);
+function choose(k){
+  var mine = intended = { key:k, at:Date.now() }; lastMode = engineMode();
+  syncGroup(k);
+  [60, 350, 900, 1700].forEach(function(ms){ setTimeout(function(){ if (intended !== mine) return; syncGroup(k); enforce(); }, ms); });
+}
+V50.choose = choose;
+
+/* File is a workspace entry point, not a second quote shortcut.  Sending it
+   to Setup keeps the first editable file page predictable after every use. */
+function wireFileToSetup(){
+  var nav=$('v23SuitePrimaryNav'),button=nav&&nav.querySelector('button[data-group="file"]');
+  if(!button||button.__v50FileToSetup)return false;
+  button.__v50FileToSetup=true;
+  button.addEventListener('click',function(event){
+    if(!event.isTrusted)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    var setup=tabFor('SETUP');
+    if(setup){
+      choose('SETUP');
+      setup.click();
+      /* Legacy group handling runs a short asynchronous selection after
+         its click. Re-assert Setup after that settles, without touching a
+         subsequent user navigation to a different primary group. */
+      var ep=userEpoch;[40,180,520].forEach(function(delay){setTimeout(function(){if(ep!==userEpoch)return;
+        if(!button.classList.contains('active')) return;
+        var current=tabFor('SETUP');
+        if(current && !current.classList.contains('active')) current.click();
+        choose('SETUP');
+      },delay);});
+    }else V50.go('SETUP');
+  },true);
+  return true;
+}
+/* The legacy workspace strip may replace its File button after our first
+   enhancement pass. A single delegated capture handler covers that replacement
+   without polling or retaining duplicate listeners. */
+var fileSetupDelegated=false;
+function installFileSetupDelegation(){
+  if(fileSetupDelegated)return;
+  fileSetupDelegated=true;
+  document.addEventListener('click',function(event){
+    if(!event.isTrusted||!event.target.closest)return;
+    var button=event.target.closest('#v23SuitePrimaryNav button[data-group="file"]');
+    if(!button)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    var setup=tabFor('SETUP');
+    if(!setup){V50.go('SETUP');return;}
+    choose('SETUP');setup.click();
+    var ep=userEpoch;[40,180,520,1200].forEach(function(delay){setTimeout(function(){if(ep!==userEpoch)return;
+      if(!button.classList.contains('active'))return;
+      var current=tabFor('SETUP');if(current&&!current.classList.contains('active'))current.click();
+      choose('SETUP');
+    },delay);});
+  },true);
+}
+/* A few retained builds mount the primary strip after the first enhancement
+   pass. Watch only that brief startup window and disconnect as soon as the
+   actual File button accepts its direct binding. */
+var fileSetupObserver=null;
+function observeFileSetupMount(){
+  if(wireFileToSetup())return;
+  if(fileSetupObserver||!window.MutationObserver)return;
+  fileSetupObserver=new MutationObserver(function(){
+    if(wireFileToSetup()&&fileSetupObserver){fileSetupObserver.disconnect();fileSetupObserver=null;}
+  });
+  fileSetupObserver.observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(function(){if(fileSetupObserver){fileSetupObserver.disconnect();fileSetupObserver=null;}},10000);
+}
+/* live summary rows open the page that holds their figure */
+var MODE_TAB = { quote:'QUOTE', setup:'SETUP', renovation:'RENOVATION', maxmortgage:'MAX MORTGAGE', rates:'MORTGAGE RATES', closing:'CLOSING',
+  escrow:'ESCROW', qualify:'QUALIFY', income:'QUALIFY', rental:'RENTAL', credit:'CREDIT', advanced:'ADVANCED', summary:'SUMMARY', compare:'SCENARIOS' };
+document.addEventListener('click', function(e){
+  var r = e.target.closest && e.target.closest('#v44LiveSummary .v44-live-row, #v44LiveSummary .v44-arv-check');
+  if (!r) return;
+  if (r.hasAttribute('data-v50-edit-score')) return;
+  var k = MODE_TAB[String(r.getAttribute('data-v35-mode')||'').toLowerCase()]; if (!k) return;
+  var cur = (row() && row().querySelector('.tab.active')) || null;
+  if (cur && tabKey(cur) === k) return;              /* already there: let the row focus its field */
+  var t = tabFor(k); if (!t) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  lastTrusted = 0; t.click();
+  setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 120);
+}, true);
+document.addEventListener('click', function(e){
+  var r=e.target.closest&&e.target.closest('#v44LiveSummary [data-v50-edit-score]'); if(!r)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  var s=store();if(!s)return; var old=$('v50ScoreEditor');if(old)old.remove();
+  var p=document.createElement('aside');p.id='v50ScoreEditor';p.className='v35-rail-editor no-print';
+  p.innerHTML='<header><div><small>Live summary</small><b>Representative credit score</b></div><button type="button" data-x aria-label="Close">×</button></header><p>Enter a score to refresh mortgage-insurance and credit-tier estimates.</p><div class="v35-rail-fields"><label><span>Credit score</span><input type="text" inputmode="decimal" autocomplete="off" value="'+esc(iNum(s.activeInputs.creditScore))+'"></label></div><footer><button type="button" class="primary" data-save>Apply change</button><button type="button" data-go>Open Credit</button></footer>';
+  document.body.appendChild(p);var b=r.getBoundingClientRect(),w=Math.min(390,innerWidth-24);p.style.width=w+'px';p.style.left=Math.max(12,Math.min(innerWidth-w-12,b.left-w-12))+'px';p.style.top=Math.max(12,Math.min(innerHeight-p.offsetHeight-12,b.top))+'px';
+  p.querySelector('[data-x]').onclick=function(){p.remove();};p.querySelector('[data-go]').onclick=function(){p.remove();V50.go('CREDIT');};p.querySelector('[data-save]').onclick=function(){var v=p.querySelector('input').value;if(window.V20&&V20.setScenario)V20.setScenario('creditScore',v,'num');else s.setField('creditScore',v,'Live summary edit');p.remove();};if(window.V19)V19.enhanceFreeform(p);
+}, true);
+function iNum(v){return N(v)>0?String(Math.round(N(v))):'';}
+/* Documents is now one shared page for both products. */
+document.addEventListener('click', function(e){
+  if (!(e.target.closest && e.target.closest('#v44Docs'))) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  V50.openUnifiedDocuments();
+}, true);
+document.addEventListener('click', function(e){
+  var t = e.target.closest && e.target.closest('#suite-root .tabs .tab'); if (!t) return;
+  var now = Date.now();
+  if (e.isTrusted){ lastTrusted = now; choose(tabKey(t)); if (STAGE[tabKey(t)]) setTimeout(function(){ window.scrollTo(0,0); }, 150); }
+  else if (now - lastTrusted > 1500){ choose(tabKey(t)); }
+}, true);
+/* the group buttons pick a page themselves; follow whatever they pick */
+document.addEventListener('click', function(e){
+  if (e.isTrusted && e.target.closest && e.target.closest('#v23SuitePrimaryNav button')){ intended = null; lastTrusted = 0; }
+}, true);
+function watchRow(){
+  var r = row(); if (!r || r.__v50obs) return;
+  r.__v50obs = true;
+  new MutationObserver(function(){
+    if (guarding || !intended) return;
+    /* the engine moved on by itself (a link inside a page): follow it */
+    var m = engineMode();
+    if (m && lastMode && m !== lastMode){
+      lastMode = m;
+      var et = tabFor(modeKey(m));
+      if (et && Date.now() - intended.at > 500){ intended = { key:modeKey(m), at:Date.now() }; }
+    }
+    enforce();
+  }).observe(r, { subtree:true, attributes:true, attributeFilter:['class'] });
+}
+
+/* ------------------------------------------------------------------ loop
+   The engines calculate synchronously through their own input handlers.
+   This layer only decorates those engine results, so it is intentionally
+   split in two: the right-side Live Summary (and its matching top figures)
+   paint on the next frame, while navigation chrome and DOM discovery wait
+   for a short idle window.  That keeps typing, tab changes and scrolling
+   responsive without delaying any lending calculation. */
+var livePending = false, decorPending = false, lastDecorated = 0, lastIncomeSync = 0;
+var DECORATE_EVERY = 2200, INCOME_SYNC_EVERY = 3000;
+function inCalculator(){ try { return !!(window.SHELL && SHELL.mode==='calc'); } catch(e){ return false; } }
+function paintLiveNow(){
+  if(document.hidden || inCalculator()) return;
+  /* These figures are deliberately not debounced: they are the visible
+     feedback for a freeform scenario edit. */
+  try { paintTop(); } catch(e){}
+  try { paintVerdict(); } catch(e){}
+  try { paintLiveExtras(); } catch(e){}
+  try { paintCreditOverview(); } catch(e){}
+}
+function refreshLive(){
+  if(livePending) return;
+  livePending = true;
+  (window.requestAnimationFrame || setTimeout)(function(){ livePending=false; paintLiveNow(); });
+}
+function decorate(){
+  decorPending=false;
+  if(document.hidden) return;
+  lastDecorated=Date.now();
+  try { installIncomeHandoff(); } catch(e){}
+  /* The Income Calculator has its own renderer. Only keep the shared shell
+     menu and document launchers current while its workspace is visible. */
+  try { paintIncome(); } catch(e){}
+  try { installIncomeAutoAgency(); decorateIncomeSources(); installIncomeReportAutosave(); paintIncomeFileActions(); renderRecentScenarios(false); } catch(e){}
+  try { stabilizeAssetsWorkspace(); } catch(e){}
+  try { installUniversalPromptLaunchers(); } catch(e){}
+  try { installDocumentEngineBridge(); mountUnifiedDocuments(); } catch(e){}
+  if(inCalculator()) return;
+  /* Calculator-to-suite handoff is useful, but it used to recompute the
+     entire income workbook every renderer pass. Poll it sparingly; switching
+     back to the suite still forces an immediate handoff through shell.go. */
+  if(Date.now()-lastIncomeSync>=INCOME_SYNC_EVERY){
+    lastIncomeSync=Date.now();
+    try { syncCalculatorIncome(false); } catch(e){}
+  }
+  try { deferSuiteInputCommit(); } catch(e){}
+  try { stabilizeZipLookup(); wirePropertyTwoWay(); wireTaxTwoWay(); wireScenarioFieldsTwoWay(); syncScenarioProperty(true); labelStreetFields(); } catch(e){}
+  try { installUniversalMenu(); } catch(e){}
+  try { paintHeader(); } catch(e){}
+  try { paintTabs(); } catch(e){}
+  try { paintWorkspaceGroups(); decorateFullWorkspace(); } catch(e){}
+  try { decorateAdvancedBar(); } catch(e){}
+  try { wireFileToSetup(); } catch(e){}
+  try { paintCols(); } catch(e){}
+  try { watchRow(); enforce(); } catch(e){}
+}
+function scheduleDecor(delay, force){
+  if(document.hidden || decorPending) return;
+  if(!force && Date.now()-lastDecorated<DECORATE_EVERY) return;
+  decorPending=true;
+  var run=function(){ decorate(); };
+  if(typeof window.requestIdleCallback==='function') window.requestIdleCallback(run,{timeout:Math.max(90,delay||0)});
+  else setTimeout(run,Math.max(0,delay||0));
+}
+function tick(){
+  /* The shared scheduler calls this periodically as a fallback for late
+     mounted content. Its noncritical half is throttled above. */
+  if(document.hidden) return;
+  refreshLive();
+  scheduleDecor(160,false);
+}
+function soon(force){
+  refreshLive();
+  scheduleDecor(force ? 0 : 90,!!force);
+}
+V50.refresh=function(){ refreshLive(); scheduleDecor(0,true); };
+var subscribed = false;
+/* A direct Loan Suite URL must win over the calculator's delayed W-2 startup
+   routine.  That routine is useful when the calculator is the requested
+   workspace, but it used to pull a fresh /loan-suite.html visit back to
+   Income a couple seconds after first paint.  Keep the explicit suite entry
+   pinned only through startup; a real workspace-button click cancels it. */
+var suiteEntryPinned = false, suiteEntryWired = false, suiteEntryInitialized = false;
+function pinSuiteEntry(){
+  /* This is a startup guard, not a standing navigation policy. `hook()` is
+     intentionally idempotent and can run again as retained layers mount, so
+     remembering the first decision prevents a later pass from re-pinning the
+     suite after the user has deliberately opened the Income Calculator. */
+  if(suiteEntryInitialized)return false;
+  suiteEntryInitialized=true;
+  var app=preferredWorkspace();
+  if(app!=='suite') return false;
+  /* A bare return URL is promoted to the direct Loan Suite route before the
+     calculator's delayed start logic can choose its W-2 screen. */
+  try {
+    if(!explicitWorkspace()){
+      var url=new URL(location.href);url.searchParams.set('app','suite');history.replaceState(null,'',url.toString());
+    }
+  } catch(e){}
+  suiteEntryPinned=true;
+  function apply(){
+    if(!suiteEntryPinned) return;
+    var shell=window.SHELL;
+    try { if(shell&&shell.mode!=='suite'&&shell.go) shell.go('suite'); } catch(e){}
+  }
+  [0,520,1450,2600,4300].forEach(function(ms){ setTimeout(apply,ms); });
+  if(!suiteEntryWired){
+    suiteEntryWired=true;
+    document.addEventListener('click',function(e){
+      /* Any click dispatched to a real workspace control is intentional.
+         The delayed legacy startup calls SHELL.go directly, so it never
+         reaches this boundary and cannot masquerade as user navigation. */
+      if(e.target.closest&&e.target.closest('#mode-calc,#mode-suite')) suiteEntryPinned=false;
+    },true);
+  }
+  return true;
+}
+function hook(){
+  installScrollStability();
+  stabilizeLegacyRenderers();
+  stabilizeAssetsWorkspace();
+  installIncomeRecordFactories();
+  installIncomeAutoAgency();
+  installIncomeReportAutosave();
+  installLoanNaming();
+  installLoanDocumentAutosave();
+  installNationwideCountyLookup();
+  var s = store();
+  /* Start a new file with the suite's Nassau planning ZIP and local lookup. */
+  if(s&&!document.documentElement.dataset.v50ZipStarted){
+    document.documentElement.dataset.v50ZipStarted='1';
+    try{if(!norm(s.activeInputs.zipCode)){s.setField('zipCode','11530','Release 50 default ZIP');s.applyZipLookup();}}catch(e){}
+  }
+  stabilizeZipLookup();
+  wirePropertyTwoWay();
+  wireTaxTwoWay();
+  wireScenarioFieldsTwoWay();
+  syncScenarioProperty(true);
+  if (s && !subscribed && s.subscribe){ subscribed = true; try { s.subscribe(function(){ persistWorkspace(); syncScenarioProperty(true); setTimeout(function(){ soon(false); }, 30); }); } catch(e){} }
+  wireWorkspacePersistence();
+  installIncomeHandoff();
+  installPopupDismissal();
+  decorateIncomeSources();
+  paintIncomeFileActions();
+  renderRecentScenarios(true);
+  installUniversalMenu();
+  installDocumentEngineBridge();
+  mountUnifiedDocuments();
+  installWorkspaceNavigation();
+  deferSuiteInputCommit();
+  wireFileToSetup();
+  installFileSetupDelegation();
+  observeFileSetupMount();
+  /* The primary workspace strip is mounted by a retained legacy layer and
+     can appear after this first hook on a cold load. Retry only the small
+     File-to-Setup binding so File is consistently the setup entry point
+     without adding a continuous listener or repaint loop. */
+  [420,1300,2600].forEach(function(ms){ setTimeout(wireFileToSetup,ms); });
+  pinSuiteEntry();
+  setTimeout(persistWorkspace,0);
+  syncCalculatorIncome(false);
+  document.addEventListener('click', function(e){ if (e.target.closest('#suite-root .tab, #v23SuitePrimaryNav button')) setTimeout(function(){ soon(true); }, 40); }, true);
+}
+if (window.LOS_SCHEDULER && LOS_SCHEDULER.add) LOS_SCHEDULER.add(tick, 1000); else setInterval(tick, 1000);
+/* V35 repaints quote controls every 800ms. Keep the display layer last so
+   fractional percentages never flash as binary floating-point artifacts.
+   This is presentation only, so a gentler cadence avoids needless layout
+   reads while an input is not active. */
+setInterval(function(){ if(!document.hidden) paintFreeformValues(); }, 600);
+document.addEventListener('visibilitychange',function(){ if(!document.hidden){ refreshLive(); scheduleDecor(0,true); } },false);
+setTimeout(function(){ hook(); tick(); }, 260);
+setTimeout(tick, 1200);
+})();
+

@@ -1,0 +1,31 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: npm ci
+      - name: Build (assemble, minify, emit launchers and landing page)
+        run: npm run build
+      - name: Build outputs are committed and current
+        run: git diff --exit-code -- dist index.html
+      - name: Node tests (every script parses, launchers, regression anchors, landing page)
+        run: npm test
+      - name: Install browser
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Landing page click-through from a clean copy of dist/
+        run: sh test/browser/package_check.sh
+      - name: Functional regression battery (calculations, navigation, every dropdown and input)
+        run: sh test/browser/run.sh dist/mortgage-suite-los.html
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist }

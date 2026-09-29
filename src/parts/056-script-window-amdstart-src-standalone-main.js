@@ -1,0 +1,1 @@
+window.__amdStart('src/standalone/main');

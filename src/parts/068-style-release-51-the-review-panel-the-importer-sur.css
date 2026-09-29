@@ -1,0 +1,10 @@
+
+/* Release 51 — the review panel the importer surfaces */
+.v51-review{
+  margin:10px 0; padding:11px 13px; border-radius:10px; font-size:12px; line-height:1.55;
+  background:var(--amber-bg,#fff6e6); border:1px solid var(--amber-line,#f2d39a); color:var(--amber-ink,#8a5a00);
+}
+.v51-review b{ display:block; margin-bottom:5px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+.v51-review ul{ margin:0; padding-left:18px; }
+.v51-review li{ margin:3px 0; }
+

@@ -1,5 +1,11 @@
 # Changelog
 
+Release 54 is documented in [CHANGELOG-v54.md](CHANGELOG-v54.md).
+
+---
+
+# Changelog
+
 ## Release 53.1 - stable navigation icons and document routing
 
 - Added one SVG icon owner for every Loan Suite and Income Calculator group, including Documents, Income, and Qualification.

@@ -1,9 +1,5 @@
-# verification artefacts
-build/shots/
-build/__pycache__/
+node_modules/
+__pycache__/
 *.pyc
-
-# editor / OS
 .DS_Store
-.vscode/
-.idea/
+qa-output/
